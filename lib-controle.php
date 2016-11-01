@@ -8,7 +8,7 @@ function emailCheck($email) {
 	}
 	list($nom, $dom) = explode("@", $email);
  	if (!checkdnsrr($dom)) {
- 		return "Ce nom de domaine n'existe pas";
+ 		return "Le nom de domaine de l'email n'existe pas";
  	}
  	return "Ok";
 }
@@ -72,7 +72,7 @@ function DateCheck($date,$typed,$avecheure,$inverse){
 	}
 }
 function RightCheck(){
-
+	/* A déplacer dans lib x-Prim : code spécifique à une appli */
 	$ar_arg = func_get_args();
 	$ledroit = $ar_arg[0];
 	$mysqli = $ar_arg[1];
