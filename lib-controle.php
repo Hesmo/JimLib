@@ -33,7 +33,7 @@ function phoneCheck($numero,$international){
 * @param integer $inverse si true renvoie au format AAAA-MM-DD HH:II sinon DD-MM-AAAA HH:II
 */
 function DateCheck($date,$typed,$avecheure,$inverse){
-	$date=eregi_replace("[^0-9]", "", $date);
+	$date = preg_replace("/[^0-9]/", "", $date);
 	$sdate = ""; $sheure = "";
 	$j=0; $m=0; $a=0; $h=0; $u=0; $s=0; 
 	if ($avecheure){

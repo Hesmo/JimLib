@@ -65,7 +65,7 @@ function DTBS_sqlbrut($requete,$pointeur){
 		$ar_retour['statut']= false;
 		$ar_retour['erreur']= mysqli_error($pointeur);
 	} else {
-		$ar_retour['nbrec'] = mysqli_num_rows($ar_retour['resultat']);
+			$ar_retour['nbrec'] = @mysqli_num_rows($ar_retour['resultat']);
 	}
 	return $ar_retour;
 

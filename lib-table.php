@@ -157,7 +157,7 @@ function TB_cellule() {
 
 	}
 	
-	$element .= ">\n";
+	$element .= ">";
 	if ($retour == 1) { return $element; } else { echo $element; }
 	
 	

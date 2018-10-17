@@ -8,6 +8,9 @@ function HTML5_title($titre){
 function HTML5_meta($nom,$valeur){
 	echo "<meta $nom=\"$valeur\">\n";
 }
+function HTML5_meta_charset($valeur){
+	echo "<meta charset=\"$valeur\">\n";
+}
 // La fonction ci-dessous à été ajouté pour prendre en charge l'ecriture de la balise meta 
 // avec la forme name="nom" content="contenu"
 // Vérifié la spec w3c pour les balises de mobile et tablette
