@@ -122,6 +122,13 @@ function DTBS_insert_rec(){
 
 
 	$listechamp = mysqli_query($pointeur, "DESCRIBE $table");
+	if (mysqli_num_rows($listechamp)!=count($ar_field)){
+		$ar_retour['statut']= false;
+		$ar_retour['erreur']= "Nombre de champ incorrect Tableau : ".count($ar_field).", bdd : ".mysqli_num_rows($listechamp);
+		// ."\n".print_r($ar_field)
+		return $ar_retour;
+	}
+
 	while ($r=mysqli_fetch_assoc($listechamp)) {
 		$chaine_field .= "`".$r['Field']."`, ";
 		if (substr($ar_field[$cpt],0,5)=="MD5('"){
