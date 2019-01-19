@@ -104,6 +104,17 @@ function FRM_opt() {
 	$element.=">".$texte."&nbsp;&nbsp;</option>\n";
 	if ($retour == 1) { return $element; } else { echo $element; }
 }
+/**
+* Affiche un élément de formulaire de type input
+* @param string $class
+* @param string $type submit par défaut
+* @param string $name 
+* @param integer $valeur 
+* @param integer $action 
+*
+* FRM_bt($class,$type,$name,$valeur,$action,$retour,$style,[$id],[$dsbld])
+* 
+*/
 function FRM_bt() {
 
 	$ar_arg = func_get_args();
