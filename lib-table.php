@@ -113,7 +113,8 @@ function TB_cellule() {
 	{
 		$arg = $ar_arg[0];
 
-		$retour = 0;		if (isset($arg['entete']) && $arg['entete'] == 'th')
+		$retour = 0;		
+		if (isset($arg['entete']) && $arg['entete'] == 'th')
 			$element = "<th ";
 		else
 			$element = "<td ";
@@ -162,8 +163,7 @@ function TB_cellule() {
 	
 	
 }
-function TB_cellule_fin()
-{
+function TB_cellule_fin() {
  	$ar_arg = func_get_args();
  	if (isset( $ar_arg[0])){echo "</th>\n"; }
  	else{ echo "</td>\n"; }

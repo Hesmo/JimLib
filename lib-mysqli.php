@@ -52,6 +52,36 @@ function DTBS_select_join($table1,$table2,$champ,$condjoin,$condition,$tri,$poin
 	}
 	return $ar_retour;
 }
+function DTBS_select_join3($table1,$table2,$table3,$champ,$condjoin,$condjoin2,$condition,$tri,$pointeur) {
+
+	$ar_retour['statut']= true;
+	$ar_retour['erreur']="";
+	$ar_retour['requete']="";
+	$ar_retour['nbrec']=0;
+	$ar_retour['resultat']=0;
+
+	if (trim($table1)==""){ $ar_retour['statut']= false; $ar_retour['erreur'] = "Table non fourni"; return $ar_retour; }
+	if (trim($table2)==""){ $ar_retour['statut']= false; $ar_retour['erreur'] = "Table non fourni"; return $ar_retour; }
+	if (trim($table3)==""){ $ar_retour['statut']= false; $ar_retour['erreur'] = "Table non fourni"; return $ar_retour; }
+	if (trim($condjoin)==""){ $ar_retour['statut']= false; $ar_retour['erreur'] = "Condition N° 1 de jointure non fournie"; return $ar_retour; }
+	if (trim($condjoin2)==""){ $ar_retour['statut']= false; $ar_retour['erreur'] = "Condition N° 2 de jointure non fournie"; return $ar_retour; }
+
+	if (trim($champ)==""){ $champ = "t1.*,t2.*,t3.*"; }
+	$ar_retour['requete'] = "SELECT $champ FROM ($table1 AS t1 LEFT JOIN $table2 AS t2 ON $condjoin) LEFT JOIN $table3 AS t3 ON $condjoin2 ";
+	
+	if (trim($condition)!="")	{ $ar_retour['requete'] .= "WHERE $condition "; }
+	if (trim($tri)!="")			{ $ar_retour['requete'] .= "ORDER BY $tri "; }
+	
+	$ar_retour['resultat'] = mysqli_query($pointeur, $ar_retour['requete']);
+	
+	if (!$ar_retour['resultat']) {
+		$ar_retour['statut']= false;
+		$ar_retour['erreur']= mysqli_error($pointeur);
+	} else {
+		$ar_retour['nbrec'] = mysqli_num_rows($ar_retour['resultat']);
+	}
+	return $ar_retour;
+}
 function DTBS_sqlbrut($requete,$pointeur){
 	
 	$ar_retour['statut']= true;
@@ -120,14 +150,14 @@ function DTBS_insert_rec(){
 	$chaine_value="";
 	$cpt=0;
 
-
+	// Attention si activé empeche le deroulement de la prod
 	$listechamp = mysqli_query($pointeur, "DESCRIBE $table");
-	if (mysqli_num_rows($listechamp)!=count($ar_field)){
+	/*if (mysqli_num_rows($listechamp)!=count($ar_field)){
 		$ar_retour['statut']= false;
 		$ar_retour['erreur']= "Nombre de champ incorrect Tableau : ".count($ar_field).", bdd : ".mysqli_num_rows($listechamp);
 		// ."\n".print_r($ar_field)
 		return $ar_retour;
-	}
+	}*/
 
 	while ($r=mysqli_fetch_assoc($listechamp)) {
 		$chaine_field .= "`".$r['Field']."`, ";
@@ -139,6 +169,7 @@ function DTBS_insert_rec(){
 		$cpt++;
 	}
 	$chaine_value  = str_replace("'NOW()'","NOW()",$chaine_value);
+	$chaine_value  = str_replace("'-NULL-'","NULL",$chaine_value);
 	$chaine_field  = substr($chaine_field,0,strlen($chaine_field)-2);
 	$chaine_field .= " ) VALUES (";
 	$chaine_value  = substr($chaine_value,0,strlen($chaine_value)-2);

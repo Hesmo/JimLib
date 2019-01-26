@@ -64,6 +64,7 @@ function HTML5_nav_off(){
 	echo "</nav>\n";
 }
 function HTML5_href(){
+	
 	$nbarg = func_num_args();
 	$ar_arg = func_get_args();
 	
@@ -77,17 +78,21 @@ function HTML5_href(){
 	if ($typeanc == "java"){
 		$nomscript = $ar_arg[6];
 		$ar_param  = $ar_arg[7];
-		$box =  "<a title=\"$title\" href=\"javascript:".$nomscript."(";
+		if (isset($ar_arg[8]) AND $ar_arg[8]!==""){  $balisedownload = "download=\"".$ar_arg[8]."\""; } else { $balisedownload="";}	
+		if (isset($ar_arg[9]) AND $ar_arg[9]!==""){  $idhref = "id=\"".$ar_arg[9]."\""; } else { $idhref="";}
+		$box =  "<a title=\"$title\" ${balisedownload} ${idhref} href=\"javascript:".$nomscript."(";
 		if (is_array($ar_param)){
 			$raccord = "'".implode("','",$ar_param)."'";
 			$box .= $raccord;
 			$box = str_replace("'event'","event",$box);
-			
+			$box = str_replace("'this.form'","this.form",$box);
 		}
 		$box = $box.')"';
 	} else {
 		$url = $ar_arg[6];
 		$target = $ar_arg[7];
+		if (isset($ar_arg[8]) AND $ar_arg[8]!==""){  $balisedownload = "download=\"".$ar_arg[8]."\""; } else { $balisedownload="";}
+		if (isset($ar_arg[9]) AND $ar_arg[9]!==""){  $idhref = "id=\"".$ar_arg[9]."\""; } else { $idhref="";}
 		$box = "<a title=\"$title\" href=\"".$url."\"";
 		if ($target!="") {$box=$box." target=\"".$target."\"";} else {$box=$box." target=\"_self\"";}
 	}
@@ -144,8 +149,7 @@ function HTML5_P() {
 
 	$ar_arg = func_get_args();
 
-	if (is_array($ar_arg[0]) && count($ar_arg) == 1)
-	{
+	if (is_array($ar_arg[0]) && count($ar_arg) == 1) {
 		$arg = $ar_arg[0];
 		$retour = 0;
 		$element = "<p ";

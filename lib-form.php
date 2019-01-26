@@ -37,14 +37,15 @@ function FRM_it(){
 	$action = $ar_arg[7]; // Script associé  (optionnel)
 	$style  = $ar_arg[8]; // Style 
 	if (isset($ar_arg[9]) AND ($ar_arg[9] == 1)){ $autocomplete = "off"; }
-
 	// Parametre ajouté voire http://www.w3schools.com/tags/att_input_type.asp
 	if (isset($ar_arg[10]) AND (trim($ar_arg[10]) != "")){ 
-		$element = "$text<input type=\"".$ar_arg[10]."\"";
+		$element = "$text<input type=\"".$ar_arg[10]."\" ";
 	} else {
-		$element = "$text<input type=\"text\"";
+		$element = "$text<input type=\"text\" ";
 	}
 	if (isset($ar_arg[11]) AND ($ar_arg[11] == 1)){ $element .= " readonly"; }
+	if (isset($ar_arg[12]) AND ($ar_arg[12] != "")){ $placeholder = $ar_arg[12]; }
+	
 	
 	if ($class!="")  { $element.= " class=\"$class\"";}
 	if ($size!="") 	 { $element.= " size=\"$size\"";}
@@ -54,10 +55,10 @@ function FRM_it(){
 	if ($valeur!="") { $element.= " value='".htmlspecialchars($valeur,ENT_QUOTES)."'";}  
 	if ($action!="") { $element.= " $action";}
 	if (isset($autocomplete)) { $element.= " autocomplete=\"off\"";}
+	if (isset($placeholder)) { $element.= " placeholder=\"".$placeholder."\"";}
 
 	$element .=">\n";
 	if ($retour == 1) { return $element; } else { echo $element; }
-	
 	
 }
 function FRM_se() {
@@ -96,11 +97,13 @@ function FRM_opt() {
 	$texte		= $ar_arg[3];
 	$retour   	= $ar_arg[4];
 	$style    	= $ar_arg[5];
+	if (isset($ar_arg[6])) { $data = $ar_arg[6]; }
 	
 	$element = "<option value=\"$valeur\"";
 	if ($style!="")     {$element.= " style=\"$style\"";}
 	if ($selection) {$element .=" selected=\"selected\" ";}
 	if (trim($class)!=""){$element.=" class=\"".$class."\" ";}
+	if (isset($ar_arg[6])) { $element.= $data." "; }
 	$element.=">".$texte."&nbsp;&nbsp;</option>\n";
 	if ($retour == 1) { return $element; } else { echo $element; }
 }
@@ -134,7 +137,7 @@ function FRM_bt() {
 	if (trim($valeur)=="")	{ $valeur="Ok"; }
 	$element = "<input";
 	if (trim($id)!=""){ $element .= " id=\"$id\" "; }
-	$element .= " type=\"$type\" class=\"$class\" name=\"$name\" value=\"$valeur\" ".$action." style=\"$style\"/ $dsbld>\n";
+	$element .= " type=\"$type\" class=\"$class\" name=\"$name\" value=\"$valeur\" ".$action." style=\"$style\" $dsbld>\n";
 	if ($retour == 1) { return $element; } else { echo $element; }
 }
 function FRM_hidden() {
@@ -217,12 +220,16 @@ function FRM_ir() {
 	$retour	 = $ar_arg[7];
 	$id		 = $ar_arg[8];
 
-	$element = "<input type=radio class=\"$class\" name=\"$name\" value=\"$value\"";
-	if ($checked==1){ $element .= " checked"; }
-	if (trim($action)!=""){ $element .= " ".$action; }
+	$element = "<input type=\"radio\"";
+	if ($class!="")	{$element .=" class=\"$class\""; }
+	if ($style!="") {$element .=" style=\"$style\"";}
+	if ($name!="")	{$element .=" name=\"$name\"";}
+	if ($value!="")	{$element .=" value=\"$value\"";}
+	if ($checked==1){$element .= " checked";}
+	if (trim($action)!=""){$element .= " ".$action; }
 	if (trim($id)!=""){ $element .= " id=\"$id\""; }
 	
-	$element = $element.">".$text."\n";
+	$element .= ">".$text."\n";
 	if ($retour == 1) { return $element; } else { echo $element; }
 }
 function FRM_ta() {
@@ -264,5 +271,14 @@ function FRM_upload($ar_param) {
 		if ($ar_param['retour']==1){ return $element; }
 	} 
 	echo $element;
+}
+function FRM_fieldset($OnOff,$Legend,$Affiche,$Style){
+	if ($OnOff) { 
+		$element = "<fieldset style=\"$Style\">\n"; 
+		if (trim($Legend)!=""){ $element.= "<legend>&nbsp;$Legend&nbsp;</legend>\n"; }
+	} else { 
+		$element = "</fieldset>\n"; 
+	}
+	if ($Affiche) { echo $element; } else { return $element; }
 }
 ?>

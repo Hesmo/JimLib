@@ -62,7 +62,102 @@ function CV_calculsumean13($digit12){
 
 	return $checksum;
 }
+/**
+* RETOURNE UN TABLEAU A PARTIR D'UNE CHAINE FOURNIT PAR UN BADGE
+*
+* @param string $lu la chaine lu par le lecteur rfid
+* ar_retour[0] la chaine fourni en argumant (nombre de 10 digit ou chaine de caractère symbole sous les chiffres sans shifts)
+* ar_retour[1] la chaine fourni en argumant converti en un nombre de 10 digit
+* ar_retour[2] 1ere partie du code hexadecimal
+* ar_retour[3] 2eme partie du code hexadecimal
+*/
+function CV_nbadge($lu){
 
+	//    1 2 3 4 5 6 7 8 9 0
+	//    & é " ' ( § è ! ç à   // Clavier MAC
+	// 	  & é " ' ( - è _ ç à   // Clavier PC
+	// La ligne suivantes transforme une saisie mac en saisie pc
+	$lu = str_replace("§","-", $lu); $lu = str_replace("!","_", $lu);
+
+	$patterns[1] = "/&/";
+	$patterns[2] = "/é/";
+	$patterns[3] = "/\"/";
+	$patterns[4] = "/'/";
+	$patterns[5] = "/\(/";
+	$patterns[6] = "/-/";
+	$patterns[7] = "/è/";
+	$patterns[8] = "/_/";
+	$patterns[9] = "/ç/";
+	$patterns[10] = "/à/";
+
+	$replacements = array(1=>"1","2","3","4","5","6","7","8","9","0");
+
+
+	return(preg_replace($patterns,$replacements,$lu));
+
+/*	
+	Tentaive de conversion 10d8h pas résolu
+	$ar_retour[2] = hexdec(substr(dechex($ar_retour[1]),0,2));
+	$ar_retour[3] = hexdec(substr(dechex(substr($ar_retour[1],-7)),-4));
+*/
+	
+	return($ar_retour);
+
+}
+/**********************************************************
+* CALCUL UNE ECHEANCE (POUR LA COMPTA)
+*
+* @param int $lestamp - TimeStamp de la date de depart
+* @param string $lecheance - Code de l'echeance (propre a xprim)
+* @param string $lecalcul - Formule de calcul de l'échéance
+*/
+function CV_echeance_mdr($lestamp,$lecheance,$lecalcul){
+	
+	$ar_dureemois = array(1=>31,2=>28,3=>31,4=>30,5=>31,6=>30,7=>31,8=>31,9=>30,10=>31,11=>30,12=>31);
+	$ar_retour = array('statut'=>false,'humain'=>'','mysql'=>'','msgerreur'=>'');
+	//$lejour=date("j",$lestamp); $lemois=date("n",$lestamp); $lannee=date("Y",$lestamp); 
+	$ar_ac=explode(";",$lecalcul);
+	$echeance = $lestamp;
+
+	if ($ar_ac[1]!=0){ 
+		// Ajout du nombre de jour
+		$echeance = $lestamp + (preg_replace("/[^0-9]/", "", $ar_ac[0]) * 24 * 3600);
+	} else {
+		$ar_retour['msgerreur']='Mode de reglement non calculable';
+		return $ar_retour;
+	}
+
+	if (isset($ar_ac[1])){ 
+
+		// Fixe la fin du mois (Au 27/12/2018 ar_ac[1] est toujours égal à fm)
+		if ($ar_ac[1]=='fm'){  
+			$lannee = date("Y",$echeance);
+			$lemois = date("n",$echeance);
+			$lejour = $ar_dureemois[$lemois];
+			// SI Annee bisextile ajoute un jour au mois de février
+			if ((floor($lannee/4) == ($lannee/4)) AND $lemois=2 ){
+				$lejour++;
+			}
+			$echeance = mktime(0,0,1,$lemois,$lejour,$lannee);
+		}
+
+	}
+
+	if (isset($ar_ac[2])){ 
+		// Pas de test sur la chaine de carac car il n'y a que des dm (Au 27/12/2018 ar_ac[2] a tooujours dm en suffixe)
+		$lejour = preg_replace("/[^0-9]/", "", $ar_ac[2]);
+		$lannee = date("Y",$echeance);
+		$lemois = date("n",$echeance) + 1;
+		if ($lemois==13){ $lemois=1; $lannee++; }
+		$echeance = mktime(0,0,1,$lemois,$lejour,$lannee);
+		
+	}
+		
+	$ar_retour['humain'] = sprintf("%02d",$lejour)."/".sprintf("%02d",$lemois)."/".$lannee;
+	$ar_retour['mysql'] = $lannee."-".sprintf("%02d",$lemois)."-".sprintf("%02d",$lejour);
+	return $ar_retour;
+	
+}
 
 
 

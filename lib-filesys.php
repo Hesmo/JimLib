@@ -3,7 +3,7 @@ function FILESYS_filtre_dir_link($var){ return !is_link($var); }
 function FILESYS_filtre_dir_file($var){ return !is_file($var); }
 function FILESYS_filtre_dir_dir($var) { return !is_dir($var);  }
 function FILESYS_filtre_dir_hide($var) {  if (substr($var,0,1)==".") { return false; } else { return true; } }
-
+function FILESYS_filtre_eaDir($var) {  if (substr($var,-6)=="@eaDir") { return false; } else { return true; } }
 
 function FILESYS_lit_repertoire($path,$file,$link,$dir,$hidden){
 
@@ -18,9 +18,13 @@ function FILESYS_lit_repertoire($path,$file,$link,$dir,$hidden){
 	if (!$d=opendir($path)){  $ar_retout['txterreur'] = "Lecture du répertoire impossible"; return $ar_retour; }	
 	// Charge la liste des fichiers
 	while ( $fichier = readdir($d) ) { 
-		array_push($ar_retour['fichiers'],$path.$fichier); 
+		$clef = fileinode ($path.$fichier);
+		$ar_retour['fichiers'][$clef]=$path.$fichier;
+		//array_push($ar_retour['fichiers'],$path.$fichier); 
 	}
 
+	// Supprime les repertoires eaDir
+	$ar_retour['fichiers'] = array_filter($ar_retour['fichiers'],'FILESYS_filtre_eaDir');
 	// Supprime les liens symboliques
 	if (!$link){  $ar_retour['fichiers'] = array_filter($ar_retour['fichiers'],'FILESYS_filtre_dir_link'); }
 	// Supprime les fichiers réguliers

@@ -42,6 +42,7 @@ function DateCheck($date,$typed,$avecheure,$inverse){
 		$sdate = substr($date,0,8);
 		$h=substr($sheure,0,2); $u=substr($sheure,2,2); $s=substr($sheure,-2);
 	} else {
+		if (strlen($date)== 6){  $date = substr($date,0,4)."20".substr($date,-2); } // "Pouet pouet et le bug de l'an 3000"
 		if (strlen($date)!= 8){ return("Erreur;Le format de la date est incorrecte"); exit; }
 		$sdate = $date;
 	}
