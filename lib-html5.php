@@ -1,6 +1,6 @@
 <?Php
 function HTML5_doctype(){ 
-	echo "<!doctype html>\n<html>\n<head>\n";
+	echo "<!doctype html>\n<html lang='fr'>\n<head>\n";
 }
 function HTML5_title($titre){
 	echo "<title>$titre</title>\n";
@@ -94,7 +94,7 @@ function HTML5_href(){
 		if (isset($ar_arg[8]) AND $ar_arg[8]!==""){  $balisedownload = "download=\"".$ar_arg[8]."\""; } else { $balisedownload="";}
 		if (isset($ar_arg[9]) AND $ar_arg[9]!==""){  $idhref = "id=\"".$ar_arg[9]."\""; } else { $idhref="";}
 		$box = "<a title=\"$title\" href=\"".$url."\"";
-		if ($target!="") {$box=$box." target=\"".$target."\"";} else {$box=$box." target=\"_self\"";}
+		if ($target!="") {$box=$box." ${balisedownload}  ${idhref} target=\"".$target."\"";} else {$box=$box." target=\"_self\"";}
 	}
 
 	if ($style!=""){$box.="style='".$style."'";}

@@ -95,26 +95,16 @@ function DTBS_sqlbrut($requete,$pointeur){
 		$ar_retour['statut']= false;
 		$ar_retour['erreur']= mysqli_error($pointeur);
 	} else {
+		if (strtoupper(substr($requete,0,6))=="SELECT"){ 
 			$ar_retour['nbrec'] = @mysqli_num_rows($ar_retour['resultat']);
+		} else {
+			$ar_retour['nbrec'] = @mysqli_affected_rows($pointeur);	
+		}
+		
 	}
 	return $ar_retour;
 
 }
-/*
-Desactivé car doublon avec la func du dessous qui est mieux faite  (plus sure)
-function DTBS_get_array_enum($table,$field,$pointeur){
-
-	$descfield = mysqli_query($pointeur, "SHOW COLUMNS FROM ".$table." LIKE '".$field."'");
-	$df = mysqli_fetch_assoc($descfield);
-	
-	$ligne = str_replace("enum(","",$df['Type']);
-	$ligne = str_replace(")","",$ligne);
-	$ligne = str_replace("'","",$ligne);
-	
-	$ar_listenum = explode(",",$ligne);
-	return $ar_listenum;
-
-}*/
 function DTBS_get_choice_enum($table,$field,$pointeur){
 
 	// Idée d'amélioration : renvoyer la valeur par défaut du champ pour fixer correctement les listes déroulantes

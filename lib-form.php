@@ -46,7 +46,6 @@ function FRM_it(){
 	if (isset($ar_arg[11]) AND ($ar_arg[11] == 1)){ $element .= " readonly"; }
 	if (isset($ar_arg[12]) AND ($ar_arg[12] != "")){ $placeholder = $ar_arg[12]; }
 	
-	
 	if ($class!="")  { $element.= " class=\"$class\"";}
 	if ($size!="") 	 { $element.= " size=\"$size\"";}
 	if ($style!="")  { $element.= " style=\"$style\"";}
@@ -139,6 +138,7 @@ function FRM_bt() {
 	if (trim($id)!=""){ $element .= " id=\"$id\" "; }
 	$element .= " type=\"$type\" class=\"$class\" name=\"$name\" value=\"$valeur\" ".$action." style=\"$style\" $dsbld>\n";
 	if ($retour == 1) { return $element; } else { echo $element; }
+
 }
 function FRM_hidden() {
 
@@ -192,7 +192,6 @@ function FRM_cb() {
 	$action	 = $ar_arg[5];
 	$retour	 = $ar_arg[6];
 	if (isset($ar_arg[7])){$valeur=$ar_arg[7];}
-	
 
 	$element = "<input type=\"checkbox\"";
 	if ($class!="")	{$element .=" class=\"$class\""; }
@@ -201,7 +200,7 @@ function FRM_cb() {
 	if ($checked==1){$element .= "checked";}
 	if ($action!=""){$element .=" ".$action;}
 	if (isset($valeur)){$element .="  value=\"$valeur\"";}
-	if (isset($ar_arg[8]) AND ($ar_arg[8] == 1)){ $element .= "onclick='return false;'"; }
+	if (isset($ar_arg[8]) AND ($ar_arg[8] == 1)){ $element .= "onclick='return false;'"; } // Equivalent de readonly
 	$element .= "/>".$text."\n";
 	if ($retour == 1) { return $element; } else { echo $element; }
 

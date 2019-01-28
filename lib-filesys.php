@@ -13,9 +13,9 @@ function FILESYS_lit_repertoire($path,$file,$link,$dir,$hidden){
 	$ar_retour['txterreur'] = "";
 
 	// Test si le path est un repertoire
-	if (!is_dir($path)){ $ar_retout['txterreur'] = "Ce n'est pas un répertoire"; return $ar_retour; }
+	if (!is_dir($path)){ $ar_retour['txterreur'] = "Ce n'est pas un répertoire"; return $ar_retour; }
 	// Ouvre le repertoire 
-	if (!$d=opendir($path)){  $ar_retout['txterreur'] = "Lecture du répertoire impossible"; return $ar_retour; }	
+	if (!$d=opendir($path)){  $ar_retour['txterreur'] = "Lecture du répertoire impossible"; return $ar_retour; }	
 	// Charge la liste des fichiers
 	while ( $fichier = readdir($d) ) { 
 		$clef = fileinode ($path.$fichier);
