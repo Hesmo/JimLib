@@ -216,7 +216,7 @@ function DTBS_efface_rec(){
 	$pointeur = $ar_arg[2];
 	
 	$efface = mysqli_query($pointeur, "DELETE FROM $table WHERE $clause");
-	
+	//jimlogperso("DELETE FROM $table WHERE $clause");
 	return $efface;
 		
 }
