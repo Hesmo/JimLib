@@ -90,6 +90,17 @@ function AlphaNumCheck($chaine){
 	return($chaine);
 
 }
+// Remplace la fonction de lib-dv.php creemotdepasse(x)
+function PwdGet($nbcaracteres) {
+	
+	$pwd="";
+	$caracterespossibles = "abcdefghjkmnpqrstuvwxyz123456789"; // liste des caract&egrave;res que l'on peut utiliser <br />
+	srand((double)microtime()*1000000);
+	for($i=0; $i<$nbcaracteres; $i++) {
+		$pwd .= $caracterespossibles[rand()%strlen($caracterespossibles)]; 
+	}
+	return $pwd;
 
+}
 
 ?>
