@@ -153,6 +153,8 @@ function DTBS_insert_rec(){
 		$chaine_field .= "`".$r['Field']."`, ";
 		if (substr($ar_field[$cpt],0,5)=="MD5('"){
 			$chaine_value .= $ar_field[$cpt].", ";
+		} elseif (substr($ar_field[$cpt],0,6)=="SHA2('") {
+			$chaine_value .= $ar_field[$cpt].", ";
 		} else {
 			$chaine_value .= "'".$ar_field[$cpt]."', ";
 		}
