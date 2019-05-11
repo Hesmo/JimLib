@@ -156,6 +156,11 @@ function DTBS_insert_rec(){
 		} else {
 			$chaine_value .= "'".$ar_field[$cpt]."', ";
 		}
+		if (substr($ar_field[$cpt],0,6)=="SHA2('"){
+			$chaine_value .= $ar_field[$cpt].", ";
+		} else {
+			$chaine_value .= "'".$ar_field[$cpt]."', ";
+		}
 		$cpt++;
 	}
 	$chaine_value  = str_replace("'NOW()'","NOW()",$chaine_value);
