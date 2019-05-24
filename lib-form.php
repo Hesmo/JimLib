@@ -10,6 +10,10 @@ function FRM_form(){
 	$target = $ar_arg[4]; // Cible après la soumission du formulaire
 	$retour = $ar_arg[5]; // Affiche ou renvoi le résultat de la fonction
 	
+	if (isset($ar_arg[6])){
+		$onsubmit = $ar_arg[6];
+	}
+
 	if (trim($method) == ""){ $method = "post"; }
 	
 	$element = "<form method=\"$method\"";
@@ -17,6 +21,7 @@ function FRM_form(){
 	if (trim($action) != "") {$element .= " action=\"$action\"";}
 	if (trim($class) != "") {$element .= " class=\"$class\"";}
 	if (trim($target) != "") {$element .= " target=\"$target\"";}
+	if (isset($onsubmit)){ $element .= " ".$onsubmit." "; }	
 	$element .= ">\n";
 	if ($retour == 1) { return $element; } else { echo $element; }
 
