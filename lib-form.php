@@ -265,16 +265,17 @@ function FRM_upload($ar_param) {
 
 	// Fonction jamais testé a voir...
 	$element = "<form method=\"post\" enctype=\"multipart/form-data\"";
-	if (isset($ar_param['name'])){ $element .= " name=\"".$ar_param['name']."\\"; }
-	if (isset($ar_param['action'])){ $element .= " action=\"".$ar_param['action']."\\"; }
-	if (isset($ar_param['class'])){ $element .= " class=\"".$ar_param['class']."\\"; }
-	if (isset($ar_param['target'])){ $element .= " target=\"".$ar_param['target']."\\"; }
+	if (isset($ar_param['name'])){ $element .= " name=\"".$ar_param['name']."\""; }
+	if (isset($ar_param['action'])){ $element .= " action=\"".$ar_param['action']."\""; }
+	if (isset($ar_param['class'])){ $element .= " class=\"".$ar_param['class']."\""; }
+	if (isset($ar_param['target'])){ $element .= " target=\"".$ar_param['target']."\""; }
 	$element=$element.">\n";
 
 	if (isset($ar_param['retour'])){
 		if ($ar_param['retour']==1){ return $element; }
 	} 
 	echo $element;
+	
 }
 function FRM_fieldset($OnOff,$Legend,$Affiche,$Style){
 	if ($OnOff) { 
