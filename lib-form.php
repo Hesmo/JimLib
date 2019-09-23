@@ -261,21 +261,65 @@ function FRM_ta() {
 	
 	if ($retour == 1) { return $element; } else { echo $element; }
 }
+/**
+* Affiche un Formulaire de téléchargement de fichier
+* @param string $ar_param['name']
+* @param string $ar_param['action']
+* @param string $ar_param['class']
+* @param string $ar_param['target']
+* @param string $ar_param['idfile']
+* @param string $ar_param['namefile']
+* @param integer $ar_param['multiple']  0 ou 1
+* @param string $ar_param['idbutton']
+* @param string $ar_param['valuebutton'] // Si vide autorempli
+* @param integer $ar_param['retour']
+* @param string $ar_param['stylebtinput']  // Si vide autorempli
+* @param string $ar_param['stylebtbutton'] // Si vide autorempli
+* @param string $ar_param['maxfilesize']
+
+*
+* FRM_upload($name,$action,$class,$target,$idfile,$namefile,$multiple,$idbutton,$valuebutton,$stylebtinput,$stylebtbutton, $maxfilesize, $retour)
+* 
+*/
 function FRM_upload($ar_param) {
 
-	// Fonction jamais testé a voir...
+	if (!isset($ar_param['stylebtinput'])){
+		$ar_param['stylebtinput'] = "margin: 5px; padding: 5px; background: white; border: 1px solid black; color: black; font-size: 100%; text-shadow: 2px 2px #cacaca; box-shadow: 2px 2px 2px #000000; text-align:center; height:38px; ";
+	}
+
 	$element = "<form method=\"post\" enctype=\"multipart/form-data\"";
 	if (isset($ar_param['name'])){ $element .= " name=\"".$ar_param['name']."\""; }
 	if (isset($ar_param['action'])){ $element .= " action=\"".$ar_param['action']."\""; }
 	if (isset($ar_param['class'])){ $element .= " class=\"".$ar_param['class']."\""; }
 	if (isset($ar_param['target'])){ $element .= " target=\"".$ar_param['target']."\""; }
-	$element=$element.">\n";
+	$element .= ">\n";
+
+	if (!isset($ar_param['idfile'])){ echo "Erreur, manque le parametre idfile"; exit(); }
+	if (!isset($ar_param['namefile'])){ echo "Erreur, manque le parametre namefile"; exit(); }
+	$element .= "<input type=\"file\" id=\"".$ar_param['idfile']."\" name=\"".$ar_param['namefile']."\"";
+	if (isset($ar_param['multiple']) AND $ar_param['multiple']){ $element .= " multiple/ "; }
+	$element .= "style=\"".$ar_param['stylebtinput']."\"";
+	$element .= ">\n";
+
+	$element .= FRM_hidden("max_file_size",$ar_param['maxfilesize'],1);
+
+
+	if (!isset($ar_param['stylebtbutton'])){
+		$ar_param['stylebtbutton'] = "margin: 5px; padding: 5px; background: grey; border: 1px solid black; color: white; font-size: 100%; text-shadow: 2px 2px black; box-shadow: 2px 2px 2px #000000; text-align:center; height:38px; float:right; ";
+	}
+
+	if (!isset($ar_param['idbutton'])){ echo "Erreur, manque le parametre idbutton"; exit(); }
+	$element .= "<br/><input type=\"submit\" id=\"".$ar_param['idbutton']."\" ";
+	$element .= "id=\"".$ar_param['idbutton']."\" name=\"btsubmitfile\" ";
+	$element .= "value=\"".$ar_param['valuebutton']."\" ";
+	$element .= "style=\"".$ar_param['stylebtbutton']."\">";
+	
 
 	if (isset($ar_param['retour'])){
 		if ($ar_param['retour']==1){ return $element; }
 	} 
 	echo $element;
-	
+
 }
 function FRM_fieldset($OnOff,$Legend,$Affiche,$Style){
 	if ($OnOff) { 
