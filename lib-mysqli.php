@@ -212,13 +212,11 @@ function DTBS_modif_rec(){
 function DTBS_efface_rec(){
 	
 	$ar_arg = func_get_args();
-	
 	$table    = $ar_arg[0];
 	$clause	  = $ar_arg[1];
 	$pointeur = $ar_arg[2];
-	
+
 	$efface = mysqli_query($pointeur, "DELETE FROM $table WHERE $clause");
-	//jimlogperso("DELETE FROM $table WHERE $clause");
 	return $efface;
 		
 }
