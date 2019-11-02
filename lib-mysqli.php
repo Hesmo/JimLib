@@ -1,4 +1,16 @@
 <?Php
+/**
+ * Construit et execute une instruction SQL select simple
+ *
+ * @param      string  $table      la table sur laquel porte la requete
+ * @param      string  $champ      les champs retournÃ©s, si vide retourne tout les champs
+ * @param      string  $condition  le filtre de la requete
+ * @param      string  $groupby    clause de regroupement
+ * @param      string  $tri        clause de tri
+ * @param      integer  $pointeur   pointeur vers une connexion mysql
+ *
+ * @return     array  $ar_retour Tableau avec des informations sur le retour de la requete (statut, erreur, requete, nbrec, resultat)
+ */
 function DTBS_select($table,$champ,$condition,$groupby,$tri,$pointeur) {
 
 	$ar_retour['statut']= true;
@@ -63,8 +75,8 @@ function DTBS_select_join3($table1,$table2,$table3,$champ,$condjoin,$condjoin2,$
 	if (trim($table1)==""){ $ar_retour['statut']= false; $ar_retour['erreur'] = "Table non fourni"; return $ar_retour; }
 	if (trim($table2)==""){ $ar_retour['statut']= false; $ar_retour['erreur'] = "Table non fourni"; return $ar_retour; }
 	if (trim($table3)==""){ $ar_retour['statut']= false; $ar_retour['erreur'] = "Table non fourni"; return $ar_retour; }
-	if (trim($condjoin)==""){ $ar_retour['statut']= false; $ar_retour['erreur'] = "Condition N° 1 de jointure non fournie"; return $ar_retour; }
-	if (trim($condjoin2)==""){ $ar_retour['statut']= false; $ar_retour['erreur'] = "Condition N° 2 de jointure non fournie"; return $ar_retour; }
+	if (trim($condjoin)==""){ $ar_retour['statut']= false; $ar_retour['erreur'] = "Condition NÂ° 1 de jointure non fournie"; return $ar_retour; }
+	if (trim($condjoin2)==""){ $ar_retour['statut']= false; $ar_retour['erreur'] = "Condition NÂ° 2 de jointure non fournie"; return $ar_retour; }
 
 	if (trim($champ)==""){ $champ = "t1.*,t2.*,t3.*"; }
 	$ar_retour['requete'] = "SELECT $champ FROM ($table1 AS t1 LEFT JOIN $table2 AS t2 ON $condjoin) LEFT JOIN $table3 AS t3 ON $condjoin2 ";
@@ -107,7 +119,7 @@ function DTBS_sqlbrut($requete,$pointeur){
 }
 function DTBS_get_choice_enum($table,$field,$pointeur){
 
-	// Idée d'amélioration : renvoyer la valeur par défaut du champ pour fixer correctement les listes déroulantes
+	// IdÃ©e d'amÃ©lioration : renvoyer la valeur par dÃ©faut du champ pour fixer correctement les listes dÃ©roulantes
 	$champs = mysqli_query($pointeur,"SHOW COLUMNS FROM ".$table." LIKE '".$field."'");
 	$colchamps = mysqli_fetch_assoc($champs);
 	
@@ -140,7 +152,7 @@ function DTBS_insert_rec(){
 	$chaine_value="";
 	$cpt=0;
 
-	// Attention si activé empeche le deroulement de la prod
+	// Attention si activÃ© empeche le deroulement de la prod
 	$listechamp = mysqli_query($pointeur, "DESCRIBE $table");
 	/*if (mysqli_num_rows($listechamp)!=count($ar_field)){
 		$ar_retour['statut']= false;
