@@ -182,7 +182,9 @@ function DTBS_insert_rec(){
 	$ar_retour['requete'] = $chaine_field.$chaine_value;
 	$ar_retour['resultat'] = mysqli_query($pointeur,$chaine_field.$chaine_value);
 	$ar_retour['insert_id'] = mysqli_insert_id($pointeur);
-	
+
+	//jimlogperso($ar_retour['requete']);
+
 	if (!$ar_retour['resultat']) {
 		$ar_retour['statut']= false;
 		$ar_retour['erreur']= mysqli_error($pointeur);
