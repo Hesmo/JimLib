@@ -321,6 +321,7 @@ function FRM_upload($ar_param) {
 	echo $element;
 
 }
+/*
 function FRM_fieldset($OnOff,$Legend,$Affiche,$Style){
 	if ($OnOff) { 
 		$element = "<fieldset style=\"$Style\">\n"; 
@@ -330,4 +331,5 @@ function FRM_fieldset($OnOff,$Legend,$Affiche,$Style){
 	}
 	if ($Affiche) { echo $element; } else { return $element; }
 }
+*/
 ?>

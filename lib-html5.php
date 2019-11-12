@@ -99,7 +99,7 @@ function HTML5_href(){
 
 	if ($style!=""){$box.="style='".$style."'";}
 	if ($class!=""){$box.="class='".$class."'";}
-	$box.= ">\n".$afficher."</a>";
+	$box.= ">".$afficher."</a>";
 	if ($retour == 1) {return $box;} else {echo $box;}
 }
 // A utiliser en dernier recour
