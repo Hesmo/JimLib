@@ -266,4 +266,34 @@ function DTBS_table_statut($bdd,$table,$pointeur){
 	return $ar_retour;
 
 }
+/**
+ * Gere les modes de transaction
+ *
+ * @param      string  $action  start, cancel ou valid
+ * @return     string  Renvoi ok ou une chaine en cas d'erreur
+ * 
+ */
+function DTBS_transaction($action){
+
+	global $mysqli;
+	switch ($action){
+		case 'start':
+			$resultat = mysqli_query($mysqli, "SET autocommit = 0;");
+			if (!$resultat){ return "Echec de l'activation du mode transactionnel"; }
+			$resultat = mysqli_query($mysqli,"START TRANSACTION;");
+			if (!$resultat){ return "Echec du démarrage de la transaction"; }
+			return "Ok";
+		break;
+		case 'cancel':
+			$resultat = mysqli_query($mysqli, "ROLLBACK;");
+			$resultat = mysqli_query($mysqli, "SET autocommit = 1;");
+			return "Ok";
+		break;
+		case 'valid':
+			$resultat = mysqli_query($mysqli, "COMMIT;");
+			$resultat = mysqli_query($mysqli, "SET autocommit = 1;");
+			return "Ok";
+		break;
+	}
+}
 ?>
