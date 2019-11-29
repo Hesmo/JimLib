@@ -283,9 +283,10 @@ function FRM_ta() {
 */
 function FRM_upload($ar_param) {
 
-	if (!isset($ar_param['stylebtinput'])){
+	$ar_param['stylebtinput']="";
+	/*if (!isset($ar_param['stylebtinput'])){
 		$ar_param['stylebtinput'] = "margin: 5px; padding: 5px; background: white; border: 1px solid black; color: black; font-size: 100%; text-shadow: 2px 2px #cacaca; box-shadow: 2px 2px 2px #000000; text-align:center; height:38px; ";
-	}
+	}*/
 
 	$element = "<form method=\"post\" enctype=\"multipart/form-data\"";
 	if (isset($ar_param['name'])){ $element .= " name=\"".$ar_param['name']."\""; }
@@ -304,15 +305,16 @@ function FRM_upload($ar_param) {
 	$element .= FRM_hidden("max_file_size",$ar_param['maxfilesize'],1);
 
 
-	if (!isset($ar_param['stylebtbutton'])){
+	$ar_param['stylebtbutton']="";
+	/*if (!isset($ar_param['stylebtbutton'])){
 		$ar_param['stylebtbutton'] = "margin: 5px; padding: 5px; background: grey; border: 1px solid black; color: white; font-size: 100%; text-shadow: 2px 2px black; box-shadow: 2px 2px 2px #000000; text-align:center; height:38px; float:right; ";
-	}
+	}*/
 
 	if (!isset($ar_param['idbutton'])){ echo "Erreur, manque le parametre idbutton"; exit(); }
-	$element .= "<br/><input type=\"submit\" id=\"".$ar_param['idbutton']."\" ";
+	$element .= "<br/><input class=\"btflat\" type=\"submit\" id=\"".$ar_param['idbutton']."\" ";
 	$element .= "id=\"".$ar_param['idbutton']."\" name=\"btsubmitfile\" ";
 	$element .= "value=\"".$ar_param['valuebutton']."\" ";
-	$element .= "style=\"".$ar_param['stylebtbutton']."\">";
+	$element .= "style=\"float: right; margin-top:15px;\">";
 	
 
 	if (isset($ar_param['retour'])){
