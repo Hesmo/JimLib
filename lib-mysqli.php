@@ -1,9 +1,15 @@
 <?Php
+/* Liste des codes erreurs et traduction en langage courant */
+$ar_errmysql[1451] = "Suppression impossible, enregistrement utilisé dans une autre table";
+$ar_errmysql[1062] = "Ajout impossible, enregistrement déjà présent";
+$ar_errmysql[1452] = "Action impossible, en raison d'une contrainte de clé etrangère";
+
+
 /**
  * Construit et execute une instruction SQL select simple
  *
  * @param      string  $table      la table sur laquel porte la requete
- * @param      string  $champ      les champs retournÃ©s, si vide retourne tout les champs
+ * @param      string  $champ      les champs retournés, si vide retourne tout les champs
  * @param      string  $condition  le filtre de la requete
  * @param      string  $groupby    clause de regroupement
  * @param      string  $tri        clause de tri
@@ -75,8 +81,8 @@ function DTBS_select_join3($table1,$table2,$table3,$champ,$condjoin,$condjoin2,$
 	if (trim($table1)==""){ $ar_retour['statut']= false; $ar_retour['erreur'] = "Table non fourni"; return $ar_retour; }
 	if (trim($table2)==""){ $ar_retour['statut']= false; $ar_retour['erreur'] = "Table non fourni"; return $ar_retour; }
 	if (trim($table3)==""){ $ar_retour['statut']= false; $ar_retour['erreur'] = "Table non fourni"; return $ar_retour; }
-	if (trim($condjoin)==""){ $ar_retour['statut']= false; $ar_retour['erreur'] = "Condition NÂ° 1 de jointure non fournie"; return $ar_retour; }
-	if (trim($condjoin2)==""){ $ar_retour['statut']= false; $ar_retour['erreur'] = "Condition NÂ° 2 de jointure non fournie"; return $ar_retour; }
+	if (trim($condjoin)==""){ $ar_retour['statut']= false; $ar_retour['erreur'] = "Condition N° 1 de jointure non fournie"; return $ar_retour; }
+	if (trim($condjoin2)==""){ $ar_retour['statut']= false; $ar_retour['erreur'] = "Condition N° 2 de jointure non fournie"; return $ar_retour; }
 
 	if (trim($champ)==""){ $champ = "t1.*,t2.*,t3.*"; }
 	$ar_retour['requete'] = "SELECT $champ FROM ($table1 AS t1 LEFT JOIN $table2 AS t2 ON $condjoin) LEFT JOIN $table3 AS t3 ON $condjoin2 ";
@@ -119,7 +125,7 @@ function DTBS_sqlbrut($requete,$pointeur){
 }
 function DTBS_get_choice_enum($table,$field,$pointeur){
 
-	// IdÃ©e d'amÃ©lioration : renvoyer la valeur par dÃ©faut du champ pour fixer correctement les listes dÃ©roulantes
+	// Idée d'amélioration : renvoyer la valeur par défaut du champ pour fixer correctement les listes déroulantes
 	$champs = mysqli_query($pointeur,"SHOW COLUMNS FROM ".$table." LIKE '".$field."'");
 	$colchamps = mysqli_fetch_assoc($champs);
 	
@@ -152,7 +158,7 @@ function DTBS_insert_rec(){
 	$chaine_value="";
 	$cpt=0;
 
-	// Attention si activÃ© empeche le deroulement de la prod
+	// Attention si activé empeche le deroulement de la prod
 	$listechamp = mysqli_query($pointeur, "DESCRIBE $table");
 	/*if (mysqli_num_rows($listechamp)!=count($ar_field)){
 		$ar_retour['statut']= false;
@@ -188,6 +194,72 @@ function DTBS_insert_rec(){
 	if (!$ar_retour['resultat']) {
 		$ar_retour['statut']= false;
 		$ar_retour['erreur']= mysqli_error($pointeur);
+	}
+	return $ar_retour;
+}
+/**
+ * Construit et execute une instruction SQL d'insertion
+ *
+ * ATTENDU :
+ * @param      string  $ar_arg[0]	la table sur laquel porte la requete
+ * @param      array   $ar_arg[1]   un tableau des valeurs à insérer (rien pour l'auto-increment )
+ *
+ * @return     array  $ar_retour Tableau avec des informations sur le retour de la requete (statut, erreur, requete, nbrec, resultat)
+ */
+function DTBS_add_rec(){
+	
+	global $mysqli;
+	$ar_arg = func_get_args();
+
+	$table 	 = $ar_arg[0];
+	$ar_nval = $ar_arg[1];
+	
+	
+	$ar_retour['statut'] = true;
+	$ar_retour['erreur'] = "";
+	$ar_retour['requete']= "";
+	$ar_retour['resultat'] = 0;
+	$ar_retour['insert_id'] = -1;
+		
+	//Insere le tableau ar_nval dans la table $table, renvoi le dernier id
+	$chaine_field = "INSERT INTO $table (";
+	$chaine_value="";
+	$cpt=0;
+
+	$listechamp = mysqli_query($mysqli, "DESCRIBE $table");
+	while ($r=mysqli_fetch_assoc($listechamp)) {
+		if ($r['Extra']!="auto_increment"){
+			$chaine_field .= "`".$r['Field']."`, ";
+			if (substr($ar_nval[$cpt],0,5)=="MD5('"){
+				$chaine_value .= $ar_nval[$cpt].", ";
+			} elseif (substr($ar_nval[$cpt],0,6)=="SHA2('") {
+				$chaine_value .= $ar_nval[$cpt].", ";
+			} else {
+				if (substr($r['Type'],0,7)=='varchar'){
+					$chaine_value .= "'".addslashes($ar_nval[$cpt])."', ";
+				} else {
+					$chaine_value .= "'".$ar_nval[$cpt]."', ";
+				}
+			}
+			$cpt++;
+		}
+	}
+	
+	$chaine_value  = str_replace("'NOW()'","NOW()",$chaine_value);
+	$chaine_value  = str_replace("'-NULL-'","NULL",$chaine_value);
+	$chaine_field  = substr($chaine_field,0,strlen($chaine_field)-2);
+	$chaine_field .= " ) VALUES (";
+	$chaine_value  = substr($chaine_value,0,strlen($chaine_value)-2);
+	$chaine_value .= ")";
+
+	$ar_retour['requete'] = $chaine_field.$chaine_value;
+	$ar_retour['resultat'] = mysqli_query($mysqli,$chaine_field.$chaine_value);
+	$ar_retour['insert_id'] = mysqli_insert_id($mysqli);
+
+	if (!$ar_retour['resultat']) {
+		$ar_retour['statut']= false;
+		$ar_retour['erreur']= mysqli_error($mysqli);
+		//jimlogperso($ar_retour['requete']);
 	}
 	return $ar_retour;
 }
@@ -281,7 +353,7 @@ function DTBS_transaction($action){
 			$resultat = mysqli_query($mysqli, "SET autocommit = 0;");
 			if (!$resultat){ return "Echec de l'activation du mode transactionnel"; }
 			$resultat = mysqli_query($mysqli,"START TRANSACTION;");
-			if (!$resultat){ return "Echec du dÃ©marrage de la transaction"; }
+			if (!$resultat){ return "Echec du démarrage de la transaction"; }
 			return "Ok";
 		break;
 		case 'cancel':
