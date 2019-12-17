@@ -158,7 +158,13 @@ function CV_echeance_mdr($lestamp,$lecheance,$lecalcul){
 	return $ar_retour;
 	
 }
-
+/**********************************************************
+* Met en forme un tableau de taille de colonne
+*
+* @param string $valeur - Valeur du tableau a mettre en forme
+* @param string $key - Cle du tableau
+*/
+function prefixe_width(&$valeur,$key) { $valeur = "width: ".$valeur."px;"; }
 
 
 ?>
