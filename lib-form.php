@@ -323,15 +323,13 @@ function FRM_upload($ar_param) {
 	echo $element;
 
 }
-/*
-function FRM_fieldset($OnOff,$Legend,$Affiche,$Style){
-	if ($OnOff) { 
-		$element = "<fieldset style=\"$Style\">\n"; 
-		if (trim($Legend)!=""){ $element.= "<legend>&nbsp;$Legend&nbsp;</legend>\n"; }
-	} else { 
-		$element = "</fieldset>\n"; 
-	}
-	if ($Affiche) { echo $element; } else { return $element; }
+function FRM_fieldset($Style,$Legend){
+	$element = "<fieldset style=\"$Style\">\n"; 
+	if (trim($Legend)!=""){ $element.= "<legend>&nbsp;$Legend&nbsp;</legend>\n"; }
+	echo $element;
 }
-*/
+function FRM_fieldset_off(){
+	echo "</fieldset>\n";
+}
+
 ?>
