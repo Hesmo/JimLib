@@ -119,7 +119,7 @@ function FRM_opt() {
 * @param integer $valeur 
 * @param integer $action 
 *
-* FRM_bt($class,$type,$name,$valeur,$action,$retour,$style,[$id],[$dsbld])
+* FRM_bt($class,$type,$name,$valeur,$action,$retour,$style,[$id],[$dsbld],[$data])
 * 
 */
 function FRM_bt() {
@@ -135,13 +135,14 @@ function FRM_bt() {
 	$style    	= $ar_arg[6];
 	if (isset($ar_arg[7])){ $id = $ar_arg[7]; } else { $id=""; }
 	if (isset($ar_arg[8])){ $dsbld = $ar_arg[8]; } else { $dsbld = ""; }
+	if (isset($ar_arg[9])){ $data = $ar_arg[9]; } else { $data = ""; }
 
 	if (trim($type)=="")	{ $type="submit"; }
 	if (trim($name)=="")	{ $name="boutton_soumission"; }
 	if (trim($valeur)=="")	{ $valeur="Ok"; }
 	$element = "<input";
 	if (trim($id)!=""){ $element .= " id=\"$id\" "; }
-	$element .= " type=\"$type\" class=\"$class\" name=\"$name\" value=\"$valeur\" ".$action." style=\"$style\" $dsbld>\n";
+	$element .= " type=\"$type\" class=\"$class\" name=\"$name\" value=\"$valeur\" ".$action." style=\"$style\" $dsbld $data>\n";
 	if ($retour == 1) { return $element; } else { echo $element; }
 
 }
