@@ -116,35 +116,31 @@ function CV_echeance_mdr($lestamp,$lecheance,$lecalcul){
 	$ar_dureemois = array(1=>31,2=>28,3=>31,4=>30,5=>31,6=>30,7=>31,8=>31,9=>30,10=>31,11=>30,12=>31);
 	$ar_retour = array('statut'=>false,'humain'=>'','mysql'=>'','msgerreur'=>'');
 	//$lejour=date("j",$lestamp); $lemois=date("n",$lestamp); $lannee=date("Y",$lestamp); 
-	$ar_ac=explode(";",$lecalcul);
-	$echeance = $lestamp;
 
-	if ($ar_ac[1]!=0){ 
-		// Ajout du nombre de jour
-		$echeance = $lestamp + (preg_replace("/[^0-9]/", "", $ar_ac[0]) * 24 * 3600);
-	} else {
+	if (trim($lecalcul)==""){ // Si lecalcul n'est pas fournit on sort
 		$ar_retour['msgerreur']='Mode de reglement non calculable';
 		return $ar_retour;
 	}
 
-	if (isset($ar_ac[1])){ 
+	$ar_ac=explode(";",$lecalcul);
 
-		// Fixe la fin du mois (Au 27/12/2018 ar_ac[1] est toujours égal à fm)
+	// Ajoute le nombre de jour à l'échéance
+	$echeance = $lestamp + (preg_replace("/[^0-9]/", "", $ar_ac[0]) * 24 * 60 * 60);
+
+	if (isset($ar_ac[1])){ 
+		// Fixe la fin du mois (Au 20/01/2018 ar_ac[1] est toujours égal à fm si il existe)
 		if ($ar_ac[1]=='fm'){  
 			$lannee = date("Y",$echeance);
 			$lemois = date("n",$echeance);
 			$lejour = $ar_dureemois[$lemois];
 			// SI Annee bisextile ajoute un jour au mois de février
-			if ((floor($lannee/4) == ($lannee/4)) AND $lemois=2 ){
-				$lejour++;
-			}
+			if ( (floor($lannee/400) == ($lannee/400)) AND $lemois=2 ){ $lejour++; }
 			$echeance = mktime(0,0,1,$lemois,$lejour,$lannee);
 		}
-
 	}
 
 	if (isset($ar_ac[2])){ 
-		// Pas de test sur la chaine de carac car il n'y a que des dm (Au 27/12/2018 ar_ac[2] a tooujours dm en suffixe)
+		// Pas de test sur la chaine de carac car il n'y a que des dm (Au 21/01/2020 ar_ac[2] a toujours dm en suffixe)
 		$lejour = preg_replace("/[^0-9]/", "", $ar_ac[2]);
 		$lannee = date("Y",$echeance);
 		$lemois = date("n",$echeance) + 1;
@@ -152,9 +148,10 @@ function CV_echeance_mdr($lestamp,$lecheance,$lecalcul){
 		$echeance = mktime(0,0,1,$lemois,$lejour,$lannee);
 		
 	}
-		
-	$ar_retour['humain'] = sprintf("%02d",$lejour)."/".sprintf("%02d",$lemois)."/".$lannee;
-	$ar_retour['mysql'] = $lannee."-".sprintf("%02d",$lemois)."-".sprintf("%02d",$lejour);
+
+	$ar_retour['humain'] = date("d/m/y",$echeance);
+	$ar_retour['mysql'] = date("Y-m-d",$echeance);
+	$ar_retour['statut'] = true;
 	return $ar_retour;
 	
 }
