@@ -207,6 +207,7 @@ function FRM_cb() {
 	if ($action!=""){$element .=" ".$action;}
 	if (isset($valeur)){$element .="  value=\"$valeur\"";}
 	if (isset($ar_arg[8]) AND ($ar_arg[8] == 1)){ $element .= "onclick='return false;'"; } // Equivalent de readonly
+	if (isset($ar_arg[9]) AND ($ar_arg[9]!="")){ $element .= $ar_arg[9]; } // Equivalent de readonly
 	$element .= "/>".$text."\n";
 	if ($retour == 1) { return $element; } else { echo $element; }
 
