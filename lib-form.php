@@ -198,6 +198,7 @@ function FRM_cb() {
 	$action	 = $ar_arg[5];
 	$retour	 = $ar_arg[6];
 	if (isset($ar_arg[7])){$valeur=$ar_arg[7];}
+	
 
 	$element = "<input type=\"checkbox\"";
 	if ($class!="")	{$element .=" class=\"$class\""; }
@@ -208,6 +209,7 @@ function FRM_cb() {
 	if (isset($valeur)){$element .="  value=\"$valeur\"";}
 	if (isset($ar_arg[8]) AND ($ar_arg[8] == 1)){ $element .= "onclick='return false;'"; } // Equivalent de readonly
 	if (isset($ar_arg[9]) AND ($ar_arg[9]!="")){ $element .= $ar_arg[9]; } // Equivalent de readonly
+	if (isset($ar_arg[10]) AND $ar_arg[10]!=""){ $element.= $data." "; }
 	$element .= "/>".$text."\n";
 	if ($retour == 1) { return $element; } else { echo $element; }
 
