@@ -227,6 +227,7 @@ function DTBS_add_rec(){
 	$cpt=0;
 
 	$listechamp = mysqli_query($mysqli, "DESCRIBE $table");
+	//  SHOW FULL COLUMNS FROM client; permet d'avoir la colonne commentaire
 	while ($r=mysqli_fetch_assoc($listechamp)) {
 		if ($r['Extra']!="auto_increment"){
 			$chaine_field .= "`".$r['Field']."`, ";
@@ -236,6 +237,12 @@ function DTBS_add_rec(){
 				$chaine_value .= $ar_nval[$cpt].", ";
 			} else {
 				if (substr($r['Type'],0,7)=='varchar'){
+					$chaine_value .= "'".addslashes($ar_nval[$cpt])."', ";
+				} elseif (substr($r['Type'],0,3)=='char'){
+					$chaine_value .= "'".addslashes($ar_nval[$cpt])."', ";
+				} elseif ($r['Type']=='text'){
+					$chaine_value .= "'".addslashes($ar_nval[$cpt])."', ";
+				} elseif ($r['Type']=='mediumtext'){
 					$chaine_value .= "'".addslashes($ar_nval[$cpt])."', ";
 				} else {
 					$chaine_value .= "'".$ar_nval[$cpt]."', ";
