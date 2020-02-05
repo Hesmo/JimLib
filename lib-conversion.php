@@ -151,6 +151,7 @@ function CV_echeance_mdr($lestamp,$lecheance,$lecalcul){
 
 	$ar_retour['humain'] = date("d/m/y",$echeance);
 	$ar_retour['mysql'] = date("Y-m-d",$echeance);
+	$ar_retour['sage'] = date("Ymd",$echeance);
 	$ar_retour['statut'] = true;
 	return $ar_retour;
 	
