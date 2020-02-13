@@ -230,6 +230,7 @@ function DTBS_add_rec(){
 	//  SHOW FULL COLUMNS FROM client; permet d'avoir la colonne commentaire
 	while ($r=mysqli_fetch_assoc($listechamp)) {
 		if ($r['Extra']!="auto_increment"){
+			if ($ar_nval[$cpt]==""){ $ar_nval[$cpt]=$r['Default']; }
 			$chaine_field .= "`".$r['Field']."`, ";
 			if (substr($ar_nval[$cpt],0,5)=="MD5('"){
 				$chaine_value .= $ar_nval[$cpt].", ";
@@ -266,7 +267,6 @@ function DTBS_add_rec(){
 	if (!$ar_retour['resultat']) {
 		$ar_retour['statut']= false;
 		$ar_retour['erreur']= mysqli_error($mysqli);
-		//jimlogperso($ar_retour['requete']);
 	}
 	return $ar_retour;
 }
@@ -370,6 +370,7 @@ function DTBS_transaction($action){
 		break;
 		case 'valid':
 			$resultat = mysqli_query($mysqli, "COMMIT;");
+			if (!$resultat){ return "Echec du COMMIT des données"; }
 			$resultat = mysqli_query($mysqli, "SET autocommit = 1;");
 			return "Ok";
 		break;
