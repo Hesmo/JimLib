@@ -230,7 +230,7 @@ function DTBS_add_rec(){
 	//  SHOW FULL COLUMNS FROM client; permet d'avoir la colonne commentaire
 	while ($r=mysqli_fetch_assoc($listechamp)) {
 		if ($r['Extra']!="auto_increment"){
-			if ($ar_nval[$cpt]==""){ $ar_nval[$cpt]=$r['Default']; }
+			if (isset($ar_nval[$cpt]) AND $ar_nval[$cpt]==""){ $ar_nval[$cpt]=$r['Default']; }
 			$chaine_field .= "`".$r['Field']."`, ";
 			if (substr($ar_nval[$cpt],0,5)=="MD5('"){
 				$chaine_value .= $ar_nval[$cpt].", ";
