@@ -118,17 +118,20 @@ function HTML5_Div() {
 	$overflow = $ar_arg[8];
 	$action	  = $ar_arg[9];
 	$retour	  = $ar_arg[10];
+	if (isset($ar_arg[11])){ $title = $ar_arg[11]; }
 
 	$element = "<div ";
-	if (trim($id)!="")		{$element .= " id=\"$id\" ";}
-	if (trim($class)!="")	{$element .= " class=\"$class\" ";}
-	if (trim($action)!= "") {$element .= " $action ";}
+	if (trim($id)!="")		{$element .= "id=\"$id\" ";}
+	if (trim($class)!="")	{$element .= "class=\"$class\" ";}
+	if (trim($action)!= "") {$element .= "$action ";}
 	
-	if (trim($top)!="")     {$style .= " top:$top;";}
-	if (trim($left)!="")    {$style .= " left:$left;";}
-	if (trim($width)!="")   {$style .= " width:$width;";}
-	if (trim($height)!="")  {$style .= " height:$height;";}
-	if (trim($position)!=""){$style .= " position:$position;";}
+	if (trim($top)!="")     {$style .= "top:$top; ";}
+	if (trim($left)!="")    {$style .= "left:$left; ";}
+	if (trim($width)!="")   {$style .= "width:$width; ";}
+	if (trim($height)!="")  {$style .= "height:$height; ";}
+	if (trim($position)!=""){$style .= "position:$position; ";}
+
+
 
 	/*
 	visible // L'élément sera agrandi de manière à ce que son contenu soit complètement visible dans tous les cas.
@@ -137,7 +140,8 @@ function HTML5_Div() {
 	auto // Le navigateur Web doit décider en cas de conflit, comment l'élément sera affiché. Proposer des barres de défilement est également permis.
 	*/
 
-	if (trim($overflow)!=""){ $style .= " overflow: $overflow;";}
+	if (isset($title)!=""){ $element .= "title= \"$title\" ";}
+	if (trim($overflow)!=""){ $style .= "overflow: $overflow; ";}
 	if ($style!="")   { $element .= "style= \"$style\" ";}
 	$element.=">\n";
 	if ($retour==1) {return $element; } else {echo $element;}
