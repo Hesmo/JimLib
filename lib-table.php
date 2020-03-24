@@ -112,7 +112,6 @@ function TB_cellule() {
 	if (is_array($ar_arg[0]) && count($ar_arg) == 1)
 	{
 		$arg = $ar_arg[0];
-
 		$retour = 0;		
 		if (isset($arg['entete']) && $arg['entete'] == 'th')
 			$element = "<th ";
