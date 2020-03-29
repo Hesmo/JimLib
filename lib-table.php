@@ -145,7 +145,6 @@ function TB_cellule() {
 		$retour  = $ar_arg[5];
 		if (isset($ar_arg[6])){ $dujava = $ar_arg[6]; } else { $dujava = ""; }
 		if (isset($ar_arg[7])){ $th = "th"; } else { $th = "td"; }
-		
 
 		$element = "<$th";
 		if (trim($id) != "") 	{ $element .= " id=\"$id\""; }
@@ -154,6 +153,12 @@ function TB_cellule() {
 		if ($colspan > 0) 		{ $element .= " colspan=\"$colspan\""; }
 		if ($rowspan > 0) 		{ $element .= " rowspan=\"$rowspan\""; }
 		if (trim($dujava)!="") 	{ $element .= " $dujava"; }
+		
+		/*if (isset($ar_arg[8]) and is_array($ar_arg['8'])){ 
+			foreach ($ar_arg[8] as $clef=>$value){
+				$element .= " data-".$clef."=\"".$value."\"";
+			}
+		}*/
 
 	}
 	

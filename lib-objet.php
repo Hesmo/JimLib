@@ -62,13 +62,18 @@ class OBJDataField {
 
 
 /** 
-* Objet qui représente une liste de seelction issue d'une requete à la base de données
+* Objet qui représente une liste de selection issue d'une requete à la base de données
 * 
-* @param string $name           Nom du champ comme dans la base de données ou avec un fonction (ex : DATE_FORMAT, IF...)
-* @param string $alias          Alias du champ pour le manipuler
-* @param string $display        Texte à afficher dans le backend
-* @param string $display_format Fonction pour formater l'affichage du texte dans le backend (ex : ucfirst,ucwords...)
-* @param string $carac          En fonction du contexte permet de dstinguer des champs (ex : Id, val...)
+* @param string $ods                    Objet dy type OBJDataSet
+* @param string $se_name                Nom de la liste select
+* @param string $se_classe              Nom de la classe de la liste
+* @param string $se_size                Taille de la liste
+* @param string $se_multiple            Type de liste : dropdown ou multiligne
+* @param string $se_style               Style pour surcharger la classe
+* @param string $opt_classe             Classe des options de la liste
+* @param string $opt_encours            Id en cours qui sera selectionné dans la liste
+* @param string $var_session_name_id    Nom de la variable de session quicontient l'Id en cours
+* @param string $html                   Contient le code généré à exploiter
 *
 */ 
 class OBJDataListe {
@@ -108,21 +113,22 @@ class OBJDataListe {
         }
         $this->html .= "</select>";
         
-        // TODO : Piste de devel pour inclure le javascript associé à la liste
-/*        $this->html .= "<script type=\"text/javascript\">\n";
-        $this->html .= "$(\"select[name=seclient]\").change(function(){\n";
-        $this->html .= "$( \"#AppClientFiche\" ).load(\"/client/xhr.get-fiche-client.php?clt_id=\" + this.value, function(responseTxt, statusTxt, xhr) {\n";
-        $this->html .= "    if (!GLOB_erreur_load(xhr)){ return; }\n";
-        $this->html .= "    });\n";
-        $this->html .= "  });";
-        $this->html .= "</script> ";*/
     }
 
 }
-
+/** 
+* Objet qui représente un fiche issue d'une requete à la base de données
+* 
+* @param string $name           Nom du champ comme dans la base de données ou avec un fonction (ex : DATE_FORMAT, IF...)
+* @param string $alias          Alias du champ pour le manipuler
+* @param string $display        Texte à afficher dans le backend
+* @param string $display_format Fonction pour formater l'affichage du texte dans le backend (ex : ucfirst,ucwords...)
+* @param string $carac          En fonction du contexte permet de dstinguer des champs (ex : Id, val...)
+*
+*/ 
 class OBJDataFiche {
 
-    public $ods, $html;
+    public $ods, $html, $IdTableDataFiche, $tdSTtitre, $tdSTval, $tableId, $BarreAction;
 
      function __construct() {
         // Fixe des parametres par défaut les variable sont ="" par défaut
@@ -131,20 +137,42 @@ class OBJDataFiche {
 
     public function OBJGetDataFiche(){
 
-        $this->html = "<table border: 1px;>";
+        
+        $this->html = TB_table($this->tableId,"","",1);
+        if ($this->BarreAction!=""){
+            $this->html .= TB_ligne("","",1,"","");
+            $this->html .= TB_cellule("",$this->tdSTval,"",2,"",1,"");
+            $ar_param = explode(";", $this->BarreAction); $i=0;
+            foreach ($ar_param as $prm) {
+                if ($i==0){
+                    $prefixe = $prm; 
+                } else {
+                    $this->html .= FRM_bt("btflat", "button", $prefixe.$prm, $prm, "", 1, "", "");
+                }
+                $i++;
+            }
+            $this->html .= "</td></tr>";
+        }
+
+        $ligne = 0; $cellule = 0;
         $rec=mysqli_fetch_assoc($this->ods->bdd_retour['resultat']);
-        foreach ($this->ar_bdd_fields as $field) {
+        foreach ($this->ods->ar_bdd_fields as $field) {
             if ($field->display_format != ""){
                 $FuncFormate = $field->display_format;
                 $rec[$field->alias] = $FuncFormate($rec[$field->alias]);
             }
-            $this->html .= "<tr><td>".$field->display."</td>";
-            $this->html .= "<td>".$rec[$field->alias]."</td></tr>";
+            $this->html .= TB_ligne("","",1,"","");
+            $this->html .= TB_cellule($this->tableId."_l".$ligne."c".$cellule,$this->tdSTtitre,"","","",1,"");
+            $cellule++;
+            $this->html .= $field->display."</td>";
+            $this->html .= TB_cellule($this->tableId."_l".$ligne."c".$cellule,$this->tdSTval,"","","",1,"");
+            $this->html .= $rec[$field->alias]."</td></tr>";
+            $ligne++; $cellule=0;
         }
-
         $this->html .= "</table>";
-        $this->bdd_retour = $ar_appel;
+
     }
 
 }
+
 ?>
