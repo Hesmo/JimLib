@@ -1,8 +1,8 @@
 <?Php
 /** 
-* Objet qui représente une connexion à la base de données
+* Objet qui reprÃ©sente une connexion Ã  la base de donnÃ©es
 * 
-* @param string $bdd_requete        Requete SQL la chaine ;bdd_field_set; est remplacée par Une construction à partir de $ar_bdd_fields dans GetDataSelect
+* @param string $bdd_requete        Requete SQL la chaine ;bdd_field_set; est remplacÃ©e par Une construction Ã  partir de $ar_bdd_fields dans GetDataSelect
 * @param array  $ar_bdd_fields      Tableau d'objet OBJDataField
 * @param array  $bdd_retour         Tableau qui contient des informations sur la requete 
 *
@@ -12,7 +12,7 @@ class OBJDataSet {
     public $bdd_requete, $ar_bdd_fields = array(), $bdd_retour;
 
     function __construct() {
-        // Fixe des parametres par défaut les variable sont ="" par défaut
+        // Fixe des parametres par dÃ©faut les variable sont ="" par dÃ©faut
         global $mysqli;
         $this->mysqli=&$mysqli;
     }
@@ -30,21 +30,24 @@ class OBJDataSet {
     }
 
 }
+
+
 /** 
-* Objet qui représente un champ de base de données 
+* Objet qui reprÃ©sente un champ de base de donnÃ©es 
 * 
-* @param string $name           Nom du champ comme dans la base de données ou avec un fonction (ex : DATE_FORMAT, IF...)
+* @param string $name           Nom du champ comme dans la base de donnÃ©es ou avec un fonction (ex : DATE_FORMAT, IF...)
 * @param string $alias          Alias du champ pour le manipuler
-* @param string $display        Texte à afficher dans le backend
+* @param string $display        Texte Ã  afficher dans le backend
 * @param string $display_format Fonction pour formater l'affichage du texte dans le backend (ex : ucfirst,ucwords...)
 * @param string $carac          En fonction du contexte permet de dstinguer des champs (ex : Id, val...)
+* @param string $frm            Objet de type OBJElementFormulaire
 *
 */ 
 class OBJDataField {
 
-    public $name, $alias, $display, $display_format, $carac;
+    public $name, $alias, $display, $display_format, $carac, $frm;
 
-    function __construct($name,$alias,$display,$display_format,$carac) {
+    function __construct($name,$alias,$display,$display_format,$carac,$ar_frm) {
         $this->name = $name;
         $this->alias = $alias;
         if ($this->alias == "") {
@@ -57,12 +60,14 @@ class OBJDataField {
         $this->display = $display;
         $this->display_format = $display_format;
         $this->carac = $carac;
+        $this->ar_frm = array();
     }
+
 }
 
 
 /** 
-* Objet qui représente une liste de selection issue d'une requete à la base de données
+* Objet qui reprÃ©sente une liste de selection issue d'une requete Ã  la base de donnÃ©es
 * 
 * @param string $ods                    Objet dy type OBJDataSet
 * @param string $se_name                Nom de la liste select
@@ -71,9 +76,9 @@ class OBJDataField {
 * @param string $se_multiple            Type de liste : dropdown ou multiligne
 * @param string $se_style               Style pour surcharger la classe
 * @param string $opt_classe             Classe des options de la liste
-* @param string $opt_encours            Id en cours qui sera selectionné dans la liste
+* @param string $opt_encours            Id en cours qui sera selectionnÃ© dans la liste
 * @param string $var_session_name_id    Nom de la variable de session quicontient l'Id en cours
-* @param string $html                   Contient le code généré à exploiter
+* @param string $html                   Contient le code gÃ©nÃ©rÃ© Ã  exploiter
 *
 */ 
 class OBJDataListe {
@@ -85,7 +90,7 @@ class OBJDataListe {
 	public $html;
 	
     function __construct() {
-    	// Fixe des parametres par défaut les variable sont ="" par défaut
+    	// Fixe des parametres par dÃ©faut les variable sont ="" par dÃ©faut
         $this->se_classe = 'seflat';
     	$this->opt_classe = 'optflat';
     	$this->opt_encours = -1;
@@ -94,7 +99,7 @@ class OBJDataListe {
 
     public function OBJGetDataListe(){
         
-        // Récupère les valeurs des champs "id" et "affiche" parmi les champs
+        // RÃ©cupÃ¨re les valeurs des champs "id" et "affiche" parmi les champs
         $Id=""; $Affiche = ""; $FuncFormate = "";
         foreach ($this->ods->ar_bdd_fields as $lobj){
             if ($lobj->carac == "id") { $Id = $lobj->alias; }
@@ -116,22 +121,25 @@ class OBJDataListe {
     }
 
 }
+
+
 /** 
-* Objet qui représente un fiche issue d'une requete à la base de données
+* Objet qui reprÃ©sente un fiche issue d'une requete Ã  la base de donnÃ©es
 * 
-* @param string $name           Nom du champ comme dans la base de données ou avec un fonction (ex : DATE_FORMAT, IF...)
-* @param string $alias          Alias du champ pour le manipuler
-* @param string $display        Texte à afficher dans le backend
-* @param string $display_format Fonction pour formater l'affichage du texte dans le backend (ex : ucfirst,ucwords...)
-* @param string $carac          En fonction du contexte permet de dstinguer des champs (ex : Id, val...)
+* @param objet  $ods            Objet dy type OBJDataSet
+* @param string $html           Contient le code gÃ©nÃ©rÃ© Ã  exploiter
+* @param string $tdSTtitre      Nom de la classe des cellules etiquettes
+* @param string $tdSTval        Nom de la classe des cellules valeurs
+* @param string $tableId        Id de la table gÃ©nÃ©rÃ©
+* @param string $BarreAction    Chaine de caractere separe avec des ; qui contient les boutons Ã  afficher
 *
-*/ 
+*/
 class OBJDataFiche {
 
-    public $ods, $html, $IdTableDataFiche, $tdSTtitre, $tdSTval, $tableId, $BarreAction;
+    public $ods, $html, $tdSTtitre, $tdSTval, $tableId, $BarreAction;
 
      function __construct() {
-        // Fixe des parametres par défaut les variable sont ="" par défaut
+        // Fixe des parametres par dÃ©faut les variable sont ="" par dÃ©faut
         $this->ods = new OBJDataSet();
     }
 
@@ -169,6 +177,113 @@ class OBJDataFiche {
             $this->html .= $rec[$field->alias]."</td></tr>";
             $ligne++; $cellule=0;
         }
+        $this->html .= "</table>";
+
+    }
+
+}
+
+class OBJElementFormulaire {
+
+    public $type, $name, $valeur;               // Type d'objet formulaire, nom et valeur (Pour checkbox : valeur = text)
+    public $classe, $style, $action;            // Tous sauf Hidden
+    public $checked;                            // Checkbox et radio
+    public $id;                                 // Hidden et radio
+    public $max, $autocomplete, $placeholder;   // Input Type text
+    public $row, $cols;                         // Textarea
+
+    public $html_elem;                          // Code HTML pour affichage (rendu final)
+
+    function __construct($type, $name, $valeur) {
+        $this->type = $type;
+        $this->name = $name;
+        $this->valeur = $valeur;
+        $this->checked = false;
+    }
+    
+    function GenElemFrm(){
+        switch ($type){
+            case "text":
+                $this->html_elem = FRM_it("",$this->classe,"",$this->max,$this->name,$this->valeur,1,$this->action,$this->style,$this->autocomplete,"","",$this->placeholder);
+            break;
+            case "hidden":
+                $this->html_elem = FRM_hidden($this->name, $this->valeur, 1, $this->id);
+            break;
+            case "password":
+                $this->html_elem = FRM_pword($this->classe, $this->name, $this->valeur, "", $this->style, 1, $this->action);
+            break;
+            case "checkbox":
+                $this->html_elem = FRM_cb($this->classe, $this->style, $this->name, $this->checked, $this->valeur, $this->action, 1);
+            break;
+            case "radio":
+                $this->html_elem = FRM_cb($this->classe, $this->style, $this->name, $this->checked, $this->valeur, "", $this->action, 1, $this->id);
+            break;
+            case "textarea":
+                $this->html_elem = FRM_ta($this->style, $this->name, $this->classe, $this->rows, $this->cols, $this->valeur, 1, $this->action);
+            break;
+        }
+    }
+
+}
+
+/** 
+* Objet qui reprÃ©sente un formulaire pour la crÃ©ation d'un enregistrement de base de donnÃ©es
+* 
+* @param array  $ar_oef            Tableau d'objet de type OBJElementFormulaire
+* @param string $html           Contient le code gÃ©nÃ©rÃ© Ã  exploiter
+* @param string $tdSTtitre      Nom de la classe des cellules etiquettes
+* @param string $tdSTval        Nom de la classe des cellules valeurs
+* @param string $tableId        Id de la table gÃ©nÃ©rÃ©
+*
+*/
+
+class OBJFormulaire {
+
+    public $ar_oef, $html, $tdSTtitre, $tdSTval, $tableId;
+
+     function __construct() {
+        // Fixe des parametres par dÃ©faut les variable sont ="" par dÃ©faut
+        $this->ar_oef = array();
+    }
+
+    public function OBJGetFormulaire(){
+        
+        $this->html = TB_table($this->tableId,"","",1);
+
+
+        /*$ligne = 0; $cellule = 0;
+        $rec=mysqli_fetch_assoc($this->ods->bdd_retour['resultat']);
+        foreach ($this->ods->ar_bdd_fields as $field) {
+            if ($field->display_format != ""){
+                $FuncFormate = $field->display_format;
+                $rec[$field->alias] = $FuncFormate($rec[$field->alias]);
+            }
+            $this->html .= TB_ligne("","",1,"","");
+            $this->html .= TB_cellule($this->tableId."_l".$ligne."c".$cellule,$this->tdSTtitre,"","","",1,"");
+            $cellule++;
+            $this->html .= $field->display."</td>";
+            $this->html .= TB_cellule($this->tableId."_l".$ligne."c".$cellule,$this->tdSTval,"","","",1,"");
+            $this->html .= $rec[$field->alias]."</td></tr>";
+            $ligne++; $cellule=0;
+        }*/
+
+/*
+        if ($this->BarreAction!=""){
+            $this->html .= TB_ligne("","",1,"","");
+            $this->html .= TB_cellule("",$this->tdSTval,"",2,"",1,"");
+            $ar_param = explode(";", $this->BarreAction); $i=0;
+            foreach ($ar_param as $prm) {
+                if ($i==0){
+                    $prefixe = $prm; 
+                } else {
+                    $this->html .= FRM_bt("btflat", "button", $prefixe.$prm, $prm, "", 1, "", "");
+                }
+                $i++;
+            }
+            $this->html .= "</td></tr>";
+        }
+*/
+
         $this->html .= "</table>";
 
     }

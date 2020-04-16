@@ -1,0 +1,20 @@
+#!/usr/bin/php
+<?Php
+echo "Toto";
+
+$listefonction = shell_exec("grep --binary-files=text function ../*php");
+
+$ar_fonction = explode("\n",$listefonction);
+foreach ($ar_fonction as $ligne){
+
+
+$fichier = substr($ligne,3,strpos($ligne,".php")+1);
+
+#echo $fichier."\n";
+echo substr($ligne,strpos($ligne,"function ")+9)."\n";
+    
+
+}
+
+
+?>
