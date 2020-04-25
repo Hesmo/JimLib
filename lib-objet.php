@@ -185,16 +185,23 @@ class OBJDataFiche {
 
 class OBJElementFormulaire {
 
+    public $etiquette;                          // Valeur de l'etiquette qui decrit l'élément du formulaire
     public $type, $name, $valeur;               // Type d'objet formulaire, nom et valeur (Pour checkbox : valeur = text)
     public $classe, $style, $action;            // Tous sauf Hidden
     public $checked;                            // Checkbox et radio
     public $id;                                 // Hidden et radio
     public $max, $autocomplete, $placeholder;   // Input Type text
     public $row, $cols;                         // Textarea
+    public $table, $champ;                      // Dans un select source enum
+    public $optclasse, $optstyle;               // Option dans un select
 
     public $html_elem;                          // Code HTML pour affichage (rendu final)
 
-    function __construct($type, $name, $valeur) {
+    function __construct($etiquette, $type, $name, $valeur) {
+        global $mysqli;
+        $this->mysqli=&$mysqli;
+
+        $this->etiquette = $etiquette;
         $this->type = $type;
         $this->name = $name;
         $this->valeur = $valeur;
@@ -202,7 +209,8 @@ class OBJElementFormulaire {
     }
     
     function GenElemFrm(){
-        switch ($type){
+        
+        switch ($this->type){
             case "text":
                 $this->html_elem = FRM_it("",$this->classe,"",$this->max,$this->name,$this->valeur,1,$this->action,$this->style,$this->autocomplete,"","",$this->placeholder);
             break;
@@ -221,6 +229,14 @@ class OBJElementFormulaire {
             case "textarea":
                 $this->html_elem = FRM_ta($this->style, $this->name, $this->classe, $this->rows, $this->cols, $this->valeur, 1, $this->action);
             break;
+            case "select_enum":
+                $ar_enum = DTBS_get_choice_enum($this->table,$this->champ,$this->mysqli);
+                $this->html_elem = FRM_se($this->name,$this->classe,'',0,'',1,$this->style);
+                foreach ($ar_enum as $choix) {
+                    $this->html_elem .= FRM_opt($this->optclasse, $choix, $choix==$this->valeur, ucfirst($choix), 1, $this->style);
+                }
+                $this->html_elem .= "</select>";
+            break;
         }
     }
 
@@ -234,12 +250,13 @@ class OBJElementFormulaire {
 * @param string $tdSTtitre      Nom de la classe des cellules etiquettes
 * @param string $tdSTval        Nom de la classe des cellules valeurs
 * @param string $tableId        Id de la table généré
+* @param string $classBt        Classe des boutons
 *
 */
 
 class OBJFormulaire {
 
-    public $ar_oef, $html, $tdSTtitre, $tdSTval, $tableId;
+    public $ar_oef, $html, $tdSTtitre, $tdSTval, $tableId, $tableStyle, $classBt;
 
      function __construct() {
         // Fixe des parametres par défaut les variable sont ="" par défaut
@@ -248,42 +265,28 @@ class OBJFormulaire {
 
     public function OBJGetFormulaire(){
         
-        $this->html = TB_table($this->tableId,"","",1);
-
-
-        /*$ligne = 0; $cellule = 0;
-        $rec=mysqli_fetch_assoc($this->ods->bdd_retour['resultat']);
-        foreach ($this->ods->ar_bdd_fields as $field) {
-            if ($field->display_format != ""){
-                $FuncFormate = $field->display_format;
-                $rec[$field->alias] = $FuncFormate($rec[$field->alias]);
+        $this->html = TB_table($this->tableId, "", $this->tableStyle, 1);
+        foreach ($this->ar_oef as $elemform) {
+            if ($elemform->type!="hidden"){
+                $this->html .= TB_ligne("","",1,"","");
+                $this->html .= TB_cellule("",$this->tdSTtitre,"text-align: right;",0,0,1,"");
+                $this->html .= $elemform->etiquette."</td>";
+                $this->html .= TB_cellule("",$this->tdSTval,"",0,0,1,"");
+                $elemform->GenElemFrm();
+                $this->html .= $elemform->html_elem."</td></tr>";    
             }
-            $this->html .= TB_ligne("","",1,"","");
-            $this->html .= TB_cellule($this->tableId."_l".$ligne."c".$cellule,$this->tdSTtitre,"","","",1,"");
-            $cellule++;
-            $this->html .= $field->display."</td>";
-            $this->html .= TB_cellule($this->tableId."_l".$ligne."c".$cellule,$this->tdSTval,"","","",1,"");
-            $this->html .= $rec[$field->alias]."</td></tr>";
-            $ligne++; $cellule=0;
-        }*/
-
-/*
-        if ($this->BarreAction!=""){
-            $this->html .= TB_ligne("","",1,"","");
-            $this->html .= TB_cellule("",$this->tdSTval,"",2,"",1,"");
-            $ar_param = explode(";", $this->BarreAction); $i=0;
-            foreach ($ar_param as $prm) {
-                if ($i==0){
-                    $prefixe = $prm; 
-                } else {
-                    $this->html .= FRM_bt("btflat", "button", $prefixe.$prm, $prm, "", 1, "", "");
-                }
-                $i++;
-            }
-            $this->html .= "</td></tr>";
         }
-*/
-
+        $this->html .= TB_ligne("","",1,"","");
+        $this->html .= TB_cellule("","","padding-top: 10px; text-align: right;",2,0,1,"");
+        foreach ($this->ar_oef as $elemform) {
+            if ($elemform->type=="hidden"){
+                $elemform->GenElemFrm();
+                $this->html .= $elemform->html_elem;
+            }
+        }
+        $this->html .= FRM_bt($this->classBt, "button", "btenregistrer", "Enregistrer", "", 1, "");
+        $this->html .= FRM_bt($this->classBt, "button", "btcancel",      "Annuler",     "", 1, "margin-right: 0px;");
+        $this->html .= "</td></tr>";
         $this->html .= "</table>";
 
     }
