@@ -186,7 +186,7 @@ class OBJDataFiche {
 class OBJElementFormulaire {
 
     public $etiquette;                          // Valeur de l'etiquette qui decrit l'élément du formulaire
-    public $type, $name, $valeur;               // Type d'objet formulaire, nom et valeur (Pour checkbox : valeur = text)
+    public $type, $name, $valeur;    // Type d'objet formulaire, nom et valeur (Pour checkbox : valeur = text)
     public $classe, $style, $action;            // Tous sauf Hidden
     public $checked;                            // Checkbox et radio
     public $id;                                 // Hidden et radio
@@ -245,8 +245,9 @@ class OBJElementFormulaire {
 /** 
 * Objet qui représente un formulaire pour la création d'un enregistrement de base de données
 * 
-* @param array  $ar_oef            Tableau d'objet de type OBJElementFormulaire
+* @param array  $ar_oef         Tableau d'objet de type OBJElementFormulaire
 * @param string $html           Contient le code généré à exploiter
+* @param string $NameFrm        Nom du formulaire
 * @param string $tdSTtitre      Nom de la classe des cellules etiquettes
 * @param string $tdSTval        Nom de la classe des cellules valeurs
 * @param string $tableId        Id de la table généré
@@ -264,8 +265,9 @@ class OBJFormulaire {
     }
 
     public function OBJGetFormulaire(){
-        
-        $this->html = TB_table($this->tableId, "", $this->tableStyle, 1);
+  
+        $this->html  = FRM_form("GET",$this->NameFrm,"","","",1);
+        $this->html .= TB_table($this->tableId, "", $this->tableStyle, 1);
         foreach ($this->ar_oef as $elemform) {
             if ($elemform->type!="hidden"){
                 $this->html .= TB_ligne("","",1,"","");
@@ -287,8 +289,17 @@ class OBJFormulaire {
         $this->html .= FRM_bt($this->classBt, "button", "btenregistrer", "Enregistrer", "", 1, "");
         $this->html .= FRM_bt($this->classBt, "button", "btcancel",      "Annuler",     "", 1, "margin-right: 0px;");
         $this->html .= "</td></tr>";
-        $this->html .= "</table>";
+        $this->html .= "</table></form>";
 
+    }
+
+    // Fonction qui permet de récupérer les champs pour faciliter la programmation
+    public function OBJGetListeChamp(){
+        $valret = "";
+        foreach ($this->ar_oef as $elemform) {
+            $valret .= $elemform->name."<br/>";
+        }
+        return($valret);
     }
 
 }

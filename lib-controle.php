@@ -102,5 +102,4 @@ function PwdGet($nbcaracteres) {
 	return $pwd;
 
 }
-
 ?>

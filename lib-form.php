@@ -27,7 +27,7 @@ function FRM_form(){
 
 }
 function FRM_form_off(){ echo "</form>\n"; }
-// Prototype : FRM_it($text,$class,$size,$max,$name,$valeur,$retour,$action,$style,$autocomplete,$type,$readonly);
+// Prototype : FRM_it($text, $class, $size, $max, $name, $valeur, $retour, $action, $style, $autocomplete, $typeinput, $readonly, $placeholder);
 function FRM_it(){
 
 	$ar_arg = func_get_args();
@@ -42,7 +42,7 @@ function FRM_it(){
 	$action = $ar_arg[7]; // Script associé  (optionnel)
 	$style  = $ar_arg[8]; // Style 
 	if (isset($ar_arg[9]) AND ($ar_arg[9] == 1)){ $autocomplete = "off"; }
-	// Parametre ajouté voire http://www.w3schools.com/tags/att_input_type.asp
+	// Parametre ajouté voir http://www.w3schools.com/tags/att_input_type.asp
 	if (isset($ar_arg[10]) AND (trim($ar_arg[10]) != "")){ 
 		$element = "$text<input type=\"".$ar_arg[10]."\" ";
 	} else {
@@ -50,7 +50,7 @@ function FRM_it(){
 	}
 	if (isset($ar_arg[11]) AND ($ar_arg[11] == 1)){ $element .= " readonly"; }
 	if (isset($ar_arg[12]) AND ($ar_arg[12] != "")){ $placeholder = $ar_arg[12]; }
-	
+
 	if ($class!="")  { $element.= " class=\"$class\"";}
 	if ($size!="") 	 { $element.= " size=\"$size\"";}
 	if ($style!="")  { $element.= " style=\"$style\"";}
@@ -335,5 +335,4 @@ function FRM_fieldset($Style,$Legend){
 function FRM_fieldset_off(){
 	echo "</fieldset>\n";
 }
-
 ?>
