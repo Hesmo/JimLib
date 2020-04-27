@@ -85,7 +85,7 @@ class OBJDataListe {
     
     public $ods;
 	public $se_name, $se_classe, $se_size, $se_multiple, $se_style;
-	public $opt_classe, $opt_encours;
+	public $opt_classe, $opt_style, $opt_encours;
     public $var_session_name_id;
 	public $html;
 	
@@ -114,7 +114,7 @@ class OBJDataListe {
                 $this->opt_encours = $_SESSION[$this->var_session_name_id];
             }
             if ($FuncFormate!=""){ $rec[$Affiche] = $FuncFormate($rec[$Affiche]); }
-            $this->html .= FRM_opt($this->opt_classe, $rec[$Id], $rec[$Id] == $this->opt_encours, $rec[$Affiche], 1, "");
+            $this->html .= FRM_opt($this->opt_classe, $rec[$Id], $rec[$Id] == $this->opt_encours, $rec[$Affiche], 1, $this->opt_style );
         }
         $this->html .= "</select>";
         
