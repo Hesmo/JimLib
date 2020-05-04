@@ -156,6 +156,33 @@ function CV_echeance_mdr($lestamp,$lecheance,$lecalcul){
 	return $ar_retour;
 	
 }
+/**
+* FORMATE UNE DATE POUR UN COURRIER
+* @param string $date
+* @param string $typed ('humain','mysql')
+* @param integer $avecheure (true,false)
+*/
+function CV_datecourrier($date,$typed,$avecheure){
+	$ma=array(1 => 'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Aout', 'Septembre', 'Octobre', 'Novembre', 'Décembre');
+	
+	$date = preg_replace("/[^0-9]/", "", $date);
+	if ($avecheure){ $avecheure = substr($date,0,8); }
+	
+	$j=0; $m=0; $a=0;
+	if ($typed=='humain'){
+		$j = substr($date,0,2); $m = substr($date,2,2); $a = substr($date,-4);
+	} else {
+		$j = substr($date,-2);  $m = substr($date,4,2); $a = substr($date,0,4);
+	}
+	
+	$lachaine  = date("j",mktime(13,52,0,$m,$j,$a))." ";
+	$lachaine .= $ma[date("n",mktime(13,52,0,$m,$j,$a))]." ";
+	$lachaine .= date("Y",mktime(13,52,0,$m,$j,$a));
+
+	return $lachaine;
+	
+}
+
 /**********************************************************
 * Met en forme un tableau de taille de colonne
 *
