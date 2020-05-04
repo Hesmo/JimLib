@@ -1,8 +1,8 @@
 <?Php
 /** 
-* Objet qui reprÃ©sente une connexion Ã  la base de donnÃ©es
+* Objet qui représente une connexion à la base de données
 * 
-* @param string $bdd_requete        Requete SQL la chaine ;bdd_field_set; est remplacÃ©e par Une construction Ã  partir de $ar_bdd_fields dans GetDataSelect
+* @param string $bdd_requete        Requete SQL la chaine ;bdd_field_set; est remplacée par Une construction à partir de $ar_bdd_fields dans GetDataSelect
 * @param array  $ar_bdd_fields      Tableau d'objet OBJDataField
 * @param array  $bdd_retour         Tableau qui contient des informations sur la requete 
 *
@@ -12,7 +12,7 @@ class OBJDataSet {
     public $bdd_requete, $ar_bdd_fields = array(), $bdd_retour;
 
     function __construct() {
-        // Fixe des parametres par dÃ©faut les variable sont ="" par dÃ©faut
+        // Fixe des parametres par défaut les variable sont ="" par défaut
         global $mysqli;
         $this->mysqli=&$mysqli;
     }
@@ -33,12 +33,12 @@ class OBJDataSet {
 
 
 /** 
-* Objet qui reprÃ©sente un champ de base de donnÃ©es 
+* Objet qui représente un champ de base de données 
 * 
-* @param string $name           Nom du champ comme dans la base de donnÃ©es ou avec un fonction (ex : DATE_FORMAT, IF...)
+* @param string $name           Nom du champ comme dans la base de données ou avec une fonction (ex : DATE_FORMAT, IF...)
 * @param string $alias          Alias du champ pour le manipuler
-* @param string $display        Texte Ã  afficher dans le backend
-* @param string $display_format Fonction pour formater l'affichage du texte dans le backend (ex : ucfirst,ucwords...)
+* @param string $display        Texte à afficher dans le frontend
+* @param string $display_format Fonction pour formater l'affichage du texte dans le frontend (ex : ucfirst,ucwords...)
 * @param string $carac          En fonction du contexte permet de dstinguer des champs (ex : Id, val...)
 * @param string $frm            Objet de type OBJElementFormulaire
 *
@@ -67,7 +67,7 @@ class OBJDataField {
 
 
 /** 
-* Objet qui reprÃ©sente une liste de selection issue d'une requete Ã  la base de donnÃ©es
+* Objet qui représente une liste de selection issue d'une requete à la base de données
 * 
 * @param string $ods                    Objet dy type OBJDataSet
 * @param string $se_name                Nom de la liste select
@@ -76,9 +76,9 @@ class OBJDataField {
 * @param string $se_multiple            Type de liste : dropdown ou multiligne
 * @param string $se_style               Style pour surcharger la classe
 * @param string $opt_classe             Classe des options de la liste
-* @param string $opt_encours            Id en cours qui sera selectionnÃ© dans la liste
+* @param string $opt_encours            Id en cours qui sera selectionné dans la liste
 * @param string $var_session_name_id    Nom de la variable de session quicontient l'Id en cours
-* @param string $html                   Contient le code gÃ©nÃ©rÃ© Ã  exploiter
+* @param string $html                   Contient le code généré à exploiter
 *
 */ 
 class OBJDataListe {
@@ -90,7 +90,7 @@ class OBJDataListe {
 	public $html;
 	
     function __construct() {
-    	// Fixe des parametres par dÃ©faut les variable sont ="" par dÃ©faut
+    	// Fixe des parametres par défaut les variable sont ="" par défaut
         $this->se_classe = 'seflat';
     	$this->opt_classe = 'optflat';
     	$this->opt_encours = -1;
@@ -99,20 +99,32 @@ class OBJDataListe {
 
     public function OBJGetDataListe(){
         
-        // RÃ©cupÃ¨re les valeurs des champs "id" et "affiche" parmi les champs
+        // Récupère les valeurs des champs "id" et "affiche" parmi les champs
         $Id=""; $Affiche = ""; $FuncFormate = "";
         foreach ($this->ods->ar_bdd_fields as $lobj){
             if ($lobj->carac == "id") { $Id = $lobj->alias; }
             if ($lobj->carac == "affiche") { $Affiche = $lobj->alias; $FuncFormate = $lobj->display_format; }
         }
         $this->html = FRM_se($this->se_name, $this->se_classe, $this->se_size, $this->se_multiple, "", 1, $this->se_style);
-        while($rec=mysqli_fetch_assoc($this->ods->bdd_retour['resultat'])){
-            if ( $this->var_session_name_id!="" AND !isset($_SESSION[$this->var_session_name_id]) ){
+        
+        // Si un nom de variable de session est renseigné
+        if ( $this->var_session_name_id!="" ){
+            // Si la variable de session n'est pas fixé on la crée
+            if  ( !isset($_SESSION[$this->var_session_name_id]) ){ $_SESSION[$this->var_session_name_id] = -1; }
+
+            // Si la variable de session est égal à -1 on prend la première valeure de la BDD
+            if ($_SESSION[$this->var_session_name_id] == -1){
+                $rec=mysqli_fetch_assoc($this->ods->bdd_retour['resultat']);
                 $_SESSION[$this->var_session_name_id] = $rec[$Id];
-                $this->opt_encours = $rec[$Id];
-            } else {
-                $this->opt_encours = $_SESSION[$this->var_session_name_id];
+                mysqli_data_seek($this->ods->bdd_retour['resultat'],0);
             }
+
+            // On recupere la variable de session pour le fonctionnement du formulaire
+            $this->opt_encours = $_SESSION[$this->var_session_name_id];
+        
+        }
+
+        while($rec=mysqli_fetch_assoc($this->ods->bdd_retour['resultat'])){
             if ($FuncFormate!=""){ $rec[$Affiche] = $FuncFormate($rec[$Affiche]); }
             $this->html .= FRM_opt($this->opt_classe, $rec[$Id], $rec[$Id] == $this->opt_encours, $rec[$Affiche], 1, $this->opt_style );
         }
@@ -124,27 +136,27 @@ class OBJDataListe {
 
 
 /** 
-* Objet qui reprÃ©sente un fiche issue d'une requete Ã  la base de donnÃ©es
+* Objet qui représente un fiche issue d'une requete à la base de données
 * 
 * @param objet  $ods            Objet dy type OBJDataSet
-* @param string $html           Contient le code gÃ©nÃ©rÃ© Ã  exploiter
+* @param string $html           Contient le code généré à exploiter
 * @param string $tdSTtitre      Nom de la classe des cellules etiquettes
 * @param string $tdSTval        Nom de la classe des cellules valeurs
-* @param string $tableId        Id de la table gÃ©nÃ©rÃ©
-* @param string $BarreAction    Chaine de caractere separe avec des ; qui contient les boutons Ã  afficher
+* @param string $tableId        Id de la table généré
+* @param string $BarreAction    Chaine de caractere separe avec des ; qui contient les boutons à afficher
+* @param string $IndexHidden    Chaine de caractere separe avec des ; qui contient l'index de la fiche pour un FRM_hidden
 *
 */
 class OBJDataFiche {
 
-    public $ods, $html, $tdSTtitre, $tdSTval, $tableId, $BarreAction;
+    public $ods, $html, $tdSTtitre, $tdSTval, $tableId, $BarreAction, $IndexHidden;
 
      function __construct() {
-        // Fixe des parametres par dÃ©faut les variable sont ="" par dÃ©faut
+        // Fixe des parametres par défaut les variable sont ="" par défaut
         $this->ods = new OBJDataSet();
     }
 
     public function OBJGetDataFiche(){
-
         
         $this->html = TB_table($this->tableId,"","",1);
         if ($this->BarreAction!=""){
@@ -159,6 +171,8 @@ class OBJDataFiche {
                 }
                 $i++;
             }
+            $hid = explode(";",$this->IndexHidden);
+            $this->html .= FRM_hidden($hid[0],$hid[1],1);
             $this->html .= "</td></tr>";
         }
 
@@ -185,8 +199,8 @@ class OBJDataFiche {
 
 class OBJElementFormulaire {
 
-    public $etiquette;                          // Valeur de l'etiquette qui decrit l'Ã©lÃ©ment du formulaire
-    public $type, $name, $valeur;    // Type d'objet formulaire, nom et valeur (Pour checkbox : valeur = text)
+    public $etiquette;                          // Valeur de l'etiquette qui decrit l'élément du formulaire
+    public $type, $name, $valeur;               // Type d'objet formulaire, nom et valeur (Pour checkbox : valeur = text)
     public $classe, $style, $action;            // Tous sauf Hidden
     public $checked;                            // Checkbox et radio
     public $id;                                 // Hidden et radio
@@ -243,14 +257,14 @@ class OBJElementFormulaire {
 }
 
 /** 
-* Objet qui reprÃ©sente un formulaire pour la crÃ©ation d'un enregistrement de base de donnÃ©es
+* Objet qui représente un formulaire pour la création d'un enregistrement de base de données
 * 
 * @param array  $ar_oef         Tableau d'objet de type OBJElementFormulaire
-* @param string $html           Contient le code gÃ©nÃ©rÃ© Ã  exploiter
+* @param string $html           Contient le code généré à exploiter
 * @param string $NameFrm        Nom du formulaire
 * @param string $tdSTtitre      Nom de la classe des cellules etiquettes
 * @param string $tdSTval        Nom de la classe des cellules valeurs
-* @param string $tableId        Id de la table gÃ©nÃ©rÃ©
+* @param string $tableId        Id de la table généré
 * @param string $classBt        Classe des boutons
 *
 */
@@ -260,7 +274,7 @@ class OBJFormulaire {
     public $ar_oef, $html, $tdSTtitre, $tdSTval, $tableId, $tableStyle, $classBt;
 
      function __construct() {
-        // Fixe des parametres par dÃ©faut les variable sont ="" par dÃ©faut
+        // Fixe des parametres par défaut les variable sont ="" par défaut
         $this->ar_oef = array();
     }
 
@@ -293,7 +307,7 @@ class OBJFormulaire {
 
     }
 
-    // Fonction qui permet de rÃ©cupÃ©rer les champs pour faciliter la programmation
+    // Fonction qui permet de récupérer les champs pour faciliter la programmation
     public function OBJGetListeChamp(){
         $valret = "";
         foreach ($this->ar_oef as $elemform) {
