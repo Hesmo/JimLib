@@ -26,7 +26,7 @@ class OBJDataSet {
         }
         $champs = implode(", ",$ar_tampon);
         $this->bdd_requete = str_replace(";bdd_field_set;", $champs, $this->bdd_requete);
-        $this->bdd_retour = DTBS_sqlbrut($this->bdd_requete,$this->mysqli);
+        $this->bdd_retour = DTBS_sqlbrut($this->bdd_requete, $this->mysqli);
     }
 
 }
@@ -40,14 +40,13 @@ class OBJDataSet {
 * @param string $display        Texte à afficher dans le frontend
 * @param string $display_format Fonction pour formater l'affichage du texte dans le frontend (ex : ucfirst,ucwords...)
 * @param string $carac          En fonction du contexte permet de distinguer des champs (ex : Id, val...)
-* @param string $ar_frm         Objet de type OBJElementFormulaire (Vérifier si il s'agit d'un tableau d'objet ou d'un tableau simple)
 *
 */ 
 class OBJDataField {
 
-    public $name, $alias, $display, $display_format, $carac, $frm;
+    public $name, $alias, $display, $display_format, $carac;
 
-    function __construct($name,$alias,$display,$display_format,$carac,$ar_frm) {
+    function __construct($name,$alias,$display,$display_format,$carac) {
         $this->name = $name;
         $this->alias = $alias;
         if ($this->alias == "") {
@@ -60,7 +59,6 @@ class OBJDataField {
         $this->display = $display;
         $this->display_format = $display_format;
         $this->carac = $carac;
-        $this->ar_frm = array();
     }
 
 }
@@ -184,7 +182,7 @@ class OBJDataFiche {
                 $rec[$field->alias] = $FuncFormate($rec[$field->alias]);
             }
             $this->html .= TB_ligne("","",1,"","");
-            $this->html .= TB_cellule($this->tableId."_l".$ligne."c".$cellule,$this->tdSTtitre,"","","",1,"");
+            $this->html .= TB_cellule($this->tableId."_l".$ligne."c".$cellule,$this->tdSTtitre,"text-align: right;","","",1,"");
             $cellule++;
             $this->html .= $field->display."</td>";
             $this->html .= TB_cellule($this->tableId."_l".$ligne."c".$cellule,$this->tdSTval,"","","",1,"");
@@ -207,6 +205,7 @@ class OBJElementFormulaire {
     public $max, $autocomplete, $placeholder;   // Input Type text
     public $row, $cols;                         // Textarea
     public $table, $champ;                      // Dans un select source enum
+    public $requete, $champId, $champNom;       // Dans un select source table
     public $optclasse, $optstyle;               // Option dans un select
 
     public $html_elem;                          // Code HTML pour affichage (rendu final)
@@ -248,6 +247,19 @@ class OBJElementFormulaire {
                 $this->html_elem = FRM_se($this->name,$this->classe,'',0,'',1,$this->style);
                 foreach ($ar_enum as $choix) {
                     $this->html_elem .= FRM_opt($this->optclasse, $choix, $choix==$this->valeur, ucfirst($choix), 1, $this->style);
+                }
+                $this->html_elem .= "</select>";
+            break;
+            case "select_table":
+                $ar_datasel = DTBS_sqlbrut($this->requete,$this->mysqli);
+                if (!$ar_datasel['statut'] OR $ar_datasel['nbrec']==0){
+                        $this->html_elem = "Pas de données à afficher";
+                } else {
+                    $this->html_elem = FRM_se($this->name,$this->classe,'',0,'',1,$this->style);
+                    $this->html_elem .= FRM_opt($this->optclasse, $this->valeur, $this->valeur==-1, "-", 1, $this->style);
+                    while($rec = mysqli_fetch_assoc($ar_datasel['resultat'])){
+                        $this->html_elem .= FRM_opt($this->optclasse, $rec[$this->champId], $rec[$this->champId]==$this->valeur, ucfirst($rec[$this->champNom]), 1, $this->style);
+                    }
                 }
                 $this->html_elem .= "</select>";
             break;
@@ -331,6 +343,7 @@ class OBJFormulaire {
 * @param array  $ar_ColText             Tableau qui contient le texte des entetes de colonne
 * @param string $tableId                Id du Tableau Entete
 * @param string $divId                  Id du DIV qui contient le tableau de données
+* @param string $tableCrpId             Id du Tableau Corps
 * @param string $ColSpanTitre           Nombre de cellule fusionné qui contiennent le titre ou le formulaire de navigation
 * @param string $NVGDT_titre            Titre du tableau, peut servir meme si on appel pas le formulaire de date
 * @param string $NVGDT_fonction_retour  Fonction rappelé par navigdate (qui rappel le tableau sans recharger les entetes) si vide alors pas d'appel navigdate
@@ -338,15 +351,19 @@ class OBJFormulaire {
 * @param int    $NVGDT_anneedepart      Dans la liste des années la plus vieille disponible
 * @param int    $NVGDT_jour             Gere les jours dans le formulaire
 *
+* CI-DESSOUS EN ATTENTE DE DECISION
+* @param string $ListeIcone             Contient les icones à afficher pour des actions sur ligne
+* @param string $ChampIdIcone           Nom du champ qui sera associé aux icones pour savoir sur quel enregistrement les actions auront lieu
+*
 */
 
 class OBJDataTableau {
 
     public $ods, $html, $tdSTtitre, $tdSTval, $ar_ColTaille, $ar_ColText;
-    public $tableId, $divId, $ColSpanTitre;
+    public $tableId, $divId, $hauteur, $ColSpanTitre, $IdRemplace; // $ListeIcone, $ChampIdIcone
     public $NVGDT_titre, $NVGDT_fonction_retour, $NVGDT_param, $NVGDT_anneedepart, $NVGDT_jour;
-
-     function __construct() {
+    
+    function __construct() {
         // Fixe des parametres par défaut les variable sont ="" par défaut
         $this->ods = new OBJDataSet();
         $this->ar_ColTaille = array();
@@ -360,8 +377,15 @@ class OBJDataTableau {
         $this->html = TB_table($this->tableId,"","width:100%;",1);
         $this->html .= TB_ligne("","",1,"","");
         if ($this->NVGDT_fonction_retour!=""){
+            global $ar_mois;
+            global $doc_root;
             // Construction du formulaire de navigation par date
-            // TODO le code ici
+            $NVGDT_titre = $this->NVGDT_titre;
+            $NVGDT_fonction_retour = $this->NVGDT_fonction_retour;
+            $NVGDT_param = $this->NVGDT_param;
+            $NVGDT_anneedepart = $this->NVGDT_anneedepart;
+            $NVGDT_jour = $this->NVGDT_jour;
+            include($doc_root."/sys/inc.navigdate-2.php");
         } else {
             // Affichage du titre
             $this->html .= TB_cellule("", $this->tdSTtitre, "", $this->ColSpanTitre, 0, 1); $this->html .= $this->NVGDT_titre."</td>";
@@ -379,19 +403,19 @@ class OBJDataTableau {
             $i++;
         }
         $this->html .= "</tr></table>";
-        $this->html .= HTML5_Div($this->divId, '', '', 'relative', '0px', '0px', '', '100%', 'auto', '' ,1);
+        $this->html .= HTML5_Div($this->divId, '', '', 'relative', '0px', '-1px', '', $this->hauteur, 'auto', '' ,1);
         $this->html .= "<div/>";
     
     }
 
     public function OBJGetCorpsTableau(){
 
-        $this->html  = TB_table("","","width:100%;",1);
+        $this->html  = TB_table($this->tableCrpId,"","width:100%;",1);
         
         if (!$this->ods->bdd_retour['statut'] OR $this->ods->bdd_retour['nbrec']==0){
             $this->html .= TB_ligne("","",1,"","");
-            $this->html .= TB_cellule('',$this->tdSTval,'',0,0,0);
-            $this->html .= "Aucune données à afficher</td></tr>";
+            $this->html .= TB_cellule('','','',0,0,0);
+            $this->html .= "<br/><br/>&nbsp;&nbsp;&nbsp;&nbsp;Aucune données à afficher</td></tr>";
             return;
         }
         while($rec=mysqli_fetch_assoc($this->ods->bdd_retour['resultat'])){
@@ -404,9 +428,14 @@ class OBJDataTableau {
                 $this->html .= TB_cellule("", $this->tdSTval, "width:".$this->ar_ColTaille[$i], "", "", 1, ""); $this->html .= $rec[$field->alias]."</td>";
                 $i++;
             }
+            // Si une cellelule d'icone existe l'affiche ici
+            /*if ($this->ListeIcone!="" AND $this->ChampIdIcone!=""){
+                $this->html .= TB_cellule("IdCellAct_".$rec['cmdn_id'], $this->tdSTval, 0, "", "", 1, ""); 
+                $this->html .= $this->ListeIcone."</td>";
+            }*/
             if ( count($this->ods->ar_bdd_fields) < count($this->ar_ColTaille) ){
                 for ($i=0;$i<(count($this->ods->ar_bdd_fields) < count($this->ar_ColTaille));$i++){
-                    $this->html .= TB_cellule("", $this->tdSTval, "", "", "", 1, ""); $this->html .= "&nbsp;</td>";
+                    $this->html .= TB_cellule("", $this->tdSTval, "", "", "", 1, ""); $this->html .= "</td>";
                 }
             }
             $this->html .= "</tr>";
