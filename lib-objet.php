@@ -341,6 +341,7 @@ class OBJFormulaire {
 * @param string $tdSTval                Nom de la classe des cellules corps
 * @param array  $ar_ColTaille           Tableau qui contient la taille des colonnes
 * @param array  $ar_ColText             Tableau qui contient le texte des entetes de colonne
+* @param array  $ar_ColStyle            Tableau qui contient une surcharge de style pour chaque colonne
 * @param string $tableId                Id du Tableau Entete
 * @param string $divId                  Id du DIV qui contient le tableau de données
 * @param string $tableCrpId             Id du Tableau Corps
@@ -359,7 +360,7 @@ class OBJFormulaire {
 
 class OBJDataTableau {
 
-    public $ods, $html, $tdSTtitre, $tdSTval, $ar_ColTaille, $ar_ColText;
+    public $ods, $html, $tdSTtitre, $tdSTval, $ar_ColTaille, $ar_ColText, $ar_ColStyle;
     public $tableId, $divId, $hauteur, $ColSpanTitre, $IdRemplace; // $ListeIcone, $ChampIdIcone
     public $NVGDT_titre, $NVGDT_fonction_retour, $NVGDT_param, $NVGDT_anneedepart, $NVGDT_jour;
     
@@ -367,14 +368,16 @@ class OBJDataTableau {
         // Fixe des parametres par défaut les variable sont ="" par défaut
         $this->ods = new OBJDataSet();
         $this->ar_ColTaille = array();
-        // Classe par défaut
+        $this->ar_ColStyle = array();
+        $this->ar_ColText = array();
+        // Classe par défaut style Perso JM par défaut
         $this->tdSTtitre = "tdtitreflat";
         $this->tdSTval = "tdcorpsflat";
     }
 
     public function OBJGetEnteteTableau(){
         
-        $this->html = TB_table($this->tableId,"","width:100%;",1);
+        $this->html = TB_table($this->tableId,"","position: relative; width:100%;",1);
         $this->html .= TB_ligne("","",1,"","");
         if ($this->NVGDT_fonction_retour!=""){
             global $ar_mois;
@@ -403,7 +406,7 @@ class OBJDataTableau {
             $i++;
         }
         $this->html .= "</tr></table>";
-        $this->html .= HTML5_Div($this->divId, '', '', 'relative', '0px', '-1px', '', $this->hauteur, 'auto', '' ,1);
+        $this->html .= HTML5_Div($this->divId, '', '', 'relative', '0px', '0px', '', $this->hauteur, 'auto', '' ,1);
         $this->html .= "<div/>";
     
     }
@@ -415,7 +418,7 @@ class OBJDataTableau {
         if (!$this->ods->bdd_retour['statut'] OR $this->ods->bdd_retour['nbrec']==0){
             $this->html .= TB_ligne("","",1,"","");
             $this->html .= TB_cellule('','','',0,0,0);
-            $this->html .= "<br/><br/>&nbsp;&nbsp;&nbsp;&nbsp;Aucune données à afficher</td></tr>";
+            $this->html .= "<br/><br/>&nbsp;&nbsp;&nbsp;&nbsp;Aucune données à afficher</td></tr></table>";
             return;
         }
         while($rec=mysqli_fetch_assoc($this->ods->bdd_retour['resultat'])){
@@ -425,7 +428,7 @@ class OBJDataTableau {
                     $FuncFormat = $field->display_format;
                     $rec[$field->alias] =  $FuncFormat($rec[$field->alias]);
                 }
-                $this->html .= TB_cellule("", $this->tdSTval, "width:".$this->ar_ColTaille[$i], "", "", 1, ""); $this->html .= $rec[$field->alias]."</td>";
+                $this->html .= TB_cellule("", $this->tdSTval, $this->ar_ColStyle[$i]."width:".$this->ar_ColTaille[$i], "", "", 1, ""); $this->html .= $rec[$field->alias]."</td>";
                 $i++;
             }
             // Si une cellelule d'icone existe l'affiche ici
