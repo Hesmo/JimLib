@@ -200,7 +200,7 @@ function HTML5_Img() {
 	$action = $ar_arg[7];
 	$usemap = $ar_arg[8];
 	if (isset($ar_arg[9])){$title=$ar_arg[9];}
-	
+
 	$element = "<img src=\"$src\"";
 	if (trim($id)!= "")		{ $element .= " id=\"$id\""; }
 	if (trim($style)!= "")	{ $element .= " style=\"$style\""; }
