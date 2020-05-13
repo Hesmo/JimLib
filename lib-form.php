@@ -84,7 +84,7 @@ function FRM_se() {
 	if ($class!="")		{$element.=" class='$class'";}
 	if ($size!="") 		{$element.=" size='$size'";}
 	if ($style!="")     {$element.=" style='$style'";}
-	if ($multiple==1)	{$element.=" multiple='multiple'";}
+	if ($multiple==1)	{$element.=" multiple";}
 	if ($action!="")	{$element.=" ".$action;}
 	$element.= ">";
 	if ($retour == 1) { return $element; } else { echo $element; }
@@ -206,7 +206,7 @@ function FRM_cb() {
 	if ($name!="")	{$element .=" name=\"$name\"";}
 	if ($checked==1){$element .= "checked";}
 	if ($action!=""){$element .=" ".$action;}
-	if (isset($valeur)){$element .="  value=\"$valeur\"";}
+	if (isset($valeur) AND trim($valeur)!=""){$element .="  value=\"$valeur\"";}
 	if (isset($ar_arg[8]) AND ($ar_arg[8] == 1)){ $element .= "onclick='return false;'"; } // Equivalent de readonly
 	if (isset($ar_arg[9]) AND ($ar_arg[9]!="")){ $element .= $ar_arg[9]; } // Equivalent de readonly
 	if (isset($ar_arg[10]) AND $ar_arg[10]!=""){ $element.= $data." "; }
