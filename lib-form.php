@@ -108,7 +108,7 @@ function FRM_opt() {
 	if ($selection) {$element .=" selected=\"selected\" ";}
 	if (trim($class)!=""){$element.=" class=\"".$class."\" ";}
 	if (isset($ar_arg[6])) { $element.= $data." "; }
-	$element.=">".$texte."&nbsp;&nbsp;</option>\n";
+	$element.=">".$texte."</option>\n";
 	if ($retour == 1) { return $element; } else { echo $element; }
 }
 /**
