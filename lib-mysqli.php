@@ -374,6 +374,9 @@ function DTBS_transaction($action){
 			$resultat = mysqli_query($mysqli, "SET autocommit = 1;");
 			return "Ok";
 		break;
+		default:
+			return "Parametre innatendu";
+		break;
 	}
 }
 ?>

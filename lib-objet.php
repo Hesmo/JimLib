@@ -237,7 +237,7 @@ class OBJElementFormulaire {
                 $this->html_elem = FRM_cb($this->classe, $this->style, $this->name, $this->checked, $this->valeur, $this->action, 1);
             break;
             case "radio":
-                $this->html_elem = FRM_cb($this->classe, $this->style, $this->name, $this->checked, $this->valeur, "", $this->action, 1, $this->id);
+                $this->html_elem = FRM_ir($this->classe, $this->style, $this->name, $this->checked, $this->valeur, "", $this->action, 1, $this->id);
             break;
             case "textarea":
                 $this->html_elem = FRM_ta($this->style, $this->name, $this->classe, $this->rows, $this->cols, $this->valeur, 1, $this->action);
