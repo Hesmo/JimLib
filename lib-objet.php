@@ -278,12 +278,13 @@ class OBJElementFormulaire {
 * @param string $tdSTval        Nom de la classe des cellules valeurs
 * @param string $tableId        Id de la table généré
 * @param string $classBt        Classe des boutons
+* @param string $tableStyle
 *
 */
 
 class OBJFormulaire {
 
-    public $ar_oef, $html, $tdSTtitre, $tdSTval, $tableId, $tableStyle, $classBt;
+    public $ar_oef, $html, $NameFrm, $tdSTtitre, $tdSTval, $tableId, $tableStyle, $classBt;
 
      function __construct() {
         // Fixe des parametres par défaut les variable sont ="" par défaut
