@@ -336,7 +336,7 @@ class OBJFormulaire {
 * Objet qui représente un tableau issue d'une requete à la base de données 
 * le tableau fait 100% c'est donc le conteneur qui doit fixé la taille
 * 
-* @param objet  $ods                    Objet dy type OBJDataSet
+* @param objet  $ods                    Objet de type OBJDataSet
 * @param string $html                   Contient le code généré à exploiter
 * @param string $tdSTtitre              Nom de la classe des cellules entetes
 * @param string $tdSTval                Nom de la classe des cellules corps
