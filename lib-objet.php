@@ -277,12 +277,13 @@ class OBJElementFormulaire {
 * @param string $tdSTval        Nom de la classe des cellules valeurs
 * @param string $tableId        Id de la table généré
 * @param string $classBt        Classe des boutons
+* @param string $tableStyle
 *
 */
 
 class OBJFormulaire {
 
-    public $ar_oef, $html, $tdSTtitre, $tdSTval, $tableId, $tableStyle, $classBt;
+    public $ar_oef, $html, $NameFrm, $tdSTtitre, $tdSTval, $tableId, $tableStyle, $classBt;
 
      function __construct() {
         // Fixe des parametres par défaut les variable sont ="" par défaut
@@ -334,7 +335,7 @@ class OBJFormulaire {
 * Objet qui représente un tableau issue d'une requete à la base de données 
 * le tableau fait 100% c'est donc le conteneur qui doit fixé la taille
 * 
-* @param objet  $ods                    Objet dy type OBJDataSet
+* @param objet  $ods                    Objet de type OBJDataSet
 * @param string $html                   Contient le code généré à exploiter
 * @param string $tdSTtitre              Nom de la classe des cellules entetes
 * @param string $tdSTval                Nom de la classe des cellules corps
@@ -406,7 +407,11 @@ class OBJDataTableau {
             $i++;
         }
         $this->html .= "</tr></table>";
+<<<<<<< HEAD
         $this->html .= HTML5_Div($this->divId, '', '', 'relative', '0px', '0px', $this->largeur, $this->hauteur, 'auto', '' ,1);
+=======
+        $this->html .= HTML5_Div($this->divId, '', '', 'relative', '0px', '-1px', '', $this->hauteur, 'auto', '' ,1);
+>>>>>>> 93f72590e41462b6e489eb66b0b429366ace4e8a
         $this->html .= "<div/>";
     
     }
