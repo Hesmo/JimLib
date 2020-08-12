@@ -31,7 +31,6 @@ class OBJDataSet {
 
 }
 
-
 /** 
 * Objet qui représente un champ de base de données 
 * 
@@ -203,7 +202,7 @@ class OBJElementFormulaire {
     public $checked;                            // Checkbox et radio
     public $id;                                 // Hidden et radio
     public $max, $autocomplete, $placeholder;   // Input Type text
-    public $row, $cols;                         // Textarea
+    public $rows,$cols;                         // Textarea
     public $table, $champ;                      // Dans un select source enum
     public $requete, $champId, $champNom;       // Dans un select source table
     public $optclasse, $optstyle;               // Option dans un select
@@ -361,7 +360,7 @@ class OBJFormulaire {
 class OBJDataTableau {
 
     public $ods, $html, $tdSTtitre, $tdSTval, $ar_ColTaille, $ar_ColText, $ar_ColStyle;
-    public $tableId, $divId, $hauteur, $ColSpanTitre, $IdRemplace; // $ListeIcone, $ChampIdIcone
+    public $tableId, $divId, $largeur, $hauteur, $ColSpanTitre, $IdRemplace; // $ListeIcone, $ChampIdIcone
     public $NVGDT_titre, $NVGDT_fonction_retour, $NVGDT_param, $NVGDT_anneedepart, $NVGDT_jour;
     
     function __construct() {
@@ -373,11 +372,12 @@ class OBJDataTableau {
         // Classe par défaut style Perso JM par défaut
         $this->tdSTtitre = "tdtitreflat";
         $this->tdSTval = "tdcorpsflat";
+        $this->largeur = "100%";
     }
 
     public function OBJGetEnteteTableau(){
         
-        $this->html = TB_table($this->tableId,"","position: relative; width:100%;",1);
+        $this->html = TB_table($this->tableId,"","position: relative; width:".$this->largeur.";",1);
         $this->html .= TB_ligne("","",1,"","");
         if ($this->NVGDT_fonction_retour!=""){
             global $ar_mois;
@@ -406,14 +406,14 @@ class OBJDataTableau {
             $i++;
         }
         $this->html .= "</tr></table>";
-        $this->html .= HTML5_Div($this->divId, '', '', 'relative', '0px', '0px', '', $this->hauteur, 'auto', '' ,1);
+        $this->html .= HTML5_Div($this->divId, '', '', 'relative', '0px', '0px', $this->largeur, $this->hauteur, 'auto', '' ,1);
         $this->html .= "<div/>";
     
     }
 
     public function OBJGetCorpsTableau(){
 
-        $this->html  = TB_table($this->tableCrpId,"","width:100%;",1);
+        $this->html  = TB_table($this->tableCrpId,"","width:".$this->largeur.";",1);
         
         if (!$this->ods->bdd_retour['statut'] OR $this->ods->bdd_retour['nbrec']==0){
             $this->html .= TB_ligne("","",1,"","");
