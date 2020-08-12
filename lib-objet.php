@@ -407,11 +407,7 @@ class OBJDataTableau {
             $i++;
         }
         $this->html .= "</tr></table>";
-<<<<<<< HEAD
-        $this->html .= HTML5_Div($this->divId, '', '', 'relative', '0px', '0px', $this->largeur, $this->hauteur, 'auto', '' ,1);
-=======
-        $this->html .= HTML5_Div($this->divId, '', '', 'relative', '0px', '-1px', '', $this->hauteur, 'auto', '' ,1);
->>>>>>> 93f72590e41462b6e489eb66b0b429366ace4e8a
+        $this->html .= HTML5_Div($this->divId, '', '', 'relative', '0px', '-1px', $this->largeur, $this->hauteur, 'auto', '' ,1);
         $this->html .= "<div/>";
     
     }
