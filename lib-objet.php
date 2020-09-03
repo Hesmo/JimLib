@@ -200,7 +200,8 @@ class OBJElementFormulaire {
     public $type, $name, $valeur;               // Type d'objet formulaire, nom et valeur (Pour checkbox : valeur = text)
     public $classe, $style, $action;            // Tous sauf Hidden
     public $checked;                            // Checkbox et radio
-    public $id;                                 // Hidden et radio
+    public $id;                                 // Hidden et radio 
+    public $texte;                              // Etiquette a droite des boutons radio
     public $max, $autocomplete, $placeholder;   // Input Type text
     public $rows,$cols;                         // Textarea
     public $table, $champ;                      // Dans un select source enum
@@ -236,7 +237,7 @@ class OBJElementFormulaire {
                 $this->html_elem = FRM_cb($this->classe, $this->style, $this->name, $this->checked, $this->valeur, $this->action, 1);
             break;
             case "radio":
-                $this->html_elem = FRM_ir($this->classe, $this->style, $this->name, $this->checked, $this->valeur, "", $this->action, 1, $this->id);
+                $this->html_elem = FRM_ir($this->classe, $this->style, $this->name, $this->checked, $this->valeur, $this->texte, $this->action, 1, $this->id);
             break;
             case "textarea":
                 $this->html_elem = FRM_ta($this->style, $this->name, $this->classe, $this->rows, $this->cols, $this->valeur, 1, $this->action);
