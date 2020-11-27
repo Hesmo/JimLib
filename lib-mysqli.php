@@ -158,13 +158,13 @@ function DTBS_insert_rec(){
 	$chaine_value="";
 	$cpt=0;
 
-	// Attention si activé empeche le deroulement de la prod
 	$listechamp = mysqli_query($pointeur, "DESCRIBE $table");
 	/*if (mysqli_num_rows($listechamp)!=count($ar_field)){
-		$ar_retour['statut']= false;
-		$ar_retour['erreur']= "Nombre de champ incorrect Tableau : ".count($ar_field).", bdd : ".mysqli_num_rows($listechamp);
-		// ."\n".print_r($ar_field)
-		return $ar_retour;
+		$filesyslog = fopen($_SERVER['DOCUMENT_ROOT']."/tmp/jimlogperso.txt",'a+');
+		fputs($filesyslog, "--------------------------------------------------------------------------------\n");
+		$message = "Nombre de champ incorrect Tableau : ".count($ar_field).", nb champ table : ".mysqli_num_rows($listechamp).", table : ".$table;
+		fputs($filesyslog, date("d/m/Y H:i")." - ".str_replace($_SERVER['DOCUMENT_ROOT'],"",$_SERVER['SCRIPT_FILENAME'])."\n".$message."\n\n\n");
+		fclose($filesyslog);
 	}*/
 
 	while ($r=mysqli_fetch_assoc($listechamp)) {
@@ -227,6 +227,13 @@ function DTBS_add_rec(){
 	$cpt=0;
 
 	$listechamp = mysqli_query($mysqli, "DESCRIBE $table");
+	/*if (mysqli_num_rows($listechamp)!=count($ar_nval)){
+		$filesyslog = fopen($_SERVER['DOCUMENT_ROOT']."/tmp/jimlogperso.txt",'a+');
+		fputs($filesyslog, "--------------------------------------------------------------------------------\n");
+		$message = "Nombre de champ incorrect Tableau : ".count($ar_nval).", nb champ table : ".mysqli_num_rows($listechamp).", table : ".$table;
+		fputs($filesyslog, date("d/m/Y H:i")." - ".str_replace($_SERVER['DOCUMENT_ROOT'],"",$_SERVER['SCRIPT_FILENAME'])."\n".$message."\n\n\n");
+		fclose($filesyslog);
+	}*/
 	//  SHOW FULL COLUMNS FROM client; permet d'avoir la colonne commentaire
 	while ($r=mysqli_fetch_assoc($listechamp)) {
 		if ($r['Extra']!="auto_increment"){
