@@ -154,11 +154,11 @@ function TB_cellule() {
 		if ($rowspan > 0) 		{ $element .= " rowspan=\"$rowspan\""; }
 		if (trim($dujava)!="") 	{ $element .= " $dujava"; }
 		
-		/*if (isset($ar_arg[8]) and is_array($ar_arg['8'])){ 
+		if (isset($ar_arg[8]) and is_array($ar_arg['8'])){ 
 			foreach ($ar_arg[8] as $clef=>$value){
 				$element .= " data-".$clef."=\"".$value."\"";
 			}
-		}*/
+		}
 
 	}
 	
