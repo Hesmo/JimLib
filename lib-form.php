@@ -56,7 +56,7 @@ function FRM_it(){
 	if ($style!="")  { $element.= " style=\"$style\"";}
 	if ($max!="") 	 { $element.= " maxlength=\"$max\"";}
 	if ($name!="") 	 { $element.= " name=\"$name\"";}
-	if ($valeur!="") { $element.= " value='".$valeur."'";}  
+	if ($valeur!="") { $element.= " value=\"$valeur\"";}  
 	if ($action!="") { $element.= " $action";}
 	if (isset($autocomplete)) { $element.= " autocomplete=\"off\"";}
 	if (isset($placeholder)) { $element.= " placeholder=\"".$placeholder."\"";}
