@@ -182,7 +182,7 @@ function FRM_pword(){
 	if ($taille!=""){$element .=" size=\"$taille\"";}
 	if ($action!=""){$element .=" $action";}
 	
-	$element .= "/>\n";
+	$element .= " >\n";
 
 	if ($retour == 1) {return $element;} else {echo $element;}
 }
@@ -210,7 +210,7 @@ function FRM_cb() {
 	if (isset($ar_arg[8]) AND ($ar_arg[8] == 1)){ $element .= "onclick='return false;'"; } // Equivalent de readonly
 	if (isset($ar_arg[9]) AND ($ar_arg[9]!="")){ $element .= $ar_arg[9]; } // Equivalent de readonly
 	if (isset($ar_arg[10]) AND $ar_arg[10]!=""){ $element.= $data." "; }
-	$element .= "/>".$text."\n";
+	$element .= " >".$text."\n";
 	if ($retour == 1) { return $element; } else { echo $element; }
 
 }
@@ -237,7 +237,7 @@ function FRM_ir() {
 	if (trim($action)!=""){$element .= " ".$action; }
 	if (trim($id)!=""){ $element .= " id=\"$id\""; }
 	
-	$element .= ">".$text."\n";
+	$element .= " >".$text."\n";
 	if ($retour == 1) { return $element; } else { echo $element; }
 }
 function FRM_ta() {
@@ -261,7 +261,7 @@ function FRM_ta() {
 	if (trim($rows)!="")  $element.= " rows=\"$rows\"";
 	if (trim($cols)!="")  $element.= " cols=\"$cols\"";
 	if (trim($action)!="") $element.= " $action";
-	$element .= ">".$contenu."</textarea>\n";
+	$element .= " >".$contenu."</textarea>\n";
 	
 	if ($retour == 1) { return $element; } else { echo $element; }
 }
@@ -304,7 +304,7 @@ function FRM_upload($ar_param) {
 	$element .= "<input type=\"file\" id=\"".$ar_param['idfile']."\" name=\"".$ar_param['namefile']."\"";
 	if (isset($ar_param['multiple']) AND $ar_param['multiple']){ $element .= " multiple/ "; }
 	$element .= "style=\"".$ar_param['stylebtinput']."\"";
-	$element .= ">\n";
+	$element .= " >\n";
 
 	$element .= FRM_hidden("max_file_size",$ar_param['maxfilesize'],1);
 
