@@ -39,14 +39,10 @@ function TB_foot(){
 function TB_body(){
 	$ar_arg = func_get_args();
 
-	if (isset($ar_arg[0]) && is_array($ar_arg[0]) && count($ar_arg) == 1)
-	{
+	if (isset($ar_arg[0]) && is_array($ar_arg[0]) && count($ar_arg) == 1) {
 		$arg = $ar_arg[0];
-
-		if ($arg["ouvre"])
-		{
+		if ($arg["ouvre"]) {
 			$element = "<tbody";
-
 			foreach ($arg as $key => $value) {
 				switch ($key) {
 					case 'retour':
@@ -60,11 +56,10 @@ function TB_body(){
 				}
 			}
 			$element .=">";
-		} 
-		else { $element = "</tbody>"; }
-	}
-	else
-	{
+		} else {
+			$element = "</tbody>";
+		}
+	} else {
 		$ouvre 	= $ar_arg[0];
 		$retour = $ar_arg[1];
 		if ($ouvre) { $element = "<tbody>"; } else { $element = "</tbody>"; }
@@ -109,34 +104,26 @@ function TB_cellule() {
 	$ar_arg = func_get_args();
 
 	//envoie des param via un tableau 
-	if (is_array($ar_arg[0]) && count($ar_arg) == 1)
-	{
+	if (is_array($ar_arg[0]) && count($ar_arg) == 1) {
 		$arg = $ar_arg[0];
 		$retour = 0;		
-		if (isset($arg['entete']) && $arg['entete'] == 'th')
+		if (isset($arg['entete']) && $arg['entete'] == 'th') {
 			$element = "<th ";
-		else
+		} else {
 			$element = "<td ";
+		}
 
 		foreach ($arg as $key => $value) {
 			switch ($key) {
-				case 'entete':
-					break;
-				case 'action':
-					$element .= " $value ";
-					break;
-				case 'retour':
-					$retour = $value;
-					break;
-				default:
-					$element .= " $key=\"$value\" ";
-					break;
+				case 'entete': break;
+				case 'action': $element .= " $value "; break;
+				case 'retour': $retour = $value; break;
+				default: $element .= " $key=\"$value\" "; break;
 			}
 		}
-	}
-	//envoie des param en ligne
-	else
-	{
+
+	} else {
+		
 		$id 	 = $ar_arg[0];
 		$class 	 = $ar_arg[1];
 		$style 	 = $ar_arg[2];
@@ -165,9 +152,9 @@ function TB_cellule() {
 	$element .= ">";
 	if ($retour == 1) { return $element; } else { echo $element; }
 	
-	
 }
 function TB_cellule_fin() {
+ 	
  	$ar_arg = func_get_args();
  	if (isset( $ar_arg[0])){echo "</th>\n"; }
  	else{ echo "</td>\n"; }
