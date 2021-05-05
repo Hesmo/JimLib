@@ -292,7 +292,7 @@ function FRM_upload($ar_param) {
 		$ar_param['stylebtinput'] = "margin: 5px; padding: 5px; background: white; border: 1px solid black; color: black; font-size: 100%; text-shadow: 2px 2px #cacaca; box-shadow: 2px 2px 2px #000000; text-align:center; height:38px; ";
 	}*/
 
-	$element = "<form method=\"post\" enctype=\"multipart/form-data\"";
+	$element = "<form method=\"post\" enctype=\"multipart/form-data\" accept-charset=\"utf-8\"";
 	if (isset($ar_param['name'])){ $element .= " name=\"".$ar_param['name']."\""; }
 	if (isset($ar_param['action'])){ $element .= " action=\"".$ar_param['action']."\""; }
 	if (isset($ar_param['class'])){ $element .= " class=\"".$ar_param['class']."\""; }

@@ -430,7 +430,8 @@ class OBJDataTableau {
                     $FuncFormat = $field->display_format;
                     $rec[$field->alias] =  $FuncFormat($rec[$field->alias]);
                 }
-                $this->html .= TB_cellule("", $this->tdSTval, $this->ar_ColStyle[$i]."width:".$this->ar_ColTaille[$i], "", "", 1, ""); $this->html .= $rec[$field->alias]."</td>";
+                $this->html .= TB_cellule("", $this->tdSTval, $this->ar_ColStyle[$i]."width:".$this->ar_ColTaille[$i], "", "", 1, ""); 
+                $this->html .= $rec[$field->alias]."</td>";
                 $i++;
             }
             // Si une cellelule d'icone existe l'affiche ici
