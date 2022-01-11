@@ -352,6 +352,9 @@ class OBJFormulaire {
 * @param string $NVGDT_param            Tableau de parametre passé eventuellement à la fonction ci-dessus
 * @param int    $NVGDT_anneedepart      Dans la liste des années la plus vieille disponible
 * @param int    $NVGDT_jour             Gere les jours dans le formulaire
+* 
+* EN TEST : $ColSupIco
+* @param bool $ColSupIco                true si il y a une colonne à la fin pour mettre des icones
 *
 * CI-DESSOUS EN ATTENTE DE DECISION
 * @param string $ListeIcone             Contient les icones à afficher pour des actions sur ligne
@@ -365,6 +368,8 @@ class OBJDataTableau {
     public $tableId, $divId, $largeur, $hauteur, $ColSpanTitre, $IdRemplace; // $ListeIcone, $ChampIdIcone
     public $NVGDT_titre, $NVGDT_fonction_retour, $NVGDT_param, $NVGDT_anneedepart, $NVGDT_jour;
     
+    public $ColSupIco, $ColSupIcoWidth; // En test
+
     function __construct() {
         // Fixe des parametres par défaut les variable sont ="" par défaut
         $this->ods = new OBJDataSet();
@@ -407,6 +412,8 @@ class OBJDataTableau {
             $this->html .= TB_cellule("", $this->tdSTtitre, "width:".$this->ar_ColTaille[$i], 0, 0, 1); $this->html .= $TextCel."</td>";
             $i++;
         }
+        if ($this->ColSupIco){ $this->html .= TB_cellule("", $this->tdSTtitre, "width:".$this->ColSupIcoWidth, 0, 0, 1); $this->html .= "</td>"; }
+
         $this->html .= "</tr></table>";
         $this->html .= HTML5_Div($this->divId, '', '', 'relative', '0px', '-1px', $this->largeur, $this->hauteur, 'auto', '' ,1);
         $this->html .= "<div/>";
@@ -444,6 +451,7 @@ class OBJDataTableau {
                     $this->html .= TB_cellule("", $this->tdSTval, "", "", "", 1, ""); $this->html .= "</td>";
                 }
             }
+            if ($this->ColSupIco){ $this->html .= TB_cellule("", $this->tdSTval, "width:".$this->ColSupIcoWidth, 0, 0, 1); $this->html .= "&nbsp;</td>"; }
             $this->html .= "</tr>";
         }
        
