@@ -19,6 +19,7 @@ function FILESYS_lit_repertoire($path,$file,$link,$dir,$hidden){
 	// Charge la liste des fichiers
 	while ( $fichier = readdir($d) ) { 
 		$clef = fileinode ($path.$fichier);
+		if (!$clef){ $ar_retour['txterreur'] = "Lecture de l'inode impossible"; return $ar_retour; }
 		$ar_retour['fichiers'][$clef]=$path.$fichier;
 		//array_push($ar_retour['fichiers'],$path.$fichier); 
 	}
@@ -35,6 +36,7 @@ function FILESYS_lit_repertoire($path,$file,$link,$dir,$hidden){
 	foreach($ar_retour['fichiers'] as $clef=>$valeur){ // For cpt impossible car la clef n'est pas incrementé
 		$ar_retour['fichiers'][$clef] = str_replace($path,"", $valeur);
 	}
+
 	// Supprime les fichiers cachés (a faire après la suppression du préfixe path)
 	if (!$hidden){  $ar_retour['fichiers'] = array_filter($ar_retour['fichiers'],'FILESYS_filtre_dir_hide'); }
 
