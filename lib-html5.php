@@ -189,7 +189,16 @@ function HTML5_P() {
 function HTML5_Img() {
 	
 	$ar_arg = func_get_args();
-	
+	// Passage en mode objet
+	if (isset($ar_arg[10])){
+		if ($ar_arg[10]){
+			$img = new CLS_HTML5_Img();
+			$img->Set_CLS_HTML5_Img($ar_arg[0], $ar_arg[1], $ar_arg[3], $ar_arg[4], $ar_arg[5], $ar_arg[6], $ar_arg[7]);
+			$img->Set_CLS_HTML5_Img_Element(false);
+			return $img;
+		}
+	}
+
 	$id     = $ar_arg[0];
 	$style  = $ar_arg[1];
 	$retour = $ar_arg[2];
@@ -211,10 +220,38 @@ function HTML5_Img() {
 	if (trim($usemap)!= "") { $element .= " usemap=\"$usemap\""; }
 	if (isset($title) AND trim($title)!="") { $element .= " title=\"$title\""; }
 	$element .= ">\n";
-	if ($retour==1) { return $element; } else {echo $element;}
+	if ($retour==1) { return $element; } else { echo $element; }
 
 }
+class CLS_HTML5_Img {
+    
+    public $id, $style, $src, $width, $height, $alt, $data, $element;
+    function Set_CLS_HTML5_Img($id, $style, $src, $width, $height, $alt, $data) {
+       $this->id = $id;
+       $this->style = $style;
+       $this->src = $src;
+       $this->width = $width;
+       $this->height = $height;
+       $this->alt = $alt; // contient le title
+       $this->data = $data;
+    }
+    function Set_CLS_HTML5_Img_Element($view){
+		$this->element = "<img src=\"$this->src\"";
+		if (trim($this->id)!= "")	   { $this->element .= " id=\"$this->id\""; }
+		if (trim($this->style)!= "")  { $this->element .= " style=\"$this->style\""; }
+		if (trim($this->width)!= "")  { $this->element .= " width=".$this->width; }
+		if (trim($this->height)!= "") { $this->element .= " height=".$this->height; }
+		if (trim($this->alt)!= "") 	{ 
+			$this->element .= " alt=\"$this->alt\""; 
+		} else { $this->element .= " alt=\"-\""; }
+		if (trim($this->data)!= "")   { $this->element .= " ".$this->data; }
+		if (trim($this->alt))         { $this->element .= " title=\"$this->alt\""; }
+		$this->element .= ">\n";
+    	if ($view){ echo $this->element; }
+    }
+    
 
+}
 function HTML5_script($fichier){
 	echo "<script src=\"$fichier\"></script>\n";
 }
