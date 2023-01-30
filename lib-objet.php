@@ -404,7 +404,12 @@ class OBJDataTableau {
         // Affiche les entetes de colonnes
         $i=0;
         foreach ($this->ar_ColText as $TextCel){
-            $this->html .= TB_cellule("", $this->tdSTtitre, "width:".$this->ar_ColTaille[$i], 0, 0, 1); $this->html .= $TextCel."</td>";
+            if ($this->ar_ColTaille[$i]!=""){
+                $substitut = "width:".$this->ar_ColTaille[$i];
+            } else {
+                $substitut = "";
+            }
+            $this->html .= TB_cellule("", $this->tdSTtitre, $substitut, 0, 0, 1); $this->html .= $TextCel."</td>";
             $i++;
         }
         $this->html .= "</tr></table>";

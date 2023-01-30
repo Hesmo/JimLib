@@ -102,11 +102,11 @@ function DTBS_select_join3($table1,$table2,$table3,$champ,$condjoin,$condjoin2,$
 }
 function DTBS_sqlbrut($requete,$pointeur){
 	
-	$ar_retour['statut']= true;
-	$ar_retour['erreur']="";
-	$ar_retour['requete']=$requete;
-	$ar_retour['nbrec']=0;
-	$ar_retour['resultat']=0;
+	$ar_retour['statut'] = true;
+	$ar_retour['erreur'] = "";
+	$ar_retour['requete'] = $requete;
+	$ar_retour['nbrec'] = 0;
+	$ar_retour['resultat'] = 0;
 	
 	$ar_retour['resultat'] = mysqli_query($pointeur, $ar_retour['requete']);
 	if (!$ar_retour['resultat']) {
