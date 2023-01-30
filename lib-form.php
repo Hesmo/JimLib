@@ -104,9 +104,9 @@ function FRM_opt() {
 	if (isset($ar_arg[6])) { $data = $ar_arg[6]; }
 	
 	$element = "<option value=\"$valeur\"";
+	if (trim($class)!=""){$element.=" class=\"".$class."\" ";}
 	if ($style!="")     {$element.= " style=\"$style\"";}
 	if ($selection) {$element .=" selected=\"selected\" ";}
-	if (trim($class)!=""){$element.=" class=\"".$class."\" ";}
 	if (isset($ar_arg[6])) { $element.= $data." "; }
 	$element.=">".$texte."</option>\n";
 	if ($retour == 1) { return $element; } else { echo $element; }
@@ -204,12 +204,12 @@ function FRM_cb() {
 	if ($class!="")	{$element .=" class=\"$class\""; }
 	if ($style!="") {$element .=" style=\"$style\"";}
 	if ($name!="")	{$element .=" name=\"$name\"";}
-	if ($checked==1){$element .= "checked";}
+	if ($checked==1){$element .= " checked";}
 	if ($action!=""){$element .=" ".$action;}
-	if (isset($valeur) AND trim($valeur)!=""){$element .="  value=\"$valeur\"";}
-	if (isset($ar_arg[8]) AND ($ar_arg[8] == 1)){ $element .= "onclick='return false;'"; } // Equivalent de readonly
-	if (isset($ar_arg[9]) AND ($ar_arg[9]!="")){ $element .= $ar_arg[9]; } // Equivalent de readonly
-	if (isset($ar_arg[10]) AND $ar_arg[10]!=""){ $element.= $data." "; }
+	if (isset($valeur) AND trim($valeur)!=""){$element .=" value=\"$valeur\"";}
+	if (isset($ar_arg[8]) AND ($ar_arg[8] == 1)){ $element .= " onclick='return false;'"; } // Equivalent de readonly
+	if (isset($ar_arg[9]) AND ($ar_arg[9]!="")){ $element .= " ".$ar_arg[9]; } // Equivalent de readonly
+	if (isset($ar_arg[10]) AND $ar_arg[10]!=""){ $element.= " ".$data." "; }
 	$element .= " >".$text."\n";
 	if ($retour == 1) { return $element; } else { echo $element; }
 
