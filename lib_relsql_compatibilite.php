@@ -32,13 +32,6 @@ function get_record($table,$champ,$condition,$tri) {
 	if (trim($condition)!=""){$rek = $rek."WHERE ".$condition;}
 	$rek = $rek." ".$tri;
 
-	//if (isset($_SESSION['user'])){
-	//	if ($_SESSION['user']=='hesmo'){
-	//		syslog(LOG_WARNING, "la valeur : ".$rek);
-	//	}
-	//}
-
-	//echo $rek;
 	$requete = mysql_query($rek);
 	if (!$requete)
 		{return -1;} // Renvoi -1 si la requete est fausse
@@ -56,10 +49,6 @@ function get_record_join($table1,$table2,$champ,$jointure,$condition,$tri){
 	$rek = $rek." ".$tri;
 
 	
-	//define_syslog_variables();
-	//syslog(LOG_WARNING, "la valeur : ".$rek);
-	
-
 	$requete = mysql_query($rek);
 	if (!$requete)
 		{return -1;} // Renvoi -1 si la requete est fausse
@@ -109,9 +98,8 @@ function kill_record($table,$condition) {
 	return $kill;
 }
 function insereligne($table,$ar_field) {
+	
 	/*$ar_t=error_get_last();*/
-
-
 	// Laisse une trace dans le fichier /var/log/debug (slackware)
 	//$a=syslog(LOG_DEBUG,"TABLE : ".$table." - script appelant : ".$_SERVER['SCRIPT_FILENAME']." Adresse IP : ".$_SERVER['REMOTE_ADDR']);
 	//Insere le tableau ar_field dans la table table, renvoi le dernier id
@@ -119,13 +107,6 @@ function insereligne($table,$ar_field) {
 	$chaine_value="";
 	$cpt=0;
 	$listechamp = mysql_query("DESCRIBE $table");
-
-	//if (count($ar_field)!=mysql_num_rows($listechamp)){
-		//define_syslog_variables();
-	//	syslog(LOG_WARNING, "IL : ".str_replace("/home/hesmo/www/lorge.org/www","",$_SERVER['SCRIPT_FILENAME']));
-	//	syslog(LOG_WARNING, "IL :   Nb var Param = ".count($ar_field));
-	//	syslog(LOG_WARNING, "IL : Nb Field Table = ".mysql_num_rows($listechamp));
-	//}
 
 	while ($r=mysql_fetch_array($listechamp)) {
 		$chaine_field = $chaine_field."`".$r[0]."`, ";
