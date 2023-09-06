@@ -366,7 +366,7 @@ function DTBS_transaction($action){
 			return "Ok";
 		break;
 		default:
-			return "Parametre innatendu";
+			return "Parametre inattendu";
 		break;
 	}
 }
