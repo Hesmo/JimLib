@@ -186,6 +186,12 @@ function HTML5_P() {
 	if ($retour==1) {return $element; } else {echo $element;}
 	
 }
+/**
+ * Genere un objet html image, passage des variables via un tableau
+ * 
+ * @param id Identifiant de l'objet indice 0
+ * @param $style Style de l'objet indice 1
+ */
 function HTML5_Img() {
 	
 	$ar_arg = func_get_args();
