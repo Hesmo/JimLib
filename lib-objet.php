@@ -443,6 +443,7 @@ class OBJDataTableau {
                     $rec[$field->alias] =  $FuncFormat($rec[$field->alias]);
                 }
                 $this->html .= TB_cellule("", $this->tdSTval, $this->ar_ColStyle[$i]."width:".$this->ar_ColTaille[$i], "", "", 1, ""); 
+                //$rec[$field->alias] = str_replace("[BR]","<br/>",$rec[$field->alias]);
                 $this->html .= $rec[$field->alias]."</td>";
                 $i++;
             }
