@@ -189,8 +189,17 @@ function HTML5_P() {
 /**
  * Genere un objet html image, passage des variables via un tableau
  * 
- * @param id Identifiant de l'objet indice 0
- * @param $style Style de l'objet indice 1
+ * @param string $id Identifiant de l'objet
+ * @param string $style Style de l'objet
+ * @param integer $retour
+ * @param string $src
+ * @param string $width
+ * @param string $height
+ * @param string $alt
+ * @param string $action
+ * @param string $usemap
+ * @param string $title // Optionnel
+ * 
  */
 function HTML5_Img() {
 	
@@ -231,7 +240,7 @@ function HTML5_Img() {
 }
 class CLS_HTML5_Img {
     
-    public $id, $style, $src, $width, $height, $alt, $data, $element;
+    public $id, $style, $src, $width, $height, $alt, $data, $element, $classe;
     function Set_CLS_HTML5_Img($id, $style, $src, $width, $height, $alt, $data) {
        $this->id = $id;
        $this->style = $style;
@@ -244,6 +253,7 @@ class CLS_HTML5_Img {
     function Set_CLS_HTML5_Img_Element($view){
 		$this->element = "<img src=\"$this->src\"";
 		if (trim($this->id)!= "")	   { $this->element .= " id=\"$this->id\""; }
+		if (trim($this->classe)!= "")	   { $this->element .= " class=\"$this->classe\""; }
 		if (trim($this->style)!= "")  { $this->element .= " style=\"$this->style\""; }
 		if (trim($this->width)!= "")  { $this->element .= " width=".$this->width; }
 		if (trim($this->height)!= "") { $this->element .= " height=".$this->height; }
