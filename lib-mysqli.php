@@ -102,11 +102,11 @@ function DTBS_select_join3($table1,$table2,$table3,$champ,$condjoin,$condjoin2,$
 }
 function DTBS_sqlbrut($requete,$pointeur){
 	
-	$ar_retour['statut']= true;
-	$ar_retour['erreur']="";
-	$ar_retour['requete']=$requete;
-	$ar_retour['nbrec']=0;
-	$ar_retour['resultat']=0;
+	$ar_retour['statut'] = true;
+	$ar_retour['erreur'] = "";
+	$ar_retour['requete'] = $requete;
+	$ar_retour['nbrec'] = 0;
+	$ar_retour['resultat'] = 0;
 	
 	$ar_retour['resultat'] = mysqli_query($pointeur, $ar_retour['requete']);
 	if (!$ar_retour['resultat']) {
@@ -159,13 +159,6 @@ function DTBS_insert_rec(){
 	$cpt=0;
 
 	$listechamp = mysqli_query($pointeur, "DESCRIBE $table");
-	/*if (mysqli_num_rows($listechamp)!=count($ar_field)){
-		$filesyslog = fopen($_SERVER['DOCUMENT_ROOT']."/tmp/jimlogperso.txt",'a+');
-		fputs($filesyslog, "--------------------------------------------------------------------------------\n");
-		$message = "Nombre de champ incorrect Tableau : ".count($ar_field).", nb champ table : ".mysqli_num_rows($listechamp).", table : ".$table;
-		fputs($filesyslog, date("d/m/Y H:i")." - ".str_replace($_SERVER['DOCUMENT_ROOT'],"",$_SERVER['SCRIPT_FILENAME'])."\n".$message."\n\n\n");
-		fclose($filesyslog);
-	}*/
 
 	while ($r=mysqli_fetch_assoc($listechamp)) {
 		$chaine_field .= "`".$r['Field']."`, ";
@@ -188,8 +181,6 @@ function DTBS_insert_rec(){
 	$ar_retour['requete'] = $chaine_field.$chaine_value;
 	$ar_retour['resultat'] = mysqli_query($pointeur,$chaine_field.$chaine_value);
 	$ar_retour['insert_id'] = mysqli_insert_id($pointeur);
-
-	//jimlogperso($ar_retour['requete']);
 
 	if (!$ar_retour['resultat']) {
 		$ar_retour['statut']= false;
@@ -227,13 +218,6 @@ function DTBS_add_rec(){
 	$cpt=0;
 
 	$listechamp = mysqli_query($mysqli, "DESCRIBE $table");
-	/*if (mysqli_num_rows($listechamp)!=count($ar_nval)){
-		$filesyslog = fopen($_SERVER['DOCUMENT_ROOT']."/tmp/jimlogperso.txt",'a+');
-		fputs($filesyslog, "--------------------------------------------------------------------------------\n");
-		$message = "Nombre de champ incorrect Tableau : ".count($ar_nval).", nb champ table : ".mysqli_num_rows($listechamp).", table : ".$table;
-		fputs($filesyslog, date("d/m/Y H:i")." - ".str_replace($_SERVER['DOCUMENT_ROOT'],"",$_SERVER['SCRIPT_FILENAME'])."\n".$message."\n\n\n");
-		fclose($filesyslog);
-	}*/
 	//  SHOW FULL COLUMNS FROM client; permet d'avoir la colonne commentaire
 	while ($r=mysqli_fetch_assoc($listechamp)) {
 		if ($r['Extra']!="auto_increment"){

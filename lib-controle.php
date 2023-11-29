@@ -94,12 +94,22 @@ function AlphaNumCheck($chaine){
 function PwdGet($nbcaracteres) {
 	
 	$pwd="";
-	$caracterespossibles = "abcdefghjkmnpqrstuvwxyz123456789"; // liste des caract&egrave;res que l'on peut utiliser <br />
+	$caracterespossibles = "abcdefghjkmnpqrstuvwxyz123456789"; 
 	srand((double)microtime()*1000000);
 	for($i=0; $i<$nbcaracteres; $i++) {
 		$pwd .= $caracterespossibles[rand()%strlen($caracterespossibles)]; 
 	}
 	return $pwd;
+}
+function AfficheRequete($req){
+
+	$req = str_replace("SELECT","SELECT<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;",$req);
+	$req = str_replace("FROM","<br/>FROM<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;",$req);
+	$req = str_replace("LEFT JOIN","<br/>LEFT JOIN<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;",$req);
+	$req = str_replace("WHERE","<br/>WHERE<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;",$req);
+	$req = str_replace("GROUP BY","<br/>GROUP BY<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;",$req);
+	$req = str_replace("ORDER BY","<br/>ORDER BY<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;",$req);
+	return($req);
 
 }
 ?>
