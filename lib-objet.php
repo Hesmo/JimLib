@@ -284,7 +284,7 @@ class OBJElementFormulaire {
 
 class OBJFormulaire {
 
-    public $ar_oef, $html, $NameFrm, $tdSTtitre, $tdSTval, $tableId, $tableStyle, $classBt;
+    public $ar_oef, $html, $NameFrm, $tdSTtitre, $tdSTval, $tableId, $tableStyle, $classBt, $NameBtRec, $NameBtCancel;
 
      function __construct() {
         // Fixe des parametres par défaut les variable sont ="" par défaut
@@ -293,6 +293,9 @@ class OBJFormulaire {
 
     public function OBJGetFormulaire(){
   
+        if ($this->NameBtRec==""){ $this->NameBtRec = "btenregistrer"; }
+        if ($this->NameBtCancel==""){ $this->NameBtCancel = "btcancel"; }
+
         $this->html  = FRM_form("GET",$this->NameFrm,"","","",1);
         $this->html .= TB_table($this->tableId, "", $this->tableStyle, 1);
         foreach ($this->ar_oef as $elemform) {
@@ -313,8 +316,8 @@ class OBJFormulaire {
                 $this->html .= $elemform->html_elem;
             }
         }
-        $this->html .= FRM_bt($this->classBt, "button", "btenregistrer", "Enregistrer", "", 1, "");
-        $this->html .= FRM_bt($this->classBt, "button", "btcancel",      "Annuler",     "", 1, "margin-right: 0px;");
+        $this->html .= FRM_bt($this->classBt, "button", $this->NameBtRec, "Enregistrer", "", 1, "");
+        $this->html .= FRM_bt($this->classBt, "button", $this->NameBtCancel,      "Annuler",     "", 1, "margin-right: 0px;");
         $this->html .= "</td></tr>";
         $this->html .= "</table></form>";
 
