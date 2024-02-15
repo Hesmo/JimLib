@@ -94,6 +94,14 @@ function TB_ligne() {
  	if (trim($class)!="") { $element .= " class=\"$class\""; }
 	if (trim($style)!="") { $element .= " style=\"$style\""; }
 	if (trim($action)!="") { $element .= " $action "; }
+
+	if (isset($ar_arg[5]) and is_array($ar_arg['5'])){ 
+		foreach ($ar_arg[5] as $clef=>$value){
+			$element .= " data-".$clef."=\"".$value."\"";
+		}
+	}
+
+
 	$element .= ">\n";
 	
 	if ($retour == 1) { return $element; } else { echo $element; }
