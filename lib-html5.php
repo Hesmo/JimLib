@@ -444,4 +444,18 @@ function HTML5_comment($commentaire) {
     // Affiche un commentaire HTML avec le texte spécifié
     echo "<!-- $commentaire -->";
 }
+/**
+ * Genere des balises ouvrantes ou fermante pour du code css 
+ * 
+ * @param boolean $etat true ou false (Ouvre ou ferme)
+ * 
+ */
+function HTML5_styleinline($etat){
+	if ($etat){
+			echo "          <style type=\"text/css\">\n             <!--";
+	} else {
+			echo "          -->\n           </style>\n";
+	}
+}
+
 ?>
