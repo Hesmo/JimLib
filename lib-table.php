@@ -1,19 +1,34 @@
 <?Php
+/**
+ * Génère une balise de tableau HTML avec les attributs spécifiés.
+ *
+ * @param string $id L'identifiant de la balise (optionnel).
+ * @param string $class La classe de la balise (optionnel).
+ * @param string $style Le style CSS de la balise (optionnel).
+ * @param int $return Si la valeur est 1, la balise générée sera retournée au lieu d'être affichée (optionnel, par défaut à 0).
+ * @return string|null Si $return est défini à 1, retourne la balise générée, sinon affiche la balise et retourne null.
+ */
 function TB_table() {
 
 	$args = func_get_args();
 
-	$id     = $args[0] ?? '';
-    $class  = $args[1] ?? '';
-    $style  = $args[2] ?? '';
-    $return = $args[3] ?? 0;
+    $id     = isset($args[0]) ? $args[0] : '';
+    $class  = isset($args[1]) ? $args[1] : '';
+    $style  = isset($args[2]) ? $args[2] : '';
+    $return = isset($args[3]) ? $args[3] : 0;
 
-	$element = "<table";
-    $element .= !empty($id)    ? " id=\"$id\""     : '';
-    $element .= !empty($class) ? " class=\"$class\"" : '';
-    $element .= !empty($style) ? " style=\"$style\"" : '';
+    $element = "<table";
+    if (!empty($id)) { 
+        $element .= " id=\"$id\"";
+    }
+    if (!empty($class)) {
+        $element .= " class=\"$class\"";
+    }
+    if (!empty($style)) {
+        $element .= " style=\"$style\"";
+    }
     $element .= ">\n";
-	
+
     if ($return == 1) {
         return $element;
     } else {
