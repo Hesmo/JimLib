@@ -120,33 +120,62 @@ function TB_table_fin($class, $alignement, $nbcol, $texte) {
     }
     echo "</table>\n";
 }
-
+/**
+ * Génère une balise <tr> HTML avec des attributs et des données facultatifs.
+ *
+ * Cette fonction prend en charge plusieurs paramètres facultatifs :
+ *  - $class : la classe CSS de la balise <tr>.
+ *  - $style : le style CSS de la balise <tr>.
+ *  - $retour : un indicateur de retour. Si défini sur 1, la balise est retournée ; sinon, elle est affichée directement.
+ *  - $idligne : l'ID de la balise <tr>.
+ *  - $action : l'action associée à la balise <tr>.
+ *  - $dataAttributes : un tableau associatif des attributs de données (data-*).
+ * 
+ * @return string|null La balise <tr> si $retour est 1, null sinon.
+ */
 function TB_ligne() {
+    // Fonction d'échappement HTML avec l'encodage ISO-8859-1
+    $escapeHtml = function ($value) {
+        return htmlspecialchars($value, ENT_QUOTES, 'ISO-8859-1');
+    };
 
-	$ar_arg = func_get_args();
+    $ar_arg = func_get_args();
 
-	$class 	= $ar_arg[0];
-	$style  = $ar_arg[1];
-	$retour = $ar_arg[2];
-	if (isset($ar_arg[3])){ $idligne = $ar_arg[3]; } else { $idligne = ""; }
-	if (isset($ar_arg[4])){ $action = $ar_arg[4]; } else { $action = ""; }
+    $class  = isset($ar_arg[0]) ? $escapeHtml($ar_arg[0]) : '';
+    $style  = isset($ar_arg[1]) ? $escapeHtml($ar_arg[1]) : '';
+    $retour = isset($ar_arg[2]) ? $ar_arg[2] : 0;
+    $idligne = isset($ar_arg[3]) ? $escapeHtml($ar_arg[3]) : '';
+    $action = isset($ar_arg[4]) ? $escapeHtml($ar_arg[4]) : '';
+    $dataAttributes = isset($ar_arg[5]) && is_array($ar_arg[5]) ? $ar_arg[5] : array();
 
- 	$element = "<tr";
- 	if (trim($idligne)!="") { $element .= " id=\"$idligne\""; }
- 	if (trim($class)!="") { $element .= " class=\"$class\""; }
-	if (trim($style)!="") { $element .= " style=\"$style\""; }
-	if (trim($action)!="") { $element .= " $action "; }
+    $element = "<tr";
+    if (!empty($idligne)) { 
+        $element .= " id=\"$idligne\""; 
+    }
+    if (!empty($class)) { 
+        $element .= " class=\"$class\""; 
+    }
+    if (!empty($style)) { 
+        $element .= " style=\"$style\""; 
+    }
+    if (!empty($action)) { 
+        $element .= " $action "; 
+    }
 
-	if (isset($ar_arg[5]) and is_array($ar_arg['5'])){ 
-		foreach ($ar_arg[5] as $clef=>$value){
-			$element .= " data-".$clef."=\"".$value."\"";
-		}
-	}
+    foreach ($dataAttributes as $key => $value) {
+        // Échappement des clés et valeurs des attributs de données
+        $escapedKey = $escapeHtml($key);
+        $escapedValue = $escapeHtml($value);
+        $element .= " data-" . $escapedKey . "=\"" . $escapedValue . "\"";
+    }
 
-
-	$element .= ">\n";
-	
-	if ($retour == 1) { return $element; } else { echo $element; }
+    $element .= ">\n";
+    
+    if ($retour == 1) { 
+        return $element; 
+    } else { 
+        echo $element; 
+    }
 }
 function TB_ligne_fin(){ echo "</tr>\n"; }
 function TB_cellule() {
