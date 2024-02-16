@@ -1,19 +1,24 @@
 <?Php
 function TB_table() {
 
-	$ar_arg = func_get_args();
+	$args = func_get_args();
 
-	$id 	= $ar_arg[0];
-	$class  = $ar_arg[1];
-	$style  = $ar_arg[2];
-	$retour = $ar_arg[3];
+	$id     = $args[0] ?? '';
+    $class  = $args[1] ?? '';
+    $style  = $args[2] ?? '';
+    $return = $args[3] ?? 0;
 
-	$element = "<table ";
-	if (trim($id)!= "") { $element .= " id=\"$id\""; }
-	if (trim($class)!=""){ $element .= " class=\"$class\"";}
-	if (trim($style)!="") 	 { $element .= " style=\"$style\"";}
-	$element .= " >\n";
-	if ($retour == 1) { return $element; } else { echo $element; }
+	$element = "<table";
+    $element .= !empty($id)    ? " id=\"$id\""     : '';
+    $element .= !empty($class) ? " class=\"$class\"" : '';
+    $element .= !empty($style) ? " style=\"$style\"" : '';
+    $element .= ">\n";
+	
+    if ($return == 1) {
+        return $element;
+    } else {
+        echo $element;
+    }
 
 }
 function TB_head(){
