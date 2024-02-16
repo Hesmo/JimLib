@@ -178,7 +178,86 @@ function TB_ligne() {
     }
 }
 function TB_ligne_fin(){ echo "</tr>\n"; }
+
+/**
+ * Génère une balise <td> ou <th> HTML avec des attributs et des données facultatifs.
+ *
+ * Cette fonction prend en charge deux modes d'utilisation :
+ * 1. Passer les paramètres via un tableau associatif.
+ * 2. Passer les paramètres individuellement.
+ * 
+ * @param mixed $id       L'ID de la balise <td> ou <th>.
+ * @param mixed $class    La classe CSS de la balise <td> ou <th>.
+ * @param mixed $style    Le style CSS de la balise <td> ou <th>.
+ * @param int   $colspan  Le nombre de colonnes que la cellule doit couvrir.
+ * @param int   $rowspan  Le nombre de lignes que la cellule doit couvrir.
+ * @param int   $retour   Indicateur de retour. Si 1, la balise est retournée ; sinon, elle est affichée directement.
+ * @param string $dujava  Attribut de données spécifique.
+ * @param string $th      Type de balise à générer, 'th' pour une cellule d'en-tête, 'td' par défaut.
+ * @param array  $dataAttributes Tableau associatif des attributs de données (data-*).
+ * 
+ * @return string|null La balise <td> ou <th> si $retour est 1, null sinon.
+ */
 function TB_cellule() {
+    
+	$ar_arg = func_get_args();
+
+    // Vérifier si les paramètres sont passés via un tableau associatif
+    if (is_array($ar_arg[0]) && count($ar_arg) == 1) {
+        $arg = $ar_arg[0];
+        $retour = 0;
+        $th = isset($arg['entete']) && $arg['entete'] === 'th' ? 'th' : 'td'; // Vérifier si la cellule doit être une cellule d'en-tête
+		
+
+
+        $element = "<$th ";
+
+        foreach ($arg as $key => $value) {
+            switch ($key) {
+                case 'entete':
+                case 'retour':
+                    break;
+                case 'action':
+                    $element .= " $value ";
+                    break;
+                default:
+                    $element .= " $key=\"" . htmlspecialchars($value, ENT_QUOTES, 'ISO-8859-1') . "\" ";
+                    break;
+            }
+        }
+
+    } else {
+        // Si les paramètres sont passés individuellement
+        $id = isset($ar_arg[0]) ? htmlspecialchars($ar_arg[0], ENT_QUOTES, 'ISO-8859-1') : '';
+        $class = isset($ar_arg[1]) ? htmlspecialchars($ar_arg[1], ENT_QUOTES, 'ISO-8859-1') : '';
+        $style = isset($ar_arg[2]) ? htmlspecialchars($ar_arg[2], ENT_QUOTES, 'ISO-8859-1') : '';
+        $colspan = isset($ar_arg[3]) ? $ar_arg[3] : '';
+        $rowspan = isset($ar_arg[4]) ? $ar_arg[4] : '';
+        $retour = isset($ar_arg[5]) ? $ar_arg[5] : 0;
+        $dujava = isset($ar_arg[6]) ? htmlspecialchars($ar_arg[6], ENT_QUOTES, 'ISO-8859-1') : '';
+		$th = isset($ar_arg[7]) && $ar_arg[7] === 'th' ? 'th' : 'td'; // Vérifier si la cellule doit être une cellule d'en-tête
+
+        $element = "<$th";
+        if (!empty($id)) { $element .= " id=\"$id\""; }
+        if (!empty($class)) { $element .= " class=\"$class\""; }
+        if (!empty($style)) { $element .= " style=\"$style\""; }
+        if (!empty($colspan)) { $element .= " colspan=\"$colspan\""; }
+        if (!empty($rowspan)) { $element .= " rowspan=\"$rowspan\""; }
+        if (!empty($dujava)) { $element .= " $dujava"; }
+
+        if (isset($ar_arg[8]) && is_array($ar_arg[8])) {
+            foreach ($ar_arg[8] as $clef => $value) {
+                $element .= " data-" . htmlspecialchars($clef, ENT_QUOTES, 'ISO-8859-1') . "=\"" . htmlspecialchars($value, ENT_QUOTES, 'ISO-8859-1') . "\"";
+            }
+        }
+    }
+
+    $element .= ">";
+    if ($retour == 1) { return $element; } else { echo $element; }
+}
+
+
+function OLDTB_cellule() {
 
 	$ar_arg = func_get_args();
 
