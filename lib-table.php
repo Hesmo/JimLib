@@ -36,15 +36,27 @@ function TB_table() {
     }
 
 }
-function TB_head(){
+/**
+ * Génère une balise d'en-tête de tableau HTML.
+ *
+ * @param bool $ouvre Indique s'il s'agit d'une balise d'ouverture (true) ou de fermeture (false).
+ * @param bool $return Si la valeur est true, la balise générée sera retournée au lieu d'être affichée (optionnel, par défaut à false).
+ * @return string|null Si $return est true, retourne la balise générée, sinon affiche la balise et retourne null.
+ */
+function TB_head() {
+    $args = func_get_args();
 
-	$ar_arg = func_get_args();
-	$ouvre 	= $ar_arg[0];
-	$retour = $ar_arg[1];
-	
-	if ($ouvre) { $element = "<thead>"; } else { $element = "</thead>"; }
-	if ($retour) { return $element; } else { echo $element; }
-	
+    $ouvre  = isset($args[0]) ? $args[0] : true;
+    $return = isset($args[1]) ? $args[1] : false;
+
+    $element = $ouvre ? "<thead>" : "</thead>";
+
+    if ($return) {
+        return $element;
+    } else {
+        echo $element;
+        return null;
+    }
 }
 function TB_foot(){
 
@@ -88,17 +100,27 @@ function TB_body(){
 	if ($retour) { return $element; } else { echo $element; }
 	
 }
-function TB_table_fin($class,$alignement,$nbcol,$texte){
-
-	if ($nbcol>0){
-		TB_ligne("","",0);
-			TB_cellule("",$class,"",$nbcol,0,0);
-				echo $texte;
-			TB_cellule_fin();
-		TB_ligne_fin();
-	}
-	echo "</table>\n";
+/**
+ * Ferme un tableau HTML en ajoutant une balise de fermeture et affiche le texte spécifié.
+ *
+ * @param string $class La classe CSS de la cellule (obligatoire).
+ * @param string $alignement L'alignement du contenu de la cellule (obligatoire).
+ * @param int $nbcol Le nombre de colonnes de la cellule (obligatoire).
+ * @param string $texte Le texte à afficher dans la cellule (obligatoire).
+ * @return void
+ */
+function TB_table_fin($class, $alignement, $nbcol, $texte) {
+    
+	if ($nbcol > 0) {
+        TB_ligne("", "", 0);
+        TB_cellule("", $class, $alignement, $nbcol, 0, 0);
+        	echo htmlspecialchars($texte, ENT_QUOTES, 'ISO-8859-1');
+        TB_cellule_fin();
+        TB_ligne_fin();
+    }
+    echo "</table>\n";
 }
+
 function TB_ligne() {
 
 	$ar_arg = func_get_args();
