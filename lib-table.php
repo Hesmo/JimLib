@@ -207,25 +207,18 @@ function TB_cellule() {
         $arg = $ar_arg[0];
         $retour = 0;
         $th = isset($arg['entete']) && $arg['entete'] === 'th' ? 'th' : 'td'; // Vérifier si la cellule doit être une cellule d'en-tête
-		
-
-
-        $element = "<$th ";
-
+        
+		$element = "<$th ";
         foreach ($arg as $key => $value) {
             switch ($key) {
-                case 'entete':
-                case 'retour':
-                    break;
-                case 'action':
-                    $element .= " $value ";
-                    break;
+                case 'entete': break;
+                case 'retour': break;
+                case 'action': $element .= " $value "; break;
                 default:
                     $element .= " $key=\"" . htmlspecialchars($value, ENT_QUOTES, 'ISO-8859-1') . "\" ";
-                    break;
+                break;
             }
         }
-
     } else {
         // Si les paramètres sont passés individuellement
         $id = isset($ar_arg[0]) ? htmlspecialchars($ar_arg[0], ENT_QUOTES, 'ISO-8859-1') : '';
@@ -251,12 +244,9 @@ function TB_cellule() {
             }
         }
     }
-
     $element .= ">";
     if ($retour == 1) { return $element; } else { echo $element; }
 }
-
-
 function OLDTB_cellule() {
 
 	$ar_arg = func_get_args();
