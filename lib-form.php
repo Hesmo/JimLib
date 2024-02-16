@@ -1,8 +1,21 @@
 <?Php
+/**
+ * Génère une balise de formulaire HTML avec des options flexibles.
+ *
+ * Cette fonction prend en charge plusieurs arguments facultatifs pour personnaliser la balise de formulaire.
+ *
+ * @param string $method   Méthode d'envoi des données du formulaire (GET ou POST).
+ * @param string $name     Nom du formulaire.
+ * @param string $action   URL de destination des données du formulaire lors de la soumission.
+ * @param string $class    Classe CSS à appliquer au formulaire.
+ * @param string $target   Nom de la fenêtre ou du cadre cible pour le résultat de la soumission.
+ * @param int    $retour   Indique si la fonction doit renvoyer la balise ou l'afficher directement (1 pour renvoyer, 0 pour afficher).
+ * @param string $onsubmit Événement onsubmit à ajouter à la balise de formulaire (facultatif).
+ * @return string          La balise de formulaire générée, si $retour est défini sur 1.
+ */
 function FRM_form(){
-	$nbarg = func_num_args();
-	$ar_arg = func_get_args();
 
+	$ar_arg = func_get_args();
 	$method = $ar_arg[0]; // GET ou POST, par défaut POST
 	$name   = $ar_arg[1]; // Nom du formulaire
 	$action = $ar_arg[2]; // Action par défaut pour submit
@@ -10,24 +23,55 @@ function FRM_form(){
 	$target = $ar_arg[4]; // Cible après la soumission du formulaire
 	$retour = $ar_arg[5]; // Affiche ou renvoi le résultat de la fonction
 	
-	if (isset($ar_arg[6])){
-		$onsubmit = $ar_arg[6];
-	}
-
+	if (isset($ar_arg[6])){ $onsubmit = $ar_arg[6]; }
 	if (trim($method) == ""){ $method = "post"; }
 	
 	$element = "<form method=\"$method\"";
-	if (trim($name) != "") {$element .= " name=\"$name\"";}
-	if (trim($action) != "") {$element .= " action=\"$action\"";}
-	if (trim($class) != "") {$element .= " class=\"$class\"";}
-	if (trim($target) != "") {$element .= " target=\"$target\"";}
-	if (isset($onsubmit)){ $element .= " ".$onsubmit." "; }	
+	if (!empty($name)) { $element .= " name=\"$name\"";}
+    if (!empty($action)) { $element .= " action=\"$action\"";}
+    if (!empty($class)) { $element .= " class=\"$class\"";}
+    if (!empty($target)) { $element .= " target=\"$target\"";}
+    if (!empty($onsubmit)) { $element .= " onsubmit=\"$onsubmit\""; }
 	$element .= ">\n";
-	if ($retour == 1) { return $element; } else { echo $element; }
+
+	if ($retour == 1) {
+        return $element;
+    } else {
+        echo $element;
+    }
 
 }
-function FRM_form_off(){ echo "</form>\n"; }
-// Prototype : FRM_it($text, $class, $size, $max, $name, $valeur, $retour, $action, $style, $autocomplete, $typeinput, $readonly, $placeholder);
+/**
+ * Ferme la balise de formulaire HTML ouverte précédemment.
+ *
+ * Cette fonction génère la balise de fermeture </form>.
+ *
+ * @return void
+ */
+function FRM_form_off() {
+    echo "</form>\n";
+}
+/**
+ * Génère un élément de formulaire HTML avec des options flexibles.
+ *
+ * Cette fonction prend en charge plusieurs arguments facultatifs pour personnaliser l'élément de formulaire.
+ *
+ * @param string $text       Texte à afficher devant l'élément.
+ * @param string $class      Nom de la classe CSS à appliquer à l'élément (optionnel).
+ * @param int    $size       Taille de l'élément (optionnel).
+ * @param int    $max        Nombre de caractères maximum permis (optionnel).
+ * @param string $name       Nom de l'élément (optionnel).
+ * @param string $valeur     Valeur de l'élément (optionnel).
+ * @param int    $retour     Indique si la fonction doit renvoyer la balise ou l'afficher directement (1 pour renvoyer, 0 pour afficher) (optionnel, par défaut 0).
+ * @param string $action     Script associé à l'élément (optionnel).
+ * @param string $style      Style CSS à appliquer à l'élément (optionnel).
+ * @param bool   $autocomplete Définit si l'autocomplétion est activée ou désactivée pour l'élément (optionnel).
+ * @param string $input_type Type de l'élément input (optionnel, par défaut "text").
+ * @param bool   $readonly   Définit si l'élément est en lecture seule ou non (optionnel).
+ * @param string $placeholder Texte de l'attribut placeholder de l'élément (optionnel).
+ * @return string             La balise de l'élément de formulaire générée, si $retour est défini sur 1.
+ * 
+ */
 function FRM_it(){
 
 	$ar_arg = func_get_args();
@@ -65,6 +109,21 @@ function FRM_it(){
 	if ($retour == 1) { return $element; } else { echo $element; }
 	
 }
+/**
+ * Génère un élément de formulaire HTML de type select avec des options flexibles.
+ *
+ * Cette fonction prend en charge plusieurs arguments facultatifs pour personnaliser l'élément de formulaire.
+ *
+ * @param string $name     Nom de l'élément select.
+ * @param string $class    Classe CSS à appliquer à l'élément select (optionnel).
+ * @param int    $size     Nombre de lignes visibles dans la liste déroulante (optionnel).
+ * @param int    $multiple Indique si la sélection multiple est autorisée (1 pour oui, 0 pour non).
+ * @param string $action   Script associé à l'élément select (optionnel).
+ * @param int    $retour   Indique si la fonction doit renvoyer la balise ou l'afficher directement (1 pour renvoyer, 0 pour afficher) (optionnel, par défaut 0).
+ * @param string $style    Style CSS à appliquer à l'élément select (optionnel).
+ * @param string $disabled Indique si l'élément select est désactivé (optionnel).
+ * @return string          La balise de l'élément de formulaire générée, si $retour est défini sur 1.
+ */
 function FRM_se() {
 	
 	$ar_arg = func_get_args();
@@ -214,6 +273,23 @@ function FRM_cb() {
 	if ($retour == 1) { return $element; } else { echo $element; }
 
 }
+/**
+ * Genere un élément de formulaire HTML de type radio avec des options flexibles.
+ *
+ * Cette fonction prend en charge plusieurs arguments facultatifs pour personnaliser l'élément de formulaire.
+ *
+ * @param string $class    Classe CSS à appliquer à l'élément radio (optionnel).
+ * @param string $style    Style CSS à appliquer à l'élément radio (optionnel).
+ * @param string $name     Nom de l'élément radio.
+ * @param int    $checked  Indique si l'élément radio est coché (1 pour oui, 0 pour non).
+ * @param string $value    Valeur de l'élément radio.
+ * @param string $text     Texte à afficher à côté de l'élément radio.
+ * @param string $action   Script associé à l'élément radio (optionnel).
+ * @param int    $retour   Indique si la fonction doit renvoyer la balise ou l'afficher directement (1 pour renvoyer, 0 pour afficher) (optionnel, par défaut 0).
+ * @param string $id       ID de l'élément radio (optionnel).
+ * @return string          La balise de l'élément de formulaire générée, si $retour est défini sur 1.
+ * 
+ */
 function FRM_ir() {
 	
 	$ar_arg = func_get_args();
