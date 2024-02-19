@@ -73,7 +73,7 @@ function DateCheck($date,$typed,$avecheure,$inverse){
 	}
 }
 function RightCheck(){
-	/* A d�placer dans lib x-Prim : code sp�cifique à une appli */
+	/* A déplacer dans lib x-Prim : code spécifique à une appli */
 	$ar_arg = func_get_args();
 	$ledroit = $ar_arg[0];
 	$mysqli = $ar_arg[1];

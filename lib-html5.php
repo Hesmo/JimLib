@@ -457,7 +457,5 @@ function HTML5_styleinline($etat){
 			echo "          -->\n           </style>\n";
 	}
 }
-function HTML5_html_off(){
-	echo "</html>";
-}
+
 ?>
