@@ -9,12 +9,11 @@
 */ 
 class OBJDataSet {
     
-    public $bdd_requete, $ar_bdd_fields = array(), $bdd_retour;
-
+    public $bdd_requete, $ar_bdd_fields = array(), $bdd_retour, $pointeurmysqli;
     function __construct() {
         // Fixe des parametres par défaut les variable sont ="" par défaut
         global $mysqli;
-        $this->mysqli=&$mysqli;
+        $this->pointeurmysqli=&$mysqli;
     }
 
     public function GetDataSelect(){
@@ -26,7 +25,7 @@ class OBJDataSet {
         }
         $champs = implode(", ",$ar_tampon);
         $this->bdd_requete = str_replace(";bdd_field_set;", $champs, $this->bdd_requete);
-        $this->bdd_retour = DTBS_sqlbrut($this->bdd_requete, $this->mysqli);
+        $this->bdd_retour = DTBS_sqlbrut($this->bdd_requete, $this->pointeurmysqli);
     }
 
 }

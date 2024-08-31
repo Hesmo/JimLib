@@ -312,7 +312,8 @@ function HTML5_P() {
  * @param string $action (facultatif) Une action spécifique à appliquer à l'élément <img>.
  * @param string $usemap Le nom de la carte image à utiliser pour l'élément <img>.
  * @param string $title (facultatif) Le titre de l'image.
- * @return string La balise <img> générée sous forme de chaîne de caractères, si $retour est 1.
+ * @param bool   $ar_arg (indice 10) (facultatif) Création d'un objet CLS_HTML5_Img
+ * @return string|object La balise <img> générée sous forme de chaîne de caractères, si $retour est 1 ou un objet CLS_HTML5_Img si  $ar_arg[10] existe et est vrai
  */
 function HTML5_Img() {
 	
@@ -348,7 +349,7 @@ function HTML5_Img() {
 	if (trim($usemap)!= "") { $element .= " usemap=\"$usemap\""; }
 	if (isset($title) AND trim($title)!="") { $element .= " title=\"$title\""; }
 	$element .= ">\n";
-	if ($retour==1) { return $element; } else { echo $element; }
+	if ($retour==1) { return $element; } else { echo $element; return true; }
 
 }
 /**
