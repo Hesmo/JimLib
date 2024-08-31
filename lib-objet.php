@@ -460,15 +460,16 @@ class OBJDataTableau {
                     $this->html .= TB_cellule("", $this->tdSTval, "", "", "", 1, ""); $this->html .= "</td>";
                 }
             }
-            if ($this->ColSupIco){ $this->html .= TB_cellule("", $this->tdSTval, "width:".$this->ColSupIcoWidth, 0, 0, 1); $this->html .= "&nbsp;</td>"; }
+            if ($this->ColSupIco){ 
+                if ($this->ColSupIcoWidth==""){ $substitut = ""; } else { $substitut = "width:".$this->ColSupIcoWidth; }
+                $this->html .= TB_cellule("", $this->tdSTval, $substitut, 0, 0, 1); $this->html .= "&nbsp;</td>"; 
+            }
             $this->html .= "</tr>";
         }
        
         $this->html .= "</table>";
     }
             
-
-
-
 }
+
 ?>
