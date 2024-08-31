@@ -21,8 +21,6 @@ function HTML5_title($titre){
  * @param string $valeur Valeur de la balise meta
  */
 function HTML5_meta($nom,$contenu){
-	$nom = htmlspecialchars($nom, ENT_QUOTES, 'ISO-8859-1');
-    $contenu = htmlspecialchars($contenu, ENT_QUOTES, 'ISO-8859-1');
 	echo "<meta name=\"$nom\" content=\"$contenu\">";
 }
 /**
@@ -32,7 +30,6 @@ function HTML5_meta($nom,$contenu){
  * 
  */
 function HTML5_meta_charset($charset) {
-    $charset = htmlspecialchars($charset, ENT_QUOTES, 'ISO-8859-1');
     echo "<meta charset=\"$charset\">\n";
     
 }
@@ -49,8 +46,6 @@ function HTML5_meta_content($nom,$valeur){
  * @param string $href L'URL de destination de la balise link.
   */
 function HTML5_headlink($rel, $href) {
-    $rel = htmlspecialchars($rel, ENT_QUOTES, 'ISO-8859-1');
-    $href = htmlspecialchars($href, ENT_QUOTES, 'ISO-8859-1');
     echo "<link rel=\"$rel\" href=\"$href\">\n";
 }
 /**
@@ -87,16 +82,16 @@ function HTML5_nav($id = '', $class = '', $style = '', $title = '', $retour = fa
     $element = "<nav";
     
     if (trim($id) != "") {
-        $element .= ' id="' . htmlspecialchars($id, ENT_QUOTES, 'ISO-8859-1') . '"';
+        $element .= ' id="' . $id . '"';
     }
     if (trim($class) != "") {
-        $element .= ' class="' . htmlspecialchars($class, ENT_QUOTES, 'ISO-8859-1') . '"';
+        $element .= ' class="' . $class . '"';
     }
     if (trim($style) != "") {
-        $element .= ' style="' . htmlspecialchars($style, ENT_QUOTES, 'ISO-8859-1') . '"';
+        $element .= ' style="' . $style . '"';
     }
     if (trim($title) != "") {
-        $element .= ' title="' . htmlspecialchars($title, ENT_QUOTES, 'ISO-8859-1') . '"';
+        $element .= ' title="' . $title . '"';
     }
     
     $element .= ">\n";
@@ -115,24 +110,19 @@ function HTML5_nav_off() {
     echo "</nav>\n";
 }
 /**
- * Génère une balise <a> HTML5 en fonction des paramètres fournis.
+ * Crée et affiche ou retourne un lien HTML5 avec les attributs spécifiés.
  *
- * Cette fonction génère une balise <a> avec les spécifications fournies en fonction des arguments passés.
- * Elle peut générer deux types de liens : un lien HTML classique pointant vers une URL ou un lien qui appelle une fonction JavaScript.
- *
- * @param int $retour Indique si la fonction doit afficher directement la balise générée (0) ou la renvoyer (1).
- * @param string $typeanc Type de lien à générer : "html" pour un lien HTML classique ou "java" pour un lien JavaScript.
- * @param string $title Le texte à afficher dans la bulle d'aide (attribut "title" de la balise <a>).
- * @param string $afficher La chaîne à afficher comme contenu du lien (peut être du texte ou une image).
- * @param string $style Le style CSS à appliquer à la balise <a>.
- * @param string $class La classe CSS à attribuer à la balise <a>.
- * @param string $url L'URL de destination du lien (uniquement pour les liens HTML).
- * @param string $target La fenêtre de destination du lien (uniquement pour les liens HTML).
- * @param string $balisedownload (facultatif) L'attribut "download" de la balise <a>, permettant de spécifier un téléchargement (uniquement pour les liens HTML).
- * @param string $idhref (facultatif) L'attribut "id" de la balise <a> (uniquement pour les liens HTML).
- * @param string $nomscript Le nom de la fonction JavaScript à appeler (uniquement pour les liens JavaScript).
- * @param array $ar_param Tableau des paramètres à passer à la fonction JavaScript (uniquement pour les liens JavaScript).
- * @return string La balise <a> générée sous forme de chaîne de caractères, si $retour est 1.
+ * @param int $retour Type de fonction : 0 pour afficher directement, 1 pour renvoyer la valeur (obligatoire).
+ * @param string $typeanc Type de lien : "html" pour un lien HTML classique, "java" pour un lien JavaScript (obligatoire).
+ * @param string $title Texte de l'infobulle (optionnel).
+ * @param string $afficher Texte ou image à afficher pour le lien (obligatoire).
+ * @param string $style Style CSS du lien (optionnel).
+ * @param string $class Classe CSS du lien (optionnel).
+ * @param string $nomscript Nom du script JavaScript à appeler (obligatoire si $typeanc est "java").
+ * @param array $ar_param Paramètres du script JavaScript (obligatoire si $typeanc est "java").
+ * @param string $balisedownload Attribut "download" du lien (optionnel).
+ * @param string $idhref ID de l'élément (optionnel).
+ * @return string|bool Le lien HTML5 avec les attributs spécifiés, si $retour est défini à 1, sinon true si il est affiché directement.
  */
 function HTML5_href(){
 	
@@ -174,27 +164,24 @@ function HTML5_href(){
 	if ($style!=""){$box.="style='".$style."'";}
 	if ($class!=""){$box.="class='".$class."'";}
 	$box.= ">".$afficher."</a>";
-	if ($retour == 1) {return $box;} else {echo $box;}
+	if ($retour == 1) {return $box;} else {echo $box; return true;}
 }
 /**
- * Génère une balise <div> HTML5 en fonction des paramètres fournis.
+ * Crée et affiche ou retourne une balise <div> HTML5 avec les attributs spécifiés.
  *
- * Cette fonction génère une balise <div> avec les spécifications fournies en fonction des arguments passés.
- * Elle permet de définir divers attributs et styles CSS pour personnaliser l'apparence et le comportement de la balise <div>.
- *
- * @param string $id L'identifiant de la balise <div>.
- * @param string $class La classe CSS de la balise <div>.
- * @param string $style Le style CSS à appliquer à la balise <div>.
- * @param string $position La position CSS de la balise <div>.
- * @param string $top La position verticale de la balise <div>.
- * @param string $left La position horizontale de la balise <div>.
- * @param string $width La largeur de la balise <div>.
- * @param string $height La hauteur de la balise <div>.
- * @param string $overflow La propriété CSS "overflow" de la balise <div>, qui définit le comportement en cas de débordement de contenu.
- * @param string $action Une action spécifique à appliquer à la balise <div>.
- * @param int $retour Indique si la fonction doit renvoyer la balise <div> générée (1) ou l'afficher directement (0).
- * @param string $title (facultatif) Le texte de l'attribut "title" de la balise <div>.
- * @return string La balise <div> générée sous forme de chaîne de caractères, si $retour est 1.
+ * @param string $id ID de l'élément (optionnel).
+ * @param string $class Classe de l'élément (optionnel).
+ * @param string $style Style CSS de l'élément (optionnel).
+ * @param string $position Position CSS de l'élément (optionnel).
+ * @param string $top Position top CSS de l'élément (optionnel).
+ * @param string $left Position left CSS de l'élément (optionnel).
+ * @param string $width Largeur CSS de l'élément (optionnel).
+ * @param string $height Hauteur CSS de l'élément (optionnel).
+ * @param string $overflow Débordement CSS de l'élément (optionnel).
+ * @param string $action Action associée à l'élément (optionnel).
+ * @param int $retour Contrôle si la balise est retournée (1) ou affichée directement (0) (optionnel).
+ * @param string $title Titre de l'élément (optionnel).
+ * @return string|bool La balise <div> avec les attributs spécifiés, si $retour est défini à 1, sinon true si elle est affichée directement.
  */
 function HTML5_Div() {
 
@@ -235,7 +222,7 @@ function HTML5_Div() {
 	if (trim($overflow)!=""){ $style .= "overflow: $overflow; ";}
 	if ($style!="")   { $element .= "style= \"$style\" ";}
 	$element.=">\n";
-	if ($retour==1) {return $element; } else {echo $element;}
+	if ($retour==1) {return $element; } else {echo $element; return true; }
 }
 /**
  * Génère une balise de fin </div> HTML5.
@@ -247,18 +234,14 @@ function HTML5_Div_off(){
 	echo "</div>\n";
 }
 /**
- * Génère une balise <p> HTML5 en fonction des paramètres fournis.
+ * Crée et affiche ou retourne un paragraphe HTML5 avec les attributs spécifiés.
  *
- * Cette fonction peut accepter soit un tableau associatif contenant les attributs de la balise <p>
- * et le texte à afficher, soit une liste d'arguments individuels pour chaque attribut.
- * Elle offre une manière flexible de générer des balises <p> avec différents attributs et texte.
- *
- * @param array|string $arg|array $id L'identifiant de la balise <p> ou un tableau associatif contenant les attributs et le texte.
- * @param string $style Le style CSS à appliquer à la balise <p>.
- * @param int $retour Indique si la fonction doit renvoyer la balise <p> générée (1) ou l'afficher directement (0).
- * @param string $texte Le texte à afficher dans la balise <p>.
- * @param string $action (facultatif) Une action spécifique à appliquer à la balise <p>.
- * @return string La balise <p> générée sous forme de chaîne de caractères, si $retour est 1.
+ * @param string|array $id ID de l'élément ou tableau associatif des attributs (optionnel).
+ * @param string $style Style CSS de l'élément (optionnel).
+ * @param int $retour Contrôle si le paragraphe est retourné (1) ou affiché directement (0) (obligatoire).
+ * @param string $texte Texte à afficher dans le paragraphe (obligatoire).
+ * @param string $action Action associée à l'élément (optionnel).
+ * @return string|bool Le paragraphe HTML5 avec les attributs spécifiés, si $retour est défini à 1, sinon true s'il est affiché directement.
  */
 function HTML5_P() {
 
@@ -292,12 +275,10 @@ function HTML5_P() {
 		$element.=">";
 		if (trim($texte)!= "") 	{$element.=$texte."</p>";}
 	}
-	if ($retour==1) {return $element; } else {echo $element;}
+	if ($retour==1) {return $element; } else {echo $element; return true;}
 	
 }
 /**
- * Génère une balise <img> HTML5 en fonction des paramètres fournis.
- *
  * Cette fonction permet d'insérer une image dans une page Web en générant une balise <img> avec
  * les attributs spécifiés tels que l'identifiant, le style, l'URL de la source, la largeur, la hauteur,
  * le texte alternatif, etc.
@@ -313,7 +294,8 @@ function HTML5_P() {
  * @param string $usemap Le nom de la carte image à utiliser pour l'élément <img>.
  * @param string $title (facultatif) Le titre de l'image.
  * @param bool   $ar_arg (indice 10) (facultatif) Création d'un objet CLS_HTML5_Img
- * @return string|object La balise <img> générée sous forme de chaîne de caractères, si $retour est 1 ou un objet CLS_HTML5_Img si  $ar_arg[10] existe et est vrai
+ * @return string|bool|object La balise <img> générée sous forme de chaîne de caractères, si $retour est 1 ou un objet CLS_HTML5_Img si  $ar_arg[10] existe et est vrai
+ *
  */
 function HTML5_Img() {
 	
@@ -461,4 +443,5 @@ function HTML5_styleinline($etat){
 function HTML5_html_off(){
 	echo "</html>";
 }
+
 ?>

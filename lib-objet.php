@@ -338,7 +338,7 @@ class OBJFormulaire {
 * Objet qui représente un tableau issue d'une requete à la base de données 
 * le tableau fait 100% c'est donc le conteneur qui doit fixé la taille
 * 
-* @param objet  $ods                    Objet de type OBJDataSet
+* @param object  $ods                    Objet de type OBJDataSet
 * @param string $html                   Contient le code généré à exploiter
 * @param string $tdSTtitre              Nom de la classe des cellules entetes
 * @param string $tdSTval                Nom de la classe des cellules corps
@@ -459,15 +459,16 @@ class OBJDataTableau {
                     $this->html .= TB_cellule("", $this->tdSTval, "", "", "", 1, ""); $this->html .= "</td>";
                 }
             }
-            if ($this->ColSupIco){ $this->html .= TB_cellule("", $this->tdSTval, "width:".$this->ColSupIcoWidth, 0, 0, 1); $this->html .= "&nbsp;</td>"; }
+            if ($this->ColSupIco){ 
+                if ($this->ColSupIcoWidth==""){ $substitut = ""; } else { $substitut = "width:".$this->ColSupIcoWidth; }
+                $this->html .= TB_cellule("", $this->tdSTval, $substitut, 0, 0, 1); $this->html .= "&nbsp;</td>"; 
+            }
             $this->html .= "</tr>";
         }
        
         $this->html .= "</table>";
     }
             
-
-
-
 }
+
 ?>
