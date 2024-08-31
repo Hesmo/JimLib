@@ -291,7 +291,7 @@ function HTML5_P() {
  * @param string $action Action associée à l'élément (optionnel).
  * @param string $usemap Nom de la map utilisée pour l'image (optionnel).
  * @param string $title Titre de l'image (optionnel).
- * @return string|bool La balise <img> HTML5 avec les attributs spécifiés, si $retour est défini à 1, sinon true si elle est affichée directement.
+ * @return string|bool|object La balise <img> HTML5 avec les attributs spécifiés, si $retour est défini à 1, sinon true si elle est affichée directement.
  */
 function HTML5_Img() {
 	
