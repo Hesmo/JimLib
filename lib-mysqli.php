@@ -261,6 +261,15 @@ function DTBS_add_rec(){
 	}
 	return $ar_retour;
 }
+/**
+ * Construit et execute une instruction SQL de modification
+ *
+ * ATTENDU :
+ * @param string  $table	  La table sur laquel porte la requete
+ * @param string  $where      Condition pour déterminer le ou les enregistrements à modifier
+ * @param array   $ar_newval  Le tableau avec les champs modifiés, la clef est le nom du champ, la valeur la nouvelle valeur
+ * @return array  $ar_retour  Tableau avec des informations sur le retour de la requete (statut, erreur, requete, nbrec, resultat)
+ */
 function DTBS_modif_rec(){
 
 	$ar_arg = func_get_args();

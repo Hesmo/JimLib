@@ -139,7 +139,7 @@ function TB_cellule() {
 		$rowspan = $ar_arg[4];
 		$retour  = $ar_arg[5];
 		if (isset($ar_arg[6])){ $dujava = $ar_arg[6]; } else { $dujava = ""; }
-		if (isset($ar_arg[7])){ $th = "th"; } else { $th = "td"; }
+		if (isset($ar_arg[7]) AND trim($ar_arg[7])!=""){ $th = "th"; } else { $th = "td"; }
 
 		$element = "<$th";
 		if (trim($id) != "") 	{ $element .= " id=\"$id\""; }

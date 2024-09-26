@@ -9,12 +9,11 @@
 */ 
 class OBJDataSet {
     
-    public $bdd_requete, $ar_bdd_fields = array(), $bdd_retour;
-
+    public $bdd_requete, $ar_bdd_fields = array(), $bdd_retour, $pointeurmysqli;
     function __construct() {
         // Fixe des parametres par défaut les variable sont ="" par défaut
         global $mysqli;
-        $this->mysqli=&$mysqli;
+        $this->pointeurmysqli=&$mysqli;
     }
 
     public function GetDataSelect(){
@@ -26,7 +25,7 @@ class OBJDataSet {
         }
         $champs = implode(", ",$ar_tampon);
         $this->bdd_requete = str_replace(";bdd_field_set;", $champs, $this->bdd_requete);
-        $this->bdd_retour = DTBS_sqlbrut($this->bdd_requete, $this->mysqli);
+        $this->bdd_retour = DTBS_sqlbrut($this->bdd_requete, $this->pointeurmysqli);
     }
 
 }
@@ -135,7 +134,7 @@ class OBJDataListe {
 /** 
 * Objet qui représente un fiche issue d'une requete à la base de données
 * 
-* @param objet  $ods            Objet dy type OBJDataSet
+* @param object  $ods            Objet dy type OBJDataSet
 * @param string $html           Contient le code généré à exploiter
 * @param string $tdSTtitre      Nom de la classe des cellules etiquettes
 * @param string $tdSTval        Nom de la classe des cellules valeurs
@@ -339,7 +338,7 @@ class OBJFormulaire {
 * Objet qui représente un tableau issue d'une requete à la base de données 
 * le tableau fait 100% c'est donc le conteneur qui doit fixé la taille
 * 
-* @param objet  $ods                    Objet de type OBJDataSet
+* @param object  $ods                    Objet de type OBJDataSet
 * @param string $html                   Contient le code généré à exploiter
 * @param string $tdSTtitre              Nom de la classe des cellules entetes
 * @param string $tdSTval                Nom de la classe des cellules corps
@@ -460,15 +459,16 @@ class OBJDataTableau {
                     $this->html .= TB_cellule("", $this->tdSTval, "", "", "", 1, ""); $this->html .= "</td>";
                 }
             }
-            if ($this->ColSupIco){ $this->html .= TB_cellule("", $this->tdSTval, "width:".$this->ColSupIcoWidth, 0, 0, 1); $this->html .= "&nbsp;</td>"; }
+            if ($this->ColSupIco){ 
+                if ($this->ColSupIcoWidth==""){ $substitut = ""; } else { $substitut = "width:".$this->ColSupIcoWidth; }
+                $this->html .= TB_cellule("", $this->tdSTval, $substitut, 0, 0, 1); $this->html .= "&nbsp;</td>"; 
+            }
             $this->html .= "</tr>";
         }
        
         $this->html .= "</table>";
     }
             
-
-
-
 }
+
 ?>
