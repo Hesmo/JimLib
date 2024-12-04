@@ -209,7 +209,7 @@ function FRM_cb() {
 	if (isset($valeur) AND trim($valeur)!=""){$element .=" value=\"$valeur\"";}
 	if (isset($ar_arg[8]) AND ($ar_arg[8] == 1)){ $element .= " onclick='return false;'"; } // Equivalent de readonly
 	if (isset($ar_arg[9]) AND ($ar_arg[9]!="")){ $element .= " ".$ar_arg[9]; } // Equivalent de readonly
-	if (isset($ar_arg[10]) AND $ar_arg[10]!=""){ $element.= " ".$data." "; }
+	if (isset($ar_arg[10]) AND $ar_arg[10]!=""){ $element.= " ".$ar_arg[10]." "; }
 	$element .= " >".$text."\n";
 	if ($retour == 1) { return $element; } else { echo $element; }
 

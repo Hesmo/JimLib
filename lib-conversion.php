@@ -63,9 +63,8 @@ function CV_calculsumean13($digit12){
 	return $checksum;
 }
 function CV_Calcul_Sum_Ean14($d13){
-	if (strlen($d13)!=13){return false;}
-	// Fait un tableau de caractère (pas necessaireon peut accéder à $digit13 avec des crochets de 0 a 12)
 
+	if (strlen($d13)!=13){return false;}
 	$total = ($d13[0]*3) + ($d13[1]*1) + ($d13[2]*3) + ($d13[3]*1) + ($d13[4]*3) + ($d13[5]*1) + ($d13[6]*3) + ($d13[7]*1) + ($d13[8]*3) + ($d13[9]*1) + ($d13[10]*3) + ($d13[11]*1) + ($d13[12]*3);
 	$multiple = floor($total/10);
 	if (($multiple*10)<$total) { $multiple++;}
