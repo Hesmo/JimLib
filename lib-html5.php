@@ -343,14 +343,16 @@ class CLS_HTML5_Img {
     /**
      * Définit les valeurs des attributs de la balise <img>.
      *
-     * @param string $id L'identifiant de l'élément <img>.
-     * @param string $style Le style CSS à appliquer à l'élément <img>.
-     * @param string $src L'URL de la source de l'image.
-     * @param string $width La largeur de l'image.
-     * @param string $height La hauteur de l'image.
-     * @param string $alt Le texte alternatif de l'image (en réalité le title).
-     * @param string $data Les données supplémentaires à inclure dans la balise <img>.
+     * @param string  $id L'identifiant de l'élément <img>.
+     * @param string  $style Le style CSS à appliquer à l'élément <img>.
+     * @param string  $src L'URL de la source de l'image.
+     * @param integer $width La largeur de l'image.
+     * @param integer $height La hauteur de l'image.
+     * @param string  $alt Le texte alternatif de l'image (en réalité le title).
+     * @param string  $data Les données supplémentaires à inclure dans la balise <img>.
+	 * @param integer $score Le nombre qui permet de savoir si on affiche ou pas un icone à partir d'une matrice.
      */
+
 	function Set_CLS_HTML5_Img($id, $style, $src, $width, $height, $alt, $data) {
        $this->id = $id;
        $this->style = $style;
@@ -359,6 +361,7 @@ class CLS_HTML5_Img {
        $this->height = $height;
        $this->alt = $alt; // contient le title
        $this->data = $data;
+	   $this->score = 0;
 	}
 	/**
      * Génère la balise <img> en utilisant les valeurs des attributs définies précédemment.
