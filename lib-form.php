@@ -285,7 +285,7 @@ function FRM_ta() {
 * FRM_upload($name,$action,$class,$target,$idfile,$namefile,$multiple,$idbutton,$valuebutton,$stylebtinput,$stylebtbutton, $maxfilesize, $retour)
 * 
 */
-function FRM_upload($ar_param) {
+function FRM_upload(array $ar_param) {
 
 	$ar_param['stylebtinput']="";
 	/*if (!isset($ar_param['stylebtinput'])){
@@ -293,7 +293,7 @@ function FRM_upload($ar_param) {
 	}*/
 
 	$element = "<form method=\"post\" enctype=\"multipart/form-data\" accept-charset=\"utf-8\"";
-	if (isset($ar_param['name'])){ $element .= " name=\"".$ar_param['name']."\""; }
+	if (isset($ar_param['name'])){ $element .= " id=\"".$ar_param['name']."\" name=\"".$ar_param['name']."\" "; }
 	if (isset($ar_param['action'])){ $element .= " action=\"".$ar_param['action']."\""; }
 	if (isset($ar_param['class'])){ $element .= " class=\"".$ar_param['class']."\""; }
 	if (isset($ar_param['target'])){ $element .= " target=\"".$ar_param['target']."\""; }
@@ -319,7 +319,6 @@ function FRM_upload($ar_param) {
 	$element .= "id=\"".$ar_param['idbutton']."\" name=\"btsubmitfile\" ";
 	$element .= "value=\"".$ar_param['valuebutton']."\" ";
 	$element .= "style=\"float: right; margin-top:15px;\">";
-	
 
 	if (isset($ar_param['retour'])){
 		if ($ar_param['retour']==1){ return $element; }
