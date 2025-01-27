@@ -198,6 +198,7 @@ class OBJElementFormulaire {
     public $etiquette;                          // Valeur de l'etiquette qui decrit l'élément du formulaire
     public $type, $name, $valeur;               // Type d'objet formulaire, nom et valeur (Pour checkbox : valeur = text)
     public $classe, $style, $action;            // Tous sauf Hidden
+    public $stylepere;                          // Pour le style du pere (se pour les opt par exemple)
     public $checked;                            // Checkbox et radio
     public $id;                                 // Hidden et radio 
     public $texte;                              // Etiquette a droite des boutons radio
@@ -243,7 +244,7 @@ class OBJElementFormulaire {
             break;
             case "select_enum":
                 $ar_enum = DTBS_get_choice_enum($this->table,$this->champ,$this->mysqli);
-                $this->html_elem = FRM_se($this->name,$this->classe,'',0,'',1,$this->style);
+                $this->html_elem = FRM_se($this->name,$this->classe,'',0,'',1,$this->stylepere);
                 foreach ($ar_enum as $choix) {
                     $this->html_elem .= FRM_opt($this->optclasse, $choix, $choix==$this->valeur, ucfirst($choix), 1, $this->style);
                 }
@@ -254,7 +255,7 @@ class OBJElementFormulaire {
                 if (!$ar_datasel['statut'] OR $ar_datasel['nbrec']==0){
                         $this->html_elem = "Pas de données à afficher";
                 } else {
-                    $this->html_elem = FRM_se($this->name,$this->classe,'',0,'',1,$this->style);
+                    $this->html_elem = FRM_se($this->name,$this->classe,'',0,'',1,$this->stylepere);
                     $this->html_elem .= FRM_opt($this->optclasse, $this->valeur, $this->valeur==-1, "-", 1, $this->style);
                     while($rec = mysqli_fetch_assoc($ar_datasel['resultat'])){
                         $this->html_elem .= FRM_opt($this->optclasse, $rec[$this->champId], $rec[$this->champId]==$this->valeur, ucfirst($rec[$this->champNom]), 1, $this->style);
