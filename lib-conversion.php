@@ -201,5 +201,17 @@ function CV_datecourrier($date,$typed,$avecheure){
 */
 function prefixe_width(&$valeur,$key) { $valeur = "width: ".$valeur."px;"; }
 
+/**
+* RENVOI UN TABLEAU AVEC LES TROIS ELEMENTS D'UNE DATE AU FORMAT JJ/MM/YYYY
+* LES MOIS ET JOURS N'ONT PAS DE ZERO DEVANT
+* @param string $a
+*/
+function CV_ExplodeDate($a) {
+	$ar_ed = array('jour'=>'', 'mois'=>'', 'annee'=>'');
+	$ar_ed['jour']  = substr($a,0,2) + 0; // Le + 0 a la fin permet de transformer de facon implicite la chaine en entier
+	$ar_ed['mois']  = substr($a,3,2) + 0;
+	$ar_ed['annee'] = substr($a,6,4);
+	return $ar_ed;
+}
 
 ?>
