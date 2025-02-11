@@ -142,7 +142,7 @@ function HTML5_href(){
 		$ar_param  = $ar_arg[7];
 		if (isset($ar_arg[8]) AND $ar_arg[8]!==""){  $balisedownload = "download=\"".$ar_arg[8]."\""; } else { $balisedownload="";}	
 		if (isset($ar_arg[9]) AND $ar_arg[9]!==""){  $idhref = "id=\"".$ar_arg[9]."\""; } else { $idhref="";}
-		$box =  "<a title=\"$title\" ${balisedownload} ${idhref} href=\"javascript:".$nomscript."(";
+		$box =  "<a title=\"$title\" $balisedownload $idhref href=\"javascript:".$nomscript."(";
 		if (is_array($ar_param)){
 			$raccord = "'".implode("','",$ar_param)."'";
 			$box .= $raccord;

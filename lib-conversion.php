@@ -42,6 +42,22 @@ function CV_dureesec_tohuman($dureesec){
 
 	return $ar_retour;	
 }
+/**
+* RENVOIE LA DIFFERENCE (toujours positif) EN SECONDE ENTRE DEUX DATES
+*
+* @param string $a // Format AAAA-MM-JJ HH:MM:SS ou AAAA-MM-JJ
+* @param string $b // Format AAAA-MM-JJ HH:MM:SS ou AAAA-MM-JJ
+*/
+function CV_DifferenceDate($a,$b) {
+
+	if (strlen($a)==10){ $a = $a." 00:00:00"; }
+	if (strlen($b)==10){ $b = $b." 00:00:00"; }
+
+	$a2 = mktime (substr($a,11,2),substr($a,14,2),substr($a,17,2),substr($a,5,2),substr($a,8,2),substr($a,0,4));
+	$b2 = mktime (substr($b,11,2),substr($b,14,2),substr($b,17,2),substr($b,5,2),substr($b,8,2),substr($b,0,4));
+	
+	return(abs($b2-$a2));
+}
 function CV_boleentostring(){
 	$ar_arg = func_get_args();
 	if ($ar_arg[0]==-1){ $valret = "non"; } else { $valret = "oui"; }
