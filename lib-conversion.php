@@ -27,6 +27,7 @@ function CV_date_mysqltohuman($datesql){
 * @param string $w
 */
 function CV_datesql_TStamp($w) {
+	if (strlen($w)==10){ $w = $w." 00:00:00"; }
 	$ladate = date_create_from_format("Y-m-d H:i:s",$w);
 	return( $ladate->format('U'));
 }
