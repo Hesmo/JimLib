@@ -16,9 +16,8 @@ function CV_date_mysqltohuman($datesql){
 	$ar_retour['dateheurelong'] = $ar_retour['datelong']." ".$ar_retour['heure'];
 	$ar_retour['dateheurecourt'] = $ar_retour['datecourt']." ".$ar_retour['heure'];
 	
-	
 	$ar_retour['tmstp'] = mktime((int) $ar_retour['heure'],(int) $ar_retour['minute'],(int) $ar_retour['seconde'],(int) $ar_retour['mois'],(int) $ar_retour['jour'],(int) $ar_retour['annee']);
-	
+
 	return $ar_retour;
 	
 }
@@ -29,7 +28,7 @@ function CV_date_mysqltohuman($datesql){
 */
 function CV_datesql_TStamp($w) {
 	$ladate = date_create_from_format("Y-m-d H:i:s",$w);
-	//return( mktime( substr($w,11,2),substr($w,14,2),substr($w,17,2),substr($w,5,2),substr($w,8,2),substr($w,0,4) ) );
+	return($ladate->getTimestamp());
 }
 /**
 * RETOURNE UN TABLEAU AVEC LE NOMBRE DE heure,seconde à partir d'un nombre de seconde
@@ -54,10 +53,12 @@ function CV_DifferenceDate($a,$b) {
 	if (strlen($a)==10){ $a = $a." 00:00:00"; }
 	if (strlen($b)==10){ $b = $b." 00:00:00"; }
 
-	$a2 = mktime (substr($a,11,2),substr($a,14,2),substr($a,17,2),substr($a,5,2),substr($a,8,2),substr($a,0,4));
-	$b2 = mktime (substr($b,11,2),substr($b,14,2),substr($b,17,2),substr($b,5,2),substr($b,8,2),substr($b,0,4));
+	$da = date_create_from_format("Y-m-d H:i:s",$a);
+	$db = date_create_from_format("Y-m-d H:i:s",$b);
+	$a2 = $da->getTimestamp(); $b2 = $db->getTimestamp();
 	
 	return(abs($b2-$a2));
+
 }
 function CV_boleentostring(){
 	$ar_arg = func_get_args();
