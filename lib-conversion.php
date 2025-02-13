@@ -28,7 +28,7 @@ function CV_date_mysqltohuman($datesql){
 */
 function CV_datesql_TStamp($w) {
 	$ladate = date_create_from_format("Y-m-d H:i:s",$w);
-	return($ladate->getTimestamp());
+	return( $ladate->format('U'));
 }
 /**
 * RETOURNE UN TABLEAU AVEC LE NOMBRE DE heure,seconde à partir d'un nombre de seconde
@@ -55,8 +55,7 @@ function CV_DifferenceDate($a,$b) {
 
 	$da = date_create_from_format("Y-m-d H:i:s",$a);
 	$db = date_create_from_format("Y-m-d H:i:s",$b);
-	$a2 = $da->getTimestamp(); $b2 = $db->getTimestamp();
-	
+	$a2 = $da->format('U'); $b2 = $db->format('U'); 
 	return(abs($b2-$a2));
 
 }
