@@ -134,7 +134,7 @@ class OBJDataListe {
 /** 
 * Objet qui représente un fiche issue d'une requete à la base de données
 * 
-* @param object  $ods            Objet dy type OBJDataSet
+* @param object $ods            Objet dy type OBJDataSet
 * @param string $html           Contient le code généré à exploiter
 * @param string $tdSTtitre      Nom de la classe des cellules etiquettes
 * @param string $tdSTval        Nom de la classe des cellules valeurs

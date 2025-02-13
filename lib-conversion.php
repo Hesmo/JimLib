@@ -28,7 +28,8 @@ function CV_date_mysqltohuman($datesql){
 * @param string $w
 */
 function CV_datesql_TStamp($w) {
-	return( mktime( substr($w,11,2),substr($w,14,2),substr($w,17,2),substr($w,5,2),substr($w,8,2),substr($w,0,4) ) );
+	$ladate = date_create_from_format("Y-m-d H:i:s",$w);
+	//return( mktime( substr($w,11,2),substr($w,14,2),substr($w,17,2),substr($w,5,2),substr($w,8,2),substr($w,0,4) ) );
 }
 /**
 * RETOURNE UN TABLEAU AVEC LE NOMBRE DE heure,seconde à partir d'un nombre de seconde
