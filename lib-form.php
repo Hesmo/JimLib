@@ -41,7 +41,7 @@ function FRM_it(){
 	$retour = $ar_arg[6]; // Renvoie la balise ou l'affiche directement
 	$action = $ar_arg[7]; // Script associé  (optionnel)
 	$style  = $ar_arg[8]; // Style 
-	if (isset($ar_arg[9]) AND ($ar_arg[9] == 1)){ $autocomplete = "off"; }
+	if (isset($ar_arg[9]) AND ($ar_arg[9] == 1)){ $autocomplete = "off"; } //	else { $autocomplete = $ar_arg[9] ; } 
 	// Parametre ajouté voir http://www.w3schools.com/tags/att_input_type.asp
 	if (isset($ar_arg[10]) AND (trim($ar_arg[10]) != "")){ 
 		$element = "$text<input type=\"".$ar_arg[10]."\" ";
