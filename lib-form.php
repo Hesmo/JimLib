@@ -186,10 +186,9 @@ function FRM_pword(){
 
 	if ($retour == 1) {return $element;} else {echo $element;}
 }
-function FRM_cb() {
+function FRM_cb(string $class="", string $style="", string $name="", int $checked=0, string $text="", string $action="", int $retour=0, string $valeur="",int $readonly=0, string $extra1="", string $extra2="") {
 
-	$ar_arg = func_get_args();
-	
+	/*$ar_arg = func_get_args();
 	$class   = $ar_arg[0];
 	$style   = $ar_arg[1];
 	$name	 = $ar_arg[2];
@@ -197,7 +196,7 @@ function FRM_cb() {
 	$text	 = $ar_arg[4];
 	$action	 = $ar_arg[5];
 	$retour	 = $ar_arg[6];
-	if (isset($ar_arg[7])){$valeur=$ar_arg[7];}
+	if (isset($ar_arg[7])){$valeur=$ar_arg[7];}*/
 	
 
 	$element = "<input type=\"checkbox\"";
@@ -207,9 +206,9 @@ function FRM_cb() {
 	if ($checked==1){$element .= " checked";}
 	if ($action!=""){$element .=" ".$action;}
 	if (isset($valeur) AND trim($valeur)!=""){$element .=" value=\"$valeur\"";}
-	if (isset($ar_arg[8]) AND ($ar_arg[8] == 1)){ $element .= " onclick='return false;'"; } // Equivalent de readonly
-	if (isset($ar_arg[9]) AND ($ar_arg[9]!="")){ $element .= " ".$ar_arg[9]; } // Equivalent de readonly
-	if (isset($ar_arg[10]) AND $ar_arg[10]!=""){ $element.= " ".$ar_arg[10]." "; }
+	if ($readonly == 1){ $element .= " onclick='return false;'"; } // Equivalent de readonly mais toujours accessible en jquery
+	if ($extra1!=""){ $element .= " ".$extra1." "; }  // Je les appel extra1 et extra2 car je ne sais pas a quoi ils servent
+	if ($extra2!=""){ $element .= " ".$extra2." "; }
 	$element .= " >".$text."\n";
 	if ($retour == 1) { return $element; } else { echo $element; }
 

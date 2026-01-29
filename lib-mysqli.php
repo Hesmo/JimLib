@@ -84,12 +84,8 @@ function DTBS2_select(mysqli $pointeur, array $options = []) {
 	$ar_retour = array( 'statut'=>true, 'erreur'=>"", 'requete'=>"", 'nbrec'=>0, 'resultat'=>0 );
 	// Parametres par défaut
 	$defaults = [
-        'table'     => '',
-        'champ'     => '*',
-        'condition' => '',
-        'groupby'   => '',
-        'tri'       => ''
-    ];
+        'table' => '', 'champ' => '*', 'condition' => '', 'groupby' => '', 'tri' => ''
+	];
 	// Fusion des parametres par défaut et des parametres fournis (les param fournis ecrase les param par défaut)
     $opt = array_merge($defaults, $options);
 
@@ -269,15 +265,13 @@ function DTBS_insert_rec(){
  *
  * @return     array  $ar_retour Tableau avec des informations sur le retour de la requete (statut, erreur, requete, nbrec, resultat)
  */
-function DTBS_add_rec(){
+function DTBS_add_rec(string $table, array $ar_nval) {
 	
 	global $mysqli;
 	$ar_arg = func_get_args();
-
-	$table 	 = $ar_arg[0];
-	$ar_nval = $ar_arg[1];
-	
-	
+	// $table 	= $ar_arg[0];
+	// $ar_nval = $ar_arg[1];
+		
 	$ar_retour['statut'] = true;
 	$ar_retour['erreur'] = "";
 	$ar_retour['requete']= "";
