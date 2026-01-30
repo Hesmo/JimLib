@@ -198,7 +198,7 @@ class OBJElementFormulaire {
     public string $etiquette;                          // Valeur de l'etiquette qui decrit l'élément du formulaire
     public string $type, $name, $valeur;               // Type d'objet formulaire, nom et valeur (Pour checkbox : valeur = text)
     public string $classe, $style, $action;            // Tous sauf Hidden
-    public string $stylepere;                          // Pour le style du pere (se pour les opt par exemple)
+    public $stylepere;                          // Pour le style du pere (se pour les opt par exemple)
     public int $checked;                            // Checkbox et radio
     public string $id;                                 // Hidden et radio 
     public string $texte;                              // Etiquette a droite des boutons radio
