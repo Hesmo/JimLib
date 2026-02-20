@@ -132,7 +132,6 @@ class OBJDataListe {
 
 }
 
-
 /** 
 * Objet qui représente un fiche issue d'une requete à la base de données
 * 
@@ -194,25 +193,58 @@ class OBJDataFiche {
     }
 
 }
-
+/** 
+* Objet qui représente un element de formulaire
+* 
+* @param string $etiquette      Valeur de l'etiquette qui decrit l'élément du formulaire
+* @param string $type           Type d'objet du formulaire
+* @param string $name           Nom de l'input pour le traitement du formulaire
+* @param string $valeur         Valeur de l'input pour le traitement du formulaire
+* @param string $classe         Classe CSS de l'élément (sauf pour Hidden)
+* @param string $style          Style CSS de l'élément (sauf pour Hidden)
+* @param string $action         Action JavaScript de l'élément (sauf pour Hidden)
+* @param string $stylepere      Style CSS du pere de l'élément (ex : style du select des options)
+* @param int    $checked        Pour les checkbox et radio
+* @param string $id             Id des éléments hidden et radio
+* @param string $texte          Texte à droite des boutons radio
+* @param int    $max            Longueur maximale pour les input type text
+* @param string $autocomplete   Attribut autocomplete pour les input type text 
+* @param string $placeholder    Placeholder pour les input type text
+* @param int    $rows           Nombre de lignes pour les textarea
+* @param int    $cols           Nombre de colonnes pour les textarea
+* @param string $table          Nom de la table pour un select source enum
+* @param string $champ          Nom du champ pour un select source enum
+* @param string $requete        Requête SQL pour un select source table
+* @param string $champId        Champ ID pour un select source table  (ex: lorge.client.clt_id)
+* @param string $champNom       Champ Nom pour un select source table (ex: lorge.client.Nom)
+* @param string $optclasse      Classe CSS pour les options d'un select
+* @param string $optstyle       Style CSS pour les options d'un select
+* @param string $html_elem      Code HTML pour affichage (rendu final)
+* @param mysqli $pointeurmysqli Pointeur mysqli pour les requetes dans les select
+*
+*/
 class OBJElementFormulaire {
 
-    public string $etiquette = "";                          // Valeur de l'etiquette qui decrit l'élément du formulaire
-    public string $type = "", $name = "", $valeur = "";     // Type d'objet formulaire, nom et valeur (Pour checkbox : valeur = text)
-    public string $classe = "", $style = "", $action = "";  // Tous sauf Hidden
-    public string $stylepere = "";                          // Pour le style du pere (se pour les opt par exemple)
-    public int $checked = -1;                               // Checkbox et radio
-    public string $id = "";                                 // Hidden et radio 
-    public string $texte = "";                              // Etiquette a droite des boutons radio
-    public $max, $autocomplete, $placeholder;               // Input Type text
-    public $rows,$cols;                                     // Textarea
-    public $table, $champ;                                  // Dans un select source enum
-    public $requete, $champId, $champNom;                   // Dans un select source table
-    public $optclasse, $optstyle;                           // Option dans un select
-    public mysqli $pointeurmysqli;                          // Pointeur mysqli pour les requetes dans les select
-
-    public $html_elem;                                      // Code HTML pour affichage (rendu final)
-
+    public string $etiquette = "";
+    public string $type = "", $name = "", $valeur = "";
+    public string $classe = "", $style = "", $action = "";
+    public string $stylepere = "";
+    public int $checked = -1;
+    public string $id = "";
+    public string $texte = "";
+    public $max = "", $autocomplete = "", $placeholder  = "";
+    public $rows, $cols;
+    public $table, $champ;
+    public $requete, $champId, $champNom;
+    public $optclasse, $optstyle;
+    public string $html_elem = "";
+    public mysqli $pointeurmysqli;
+    
+    /** 
+    * Initialisation de l'objet avec les parametres de base pour tous les types d'input, 
+    * les autres parametres sont fixer directement sur l'objet après son instanciation en fonction du type d'input 
+    *
+    */
     function __construct($etiquette, $type, $name, $valeur) {
         global $mysqli;
         $this->pointeurmysqli=&$mysqli;
@@ -223,7 +255,11 @@ class OBJElementFormulaire {
         $this->valeur = $valeur;
         $this->checked = false;
     }
-    
+
+    /** 
+    * Chargement de l'objet final dans html_elem avec les parametres définit dans le code php appelant
+    *
+    */    
     function GenElemFrm(){
         
         switch ($this->type){
@@ -274,14 +310,16 @@ class OBJElementFormulaire {
 /** 
 * Objet qui représente un formulaire pour la création d'un enregistrement de base de données
 * 
-* @param array  $ar_oef         Tableau d'objet de type OBJElementFormulaire
-* @param string $html           Contient le code généré à exploiter
-* @param string $NameFrm        Nom du formulaire
-* @param string $tdSTtitre      Nom de la classe des cellules etiquettes
-* @param string $tdSTval        Nom de la classe des cellules valeurs
-* @param string $tableId        Id de la table généré
-* @param string $classBt        Classe des boutons
-* @param string $tableStyle
+* @param OBJElementFormulaire[] $ar_oef   Tableau d'objet de type OBJElementFormulaire
+* @param string $html   Contient le code généré à exploiter
+* @param string $NameFrm   Nom du formulaire
+* @param string $tdSTtitre   Nom de la classe des cellules etiquettes
+* @param string $tdSTval   Nom de la classe des cellules valeurs
+* @param string $tableId   Id de la table généré
+* @param string $classBt   Classe des boutons
+* @param string $tableStyle   Style de la table du formulaire
+* @param string $NameBtRec   Nom du bouton enregistrer
+* @param string $NameBtCancel   Nom du bouton annuler
 *
 */
 
@@ -289,7 +327,6 @@ class OBJFormulaire {
 
     /** @var OBJElementFormulaire[] */
     public $ar_oef = array();
-
     public $html, $NameFrm, $tdSTtitre, $tdSTval, $tableId, $tableStyle, $classBt, $NameBtRec, $NameBtCancel;
 
      function __construct() {
@@ -343,7 +380,7 @@ class OBJFormulaire {
 /** 
 *
 * Objet qui représente un tableau issue d'une requete à la base de données 
-* le tableau fait 100% c'est donc le conteneur qui doit fixé la taille
+* le tableau fait 100% c'est donc le conteneur qui doit fixer la taille
 * 
 * @param OBJDataSet $ods                Objet de type OBJDataSet
 * @param string $html                   Contient le code généré à exploiter
@@ -354,8 +391,11 @@ class OBJFormulaire {
 * @param array  $ar_ColStyle            Tableau qui contient une surcharge de style pour chaque colonne
 * @param string $tableId                Id du Tableau Entete
 * @param string $divId                  Id du DIV qui contient le tableau de données
-* @param string $tableCrpId             Id du Tableau Corps
+* @param string $largeur                Largeur du tableau
+* @param string $hauteur                Hauteur du tableau
 * @param string $ColSpanTitre           Nombre de cellule fusionné qui contiennent le titre ou le formulaire de navigation
+* @param string $IdRemplace             Id de la cellule du tableau d'entete qui sera remplacé par le formulaire de navigation (si il y a lieu)
+* @param string $tableCrpId             Id du Tableau Corps
 * @param string $NVGDT_titre            Titre du tableau, peut servir meme si on appel pas le formulaire de date
 * @param string $NVGDT_fonction_retour  Fonction rappelé par navigdate (qui rappel le tableau sans recharger les entetes) si vide alors pas d'appel navigdate
 * @param string $NVGDT_param            Tableau de parametre passé eventuellement à la fonction ci-dessus
@@ -364,6 +404,7 @@ class OBJFormulaire {
 * 
 * EN TEST : $ColSupIco
 * @param bool $ColSupIco                true si il y a une colonne à la fin pour mettre des icones
+* @param integer $ColSupIcoWidth        Largeur de la colonne des icones
 *
 * CI-DESSOUS EN ATTENTE DE DECISION
 * @param string $ListeIcone             Contient les icones à afficher pour des actions sur ligne
@@ -374,11 +415,13 @@ class OBJFormulaire {
 class OBJDataTableau {
 
     public $ods, $html, $tdSTtitre, $tdSTval, $ar_ColTaille, $ar_ColText, $ar_ColStyle;
-    public $tableId, $divId, $largeur, $hauteur, $ColSpanTitre, $IdRemplace; // $ListeIcone, $ChampIdIcone
-    public $NVGDT_titre, $NVGDT_fonction_retour, $NVGDT_param, $NVGDT_anneedepart, $NVGDT_jour;
+    public $tableId, $divId, $largeur, $hauteur, $ColSpanTitre, $IdRemplace; 
     public string $tableCrpId;
+    public $NVGDT_titre, $NVGDT_fonction_retour, $NVGDT_param, $NVGDT_anneedepart, $NVGDT_jour;
     
     public $ColSupIco, $ColSupIcoWidth; // En test
+    // $ListeIcone, $ChampIdIcone
+    
 
     function __construct() {
         // Fixe des parametres par défaut les variable sont ="" par défaut
