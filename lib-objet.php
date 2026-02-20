@@ -2,14 +2,16 @@
 /** 
 * Objet qui représente une connexion à la base de données
 * 
-* @param string $bdd_requete        Requete SQL la chaine ;bdd_field_set; est remplacée par Une construction à partir de $ar_bdd_fields dans GetDataSelect
-* @param array  $ar_bdd_fields      Tableau d'objet OBJDataField
+* @param string $bdd_requete        Requete SQL la chaine ;bdd_field_set; est remplacée par une construction à partir de $ar_bdd_fields dans GetDataSelect
+* @param OBJDataField[] $ar_bdd_fields      Tableau d'objet OBJDataField
 * @param array  $bdd_retour         Tableau qui contient des informations sur la requete 
 *
 */ 
 class OBJDataSet {
     
-    public $bdd_requete, $ar_bdd_fields = array(), $bdd_retour, $pointeurmysqli;
+    /** @var OBJDataField[] */
+    public $ar_bdd_fields = array();
+    public $bdd_requete, $bdd_retour, $pointeurmysqli;
     function __construct() {
         // Fixe des parametres par défaut les variable sont ="" par défaut
         global $mysqli;
@@ -199,20 +201,21 @@ class OBJElementFormulaire {
     public string $type = "", $name = "", $valeur = "";     // Type d'objet formulaire, nom et valeur (Pour checkbox : valeur = text)
     public string $classe = "", $style = "", $action = "";  // Tous sauf Hidden
     public string $stylepere = "";                          // Pour le style du pere (se pour les opt par exemple)
-    public int $checked = -1;                            // Checkbox et radio
+    public int $checked = -1;                               // Checkbox et radio
     public string $id = "";                                 // Hidden et radio 
     public string $texte = "";                              // Etiquette a droite des boutons radio
-    public $max, $autocomplete, $placeholder;   // Input Type text
-    public $rows,$cols;                         // Textarea
-    public $table, $champ;                      // Dans un select source enum
-    public $requete, $champId, $champNom;       // Dans un select source table
-    public $optclasse, $optstyle;               // Option dans un select
+    public $max, $autocomplete, $placeholder;               // Input Type text
+    public $rows,$cols;                                     // Textarea
+    public $table, $champ;                                  // Dans un select source enum
+    public $requete, $champId, $champNom;                   // Dans un select source table
+    public $optclasse, $optstyle;                           // Option dans un select
+    public mysqli $pointeurmysqli;                          // Pointeur mysqli pour les requetes dans les select
 
-    public $html_elem;                          // Code HTML pour affichage (rendu final)
+    public $html_elem;                                      // Code HTML pour affichage (rendu final)
 
     function __construct($etiquette, $type, $name, $valeur) {
         global $mysqli;
-        $this->mysqli=&$mysqli;
+        $this->pointeurmysqli=&$mysqli;
 
         $this->etiquette = $etiquette;
         $this->type = $type;
@@ -243,7 +246,7 @@ class OBJElementFormulaire {
                 $this->html_elem = FRM_ta($this->style, $this->name, $this->classe, $this->rows, $this->cols, $this->valeur, 1, $this->action);
             break;
             case "select_enum":
-                $ar_enum = DTBS_get_choice_enum($this->table,$this->champ,$this->mysqli);
+                $ar_enum = DTBS_get_choice_enum($this->table,$this->champ,$this->pointeurmysqli);
                 $this->html_elem = FRM_se($this->name,$this->classe,'',0,'',1,$this->stylepere);
                 foreach ($ar_enum as $choix) {
                     $this->html_elem .= FRM_opt($this->optclasse, $choix, $choix==$this->valeur, ucfirst($choix), 1, $this->style);
@@ -251,7 +254,7 @@ class OBJElementFormulaire {
                 $this->html_elem .= "</select>";
             break;
             case "select_table":
-                $ar_datasel = DTBS_sqlbrut($this->requete,$this->mysqli);
+                $ar_datasel = DTBS_sqlbrut($this->requete,$this->pointeurmysqli);
                 if (!$ar_datasel['statut'] OR $ar_datasel['nbrec']==0){
                         $this->html_elem = "Pas de données à afficher";
                 } else {
@@ -284,7 +287,10 @@ class OBJElementFormulaire {
 
 class OBJFormulaire {
 
-    public $ar_oef, $html, $NameFrm, $tdSTtitre, $tdSTval, $tableId, $tableStyle, $classBt, $NameBtRec, $NameBtCancel;
+    /** @var OBJElementFormulaire[] */
+    public $ar_oef = array();
+
+    public $html, $NameFrm, $tdSTtitre, $tdSTval, $tableId, $tableStyle, $classBt, $NameBtRec, $NameBtCancel;
 
      function __construct() {
         // Fixe des parametres par défaut les variable sont ="" par défaut
@@ -339,7 +345,7 @@ class OBJFormulaire {
 * Objet qui représente un tableau issue d'une requete à la base de données 
 * le tableau fait 100% c'est donc le conteneur qui doit fixé la taille
 * 
-* @param object  $ods                    Objet de type OBJDataSet
+* @param OBJDataSet $ods                Objet de type OBJDataSet
 * @param string $html                   Contient le code généré à exploiter
 * @param string $tdSTtitre              Nom de la classe des cellules entetes
 * @param string $tdSTval                Nom de la classe des cellules corps
@@ -370,6 +376,7 @@ class OBJDataTableau {
     public $ods, $html, $tdSTtitre, $tdSTval, $ar_ColTaille, $ar_ColText, $ar_ColStyle;
     public $tableId, $divId, $largeur, $hauteur, $ColSpanTitre, $IdRemplace; // $ListeIcone, $ChampIdIcone
     public $NVGDT_titre, $NVGDT_fonction_retour, $NVGDT_param, $NVGDT_anneedepart, $NVGDT_jour;
+    public string $tableCrpId;
     
     public $ColSupIco, $ColSupIcoWidth; // En test
 
