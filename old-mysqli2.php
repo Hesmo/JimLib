@@ -1,48 +1,5 @@
 <?Php
-/* Liste des codes erreurs et traduction en langage courant */
-$ar_errmysql[1451] = "Suppression impossible, enregistrement utilisé dans une autre table";
-$ar_errmysql[1062] = "Ajout impossible, enregistrement déjà présent";
-$ar_errmysql[1452] = "Action impossible, en raison d'une contrainte de clé etrangère";
 
-
-/**
- * Construit et execute une instruction SQL select simple
- *
- * @param      string  $table      la table sur laquel porte la requete
- * @param      string  $champ      les champs retournés, si vide retourne tout les champs
- * @param      string  $condition  le filtre de la requete
- * @param      string  $groupby    clause de regroupement
- * @param      string  $tri        clause de tri
- * @param      integer $pointeur   pointeur vers une connexion mysql
- *
- * @return     array  $ar_retour Tableau avec des informations sur le retour de la requete (statut, erreur, requete, nbrec, resultat)
- */
-function DTBS_select($table,$champ,$condition,$groupby,$tri,$pointeur) {
-
-	$ar_retour['statut']= true;
-	$ar_retour['erreur']="";
-	$ar_retour['requete']="";
-	$ar_retour['nbrec']=0;
-	$ar_retour['resultat']=0;
-
-	if (trim($table)==""){ $ar_retour['statut']= false; $ar_retour['erreur'] = "Table non fourni"; return $ar_retour; }
-	if (trim($champ)==""){ $champ = "*"; }
-	$ar_retour['requete'] = "SELECT $champ FROM $table ";
-	
-	if (trim($condition)!="")	{ $ar_retour['requete'] .= "WHERE $condition "; }
-	if (trim($groupby)!="")	{ $ar_retour['requete'] .= "GROUP BY $groupby "; }
-	if (trim($tri)!="")			{ $ar_retour['requete'] .= "ORDER BY $tri "; }
-	
-	$ar_retour['resultat'] = mysqli_query($pointeur, $ar_retour['requete']);
-	
-	if (!$ar_retour['resultat']) {
-		$ar_retour['statut']= false;
-		$ar_retour['erreur']= mysqli_error($pointeur);
-	} else {
-		$ar_retour['nbrec'] = mysqli_num_rows($ar_retour['resultat']);
-	}
-	return $ar_retour;
-}
 function DTBS_select_join($table1,$table2,$champ,$condjoin,$condition,$tri,$pointeur) {
 
 	$ar_retour['statut']= true;

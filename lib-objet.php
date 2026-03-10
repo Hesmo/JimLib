@@ -2,9 +2,9 @@
 /** 
 * Objet qui représente une connexion à la base de données
 * 
-* @param string $bdd_requete        Requete SQL la chaine ;bdd_field_set; est remplacée par une construction à partir de $ar_bdd_fields dans GetDataSelect
+* @param string $bdd_requete                Requete SQL la chaine ;bdd_field_set; est remplacée par une construction à partir de $ar_bdd_fields dans GetDataSelect
 * @param OBJDataField[] $ar_bdd_fields      Tableau d'objet OBJDataField
-* @param array  $bdd_retour         Tableau qui contient des informations sur la requete 
+* @param array  $bdd_retour                 Tableau qui contient des informations sur la requete 
 *
 */ 
 class OBJDataSet {

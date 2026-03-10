@@ -166,22 +166,31 @@ function HTML5_href(){
 	$box.= ">".$afficher."</a>";
 	if ($retour == 1) {return $box;} else {echo $box; return true;}
 }
+
 /**
- * Crée et affiche ou retourne une balise <div> HTML5 avec les attributs spécifiés.
+ * Génère un élément HTML <div> avec divers attributs dynamiques (id, class, style, positionnement, overflow, etc.).
  *
- * @param string $id ID de l'élément (optionnel).
- * @param string $class Classe de l'élément (optionnel).
- * @param string $style Style CSS de l'élément (optionnel).
- * @param string $position Position CSS de l'élément (optionnel).
- * @param string $top Position top CSS de l'élément (optionnel).
- * @param string $left Position left CSS de l'élément (optionnel).
- * @param string $width Largeur CSS de l'élément (optionnel).
- * @param string $height Hauteur CSS de l'élément (optionnel).
- * @param string $overflow Débordement CSS de l'élément (optionnel).
- * @param string $action Action associée à l'élément (optionnel).
- * @param int $retour Contrôle si la balise est retournée (1) ou affichée directement (0) (optionnel).
- * @param string $title Titre de l'élément (optionnel).
- * @return string|bool La balise <div> avec les attributs spécifiés, si $retour est défini à 1, sinon true si elle est affichée directement.
+ * Cette fonction utilise une liste d?arguments positionnels pour construire un tag <div>
+ * avec des attributs HTML et CSS optionnels. Elle peut soit retourner la chaîne HTML,
+ * soit l'afficher directement.
+ *
+ * Liste des paramètres (par position) :
+ *  0 : string $id            Identifiant HTML du <div> (optionnel).
+ *  1 : string $class         Classe(s) CSS du <div> (optionnel).
+ *  2 : string $style         Style CSS initial (complété par les paramètres suivants).
+ *  3 : string $position      Position CSS (ex : "absolute", "relative", etc.).
+ *  4 : string $top           Valeur CSS "top".
+ *  5 : string $left          Valeur CSS "left".
+ *  6 : string $width         Largeur CSS (ex : "100px", "50%").
+ *  7 : string $height        Hauteur CSS.
+ *  8 : string $overflow      Gestion de l'overflow (visible | hidden | scroll | auto).
+ *  9 : string $action        Attribut(s) HTML additionnels (ex : "onclick='...'").
+ * 10 : int    $retour        Si 1 ? retourne la chaîne ; sinon affiche et retourne true.
+ * 11 : string $title         Texte du tooltip (attribut HTML "title"). Optionnel.
+ *
+ * @param mixed ...$ar_arg    Arguments décrits ci?dessus, transmis via func_get_args().
+ *
+ * @return string|bool        Retourne le code HTML si $retour = 1, sinon true après affichage.
  */
 function HTML5_Div() {
 
