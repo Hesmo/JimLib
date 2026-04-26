@@ -251,4 +251,67 @@ function DTBS2_modif_rec(mysqli $pointeur, string $table, string $clause, array 
 	return $ar_retour;
 
 }
+/**
+ * Ajoute un enregistrement dans une table MySQL via l'extension mysqli.
+ * * @param mysqli $mysqli    L'instance de connexion active
+ * @param string $table     Le nom de la table
+ * @param array $ar_nval    Tableau associatif [nom_champ => valeur]
+ * @return bool             True en cas de succès, False sinon
+ */
+
+function DTBS2_add_rec(mysqli $mysqli, string $table, array $ar_nval): array {
+    $ar_retour = [
+        'statut'    => true,
+        'erreur'    => "",
+        'requete'   => "",
+        'resultat'  => 0,
+        'insert_id' => -1
+    ];
+	
+	if (empty($ar_nval)) {
+        $ar_retour['statut'] = false;
+        $ar_retour['erreur'] = "Le tableau de données est vide.";
+        return $ar_retour;
+    }
+
+	// 1. Préparation des éléments de la requête
+    $columns = implode(", ", array_keys($ar_nval));
+    $placeholders = implode(", ", array_fill(0, count($ar_nval), "?"));
+
+	// On stocke la requête SQL "template" pour le retour
+	$table_protected = str_replace('.', '`.`', $table);
+    $ar_retour['requete'] = "INSERT INTO `$table_protected` ($columns) VALUES ($placeholders)";
+
+    // 2. Préparation du Statement
+    $stmt = $mysqli->prepare($ar_retour['requete']);
+	if (!$stmt) {
+        $ar_retour['statut'] = false;
+        $ar_retour['erreur'] = "Erreur de préparation : " . $mysqli->error;
+        return $ar_retour;
+    }
+
+	// 3. Typage dynamique (i = int, d = double, s = string)
+    $types = "";
+    foreach ($ar_nval as $value) {
+        if (is_int($value)) $types .= "i";
+        elseif (is_double($value)) $types .= "d";
+        else $types .= "s";
+    }
+
+	// 4. Liaison et exécution
+	$params = array_values($ar_nval); 
+	$stmt->bind_param($types, ...$params); // Plus de souligné ici car $params est une variable
+
+    if ($stmt->execute()) {
+        $ar_retour['resultat'] = $stmt->affected_rows;
+        $ar_retour['insert_id'] = $mysqli->insert_id;
+    } else {
+        $ar_retour['statut'] = false;
+        $ar_retour['erreur'] = "Erreur d'exécution : " . $stmt->error;
+    }
+
+    $stmt->close();
+    return $ar_retour;
+}
+
 ?>
