@@ -253,10 +253,16 @@ function DTBS2_modif_rec(mysqli $pointeur, string $table, string $clause, array 
 }
 /**
  * Ajoute un enregistrement dans une table MySQL via l'extension mysqli.
- * * @param mysqli $mysqli    L'instance de connexion active
+ *  
+ * @param mysqli $mysqli    L'instance de connexion active
  * @param string $table     Le nom de la table
  * @param array $ar_nval    Tableau associatif [nom_champ => valeur]
- * @return bool             True en cas de succès, False sinon
+ * @return array            Tableau de retour avec les clés :
+ *                          - statut (bool) : true si succès, false sinon
+ *                          - erreur (string) : message d'erreur MySQL en cas d'échec
+ *                          - requete (string) : la requête SQL générée
+ *                          - resultat (mixed) : résultat brut de mysqli_query()
+ *                          - insert_id (int) : ID de l'enregistrement inséré ou -1 en cas d'échec
  */
 
 function DTBS2_add_rec(mysqli $mysqli, string $table, array $ar_nval): array {
