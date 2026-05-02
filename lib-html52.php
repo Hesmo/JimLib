@@ -164,6 +164,110 @@ function HTML52_img(array $options = []): string|null {
     echo $out;
     return null; // Optionnel, mais propre pour correspondre au prototype
 }
+/**
+ * Génère et affiche (ou retourne) la balise d'ouverture d'un bloc (<div>).
+ *
+ * @param array $options {
+ *     @var bool        $retour     Si true, retourne la chaîne au lieu de l'afficher.
+ *     @var string      $id         L'attribut HTML 'id'.
+ *     @var string      $class      L'attribut HTML 'class'.
+ *     @var string      $style      Styles CSS additionnels (chaîne brute).
+ *     @var CssPosition $position   Enum: ABSOLUTE, RELATIVE, FIXED, STATIC.
+ *     @var int|null    $top        Position haute (px).
+ *     @var int|null    $left       Position gauche (px).
+ *     @var int|null    $width      Largeur.
+ *     @var CssUnit     $widthUnit  Enum: PX, PERCENT.
+ *     @var int|null    $height     Hauteur.
+ *     @var CssUnit     $heightUnit Enum: PX, PERCENT.
+ *     @var CssOverflow $overflow   Enum: HIDDEN, SCROLL, AUTO, VISIBLE.
+ *     @var array       $data       Tableau pour attributs 'data-*'.
+ * }
+ * 
+ * @return string|null La balise <div> ou null selon l'option 'retour'.
+ */
+function HTML52_div(array $options = []): ?string {
+
+    $defaults = [
+        'retour'     => false,
+        'id'         => '',
+        'class'      => '',
+        'style'      => '',
+        'position'   => CssPosition::RELATIVE,
+        'top'        => null,
+        'left'       => null,
+        'width'      => null,
+        'widthUnit'  => CssUnit::PX,
+        'height'     => null,
+        'heightUnit' => CssUnit::PX,
+        'overflow'   => CssOverflow::HIDDEN,
+        'data'       => []
+    ];
+
+    $opt = array_merge($defaults, $options);
+    
+    // --- 1. Construction du style CSS via les Enums ---
+    $css = [];
+    $css[] = 'position:' . $opt['position']->value;
+    
+    if ($opt['top']    !== null) $css[] = 'top:' . $opt['top'] . 'px';
+    if ($opt['left']   !== null) $css[] = 'left:' . $opt['left'] . 'px';
+    if ($opt['width']  !== null) $css[] = 'width:' . $opt['width'] . $opt['widthUnit']->value;
+    if ($opt['height'] !== null) $css[] = 'height:' . $opt['height'] . $opt['heightUnit']->value;
+    
+    $css[] = 'overflow:' . $opt['overflow']->value;
+
+    // Fusion avec le style manuel (on nettoie les points-virgules superflus)
+    if (trim((string)$opt['style']) !== '') {
+        $css[] = trim((string)$opt['style'], '; ');
+    }
+
+    $finalStyle = implode(';', $css);
+
+    // --- 2. Construction de la balise HTML ---
+    $out = "<div";
+
+    // Sécurisation ID et Class (ISO-8859-1)
+    if (trim((string)$opt['id']) !== '') {
+        $out .= ' id="' . htmlspecialchars($opt['id'], ENT_QUOTES | ENT_SUBSTITUTE, 'ISO-8859-1') . '"';
+    }
+    if (trim((string)$opt['class']) !== '') {
+        $out .= ' class="' . htmlspecialchars($opt['class'], ENT_QUOTES | ENT_SUBSTITUTE, 'ISO-8859-1') . '"';
+    }
+
+    // Le style est déjà sécurisé par les Enums et le trim, mais on l'échappe par précaution
+    $out .= ' style="' . htmlspecialchars($finalStyle, ENT_QUOTES | ENT_SUBSTITUTE, 'ISO-8859-1') . '"';
+
+    // --- 3. Gestion du tableau 'data' (Style TB2) ---
+    if (!empty($opt['data'])) {
+        if (!is_array($opt['data'])) {
+            trigger_error("Erreur critique dans HTML52_div : le paramètre 'data' doit être un tableau.", E_USER_ERROR);
+        }
+        foreach ($opt['data'] as $dataKey => $dataVal) {
+            $safeDataVal = htmlspecialchars((string)$dataVal, ENT_QUOTES | ENT_SUBSTITUTE, 'ISO-8859-1');
+            $out .= " data-$dataKey=\"$safeDataVal\"";
+        }
+    }
+
+    $out .= ">";
+
+    // --- 4. Sortie ou Retour ---
+    if ($opt['retour'] === true) {
+        return $out;
+    }
+
+    echo $out . "\n";
+    return null;
+}
+
+/**
+ * Fermeture du bloc div.
+ */
+function HTML52_div_fin(): void {
+    echo "</div>\n";
+}
+
+
+
 
 
 /**
