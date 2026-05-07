@@ -319,5 +319,42 @@ function DTBS2_add_rec(mysqli $mysqli, string $table, array $ar_nval): array {
     $stmt->close();
     return $ar_retour;
 }
+/**
+ * Extrait les valeurs possibles d'un champ ENUM d'une table MariaDB.
+ * Pour faire un select utiliiser plutot FRM2_select_from_enum
+ * 
+ * @param mysqli $mysqli  Lien de connexion.
+ * @param string $table   Nom de la table (format bdd.table supporté).
+ * @param string $field   Nom du champ ENUM.
+ * @return array          Tableau contenant les valeurs de l'énumération.
+ * 
+ */
+function DTBS2_get_choice_enum($mysqli, $table, $field): array {
+    
+	
 
+    // Protection du nom de la table pour le format bdd.table
+    $tableParts = explode('.', $table);
+    $fullTableName = (count($tableParts) === 2) 
+        ? "`" . $tableParts[0] . "`.`" . $tableParts[1] . "`" 
+        : "`" . $table . "`";
+
+    $requete = "SHOW COLUMNS FROM $fullTableName LIKE '" . mysqli_real_escape_string($mysqli, $field) . "'";
+    $res = mysqli_query($mysqli, $requete);
+    
+    if (!$res) {
+        return [];
+    }
+
+    $row = mysqli_fetch_assoc($res);
+    
+    // Le type ressemble à : enum('Valeur 1','Valeur 2','Valeur 3')
+    if (preg_match("/^enum\('(.*)'\)$/", $row['Type'], $matches)) {
+        // On sépare par ',' (les valeurs sont entourées de quotes dans la chaîne retournée par SQL)
+        $enum = explode("','", $matches[1]);
+        return $enum;
+    }
+
+    return [];
+}
 ?>
