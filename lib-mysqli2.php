@@ -357,4 +357,49 @@ function DTBS2_get_choice_enum($mysqli, $table, $field): array {
 
     return [];
 }
+/**
+ * Exécute une requête SQL brute (V2) et retourne un compte-rendu complet.
+ * 
+ * @param mysqli $pointeur  Le lien de connexion mysqli. 
+ * @param string $requete   La requête SQL à exécuter.
+ * @return array {
+ *     @var bool   $statut   True si succès, False si erreur SQL.
+ *     @var string $erreur   Message d'erreur mysqli_error.
+ *     @var string $requete  La requête telle qu'envoyée.
+ *     @var int    $nbrec    Lignes retournées (lecture) ou affectées (écriture).
+ *     @var mixed  $resultat Ressource mysqli_result ou boolean.
+ * }
+ */
+function DTBS2_sqlbrut(mysqli $pointeur, string $requete): array {
+    
+    $ar_retour = [
+        'statut'   => true,
+        'erreur'   => "",
+        'requete'  => $requete,
+        'nbrec'    => 0,
+        'resultat' => null
+    ];
+
+    $ar_retour['resultat'] = mysqli_query($pointeur, $requete);
+
+    if (!$ar_retour['resultat']) {
+        $ar_retour['statut'] = false;
+        $ar_retour['erreur'] = mysqli_error($pointeur);
+    } else {
+        // Nettoyage et passage en majuscules du début de la requête
+        $start = strtoupper(ltrim($requete));
+
+        // Liste des commandes qui retournent un jeu de résultats (lecture)
+        if (str_starts_with($start, 'SELECT') || 
+            str_starts_with($start, 'SHOW')   || 
+            str_starts_with($start, 'DESCRIBE')) {
+            $ar_retour['nbrec'] = mysqli_num_rows($ar_retour['resultat']);
+        } else {
+            // Commandes d'écriture (INSERT, UPDATE, DELETE, etc.)
+            $ar_retour['nbrec'] = mysqli_affected_rows($pointeur);
+        }
+    }
+
+    return $ar_retour;
+}
 ?>
