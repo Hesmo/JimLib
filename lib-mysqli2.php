@@ -280,23 +280,25 @@ function DTBS2_add_rec(mysqli $mysqli, string $table, array $ar_nval): array {
         return $ar_retour;
     }
 
-	// 1. Préparation des éléments de la requête
-    $columns = implode(", ", array_keys($ar_nval));
+    // 1. Préparation des éléments de la requête
+    // PROTECTION DU NOM DE TABLE (Gestion du point pour bdd.table)
+    $table_protected = str_replace('.', '`.`', $table);
+
+    $columns = implode("`, `", array_keys($ar_nval)); // Protection des noms de colonnes aussi
     $placeholders = implode(", ", array_fill(0, count($ar_nval), "?"));
 
-	// On stocke la requête SQL "template" pour le retour
-	$table_protected = str_replace('.', '`.`', $table);
-    $ar_retour['requete'] = "INSERT INTO `$table_protected` ($columns) VALUES ($placeholders)";
+    // Construction du template final
+    $ar_retour['requete'] = "INSERT INTO `$table_protected` (`$columns`) VALUES ($placeholders)";
 
     // 2. Préparation du Statement
     $stmt = $mysqli->prepare($ar_retour['requete']);
-	if (!$stmt) {
+    if (!$stmt) {
         $ar_retour['statut'] = false;
         $ar_retour['erreur'] = "Erreur de préparation : " . $mysqli->error;
         return $ar_retour;
     }
 
-	// 3. Typage dynamique (i = int, d = double, s = string)
+	// 3. Typage dynamique
     $types = "";
     foreach ($ar_nval as $value) {
         if (is_int($value)) $types .= "i";
@@ -305,8 +307,8 @@ function DTBS2_add_rec(mysqli $mysqli, string $table, array $ar_nval): array {
     }
 
 	// 4. Liaison et exécution
-	$params = array_values($ar_nval); 
-	$stmt->bind_param($types, ...$params); // Plus de souligné ici car $params est une variable
+    $params = array_values($ar_nval); 
+    $stmt->bind_param($types, ...$params);
 
     if ($stmt->execute()) {
         $ar_retour['resultat'] = $stmt->affected_rows;
@@ -330,8 +332,6 @@ function DTBS2_add_rec(mysqli $mysqli, string $table, array $ar_nval): array {
  * 
  */
 function DTBS2_get_choice_enum($mysqli, $table, $field): array {
-    
-	
 
     // Protection du nom de la table pour le format bdd.table
     $tableParts = explode('.', $table);

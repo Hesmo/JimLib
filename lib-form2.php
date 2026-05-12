@@ -435,6 +435,7 @@ function FRM2_it(array $options = []): ?string {
  *     @var string $where       Condition WHERE.
  *     @var string $first_opt   Option vide (ex: "-- Choisir --").
  *     @var string $first_opt_val   // Valeur par défaut -1
+ *     @var string $format_lbl  Fonction de formatage du label (ex: 'ucfirst', 'strtoupper', 'ucwords'....).
  *     @var array  $se_options  Options pour FRM2_se (class, id, data...).
  *     @var bool   $retour      Si true, retourne le HTML.
  * }
@@ -452,6 +453,7 @@ function FRM2_select_from_table(array $options = []): ?string {
         'where'         => '1',
         'first_opt'     => null,
         'first_opt_val' => '-1',
+        'format_lbl'    => null, // Nouvelle option
         'se_options'    => [],
         'retour'        => false
     ];
@@ -498,9 +500,13 @@ function FRM2_select_from_table(array $options = []): ?string {
             $val = $row[$opt['val_field']];
             $lbl = $row[$opt['lbl_field']];
             
+            if (!empty($opt['format_lbl']) && function_exists($opt['format_lbl'])) {
+                $lbl = $opt['format_lbl']($lbl);
+            }
+
             $html .= FRM2_opt([
                 'value'    => $val,
-                'label'    => $lbl,
+                'label'    => $lbl, 
                 'selected' => ((string)$val === (string)$opt['selected']),
                 'retour'   => true
             ]);
@@ -526,6 +532,7 @@ function FRM2_select_from_table(array $options = []): ?string {
  *     @var string $selected    Valeur à sélectionner par défaut.
  *     @var string $first_opt   Libellé d'une première option (ex: "-- Statut --").
  *     @var string $first_opt_val Valeur de la première option (défaut: -1).
+ *     @var string $format_lbl  Fonction de formatage du label (ex: 'ucfirst', 'strtoupper').
  *     @var array  $se_options  Options pour FRM2_se (class, id, data...).
  *     @var bool   $retour      Si true, retourne le HTML au lieu de l'afficher.
  * }
@@ -540,6 +547,7 @@ function FRM2_select_from_enum(array $options = []): ?string {
         'selected'      => '',
         'first_opt'     => null,
         'first_opt_val' => '-1',
+        'format_lbl'    => null, // Nouvelle option de formatage
         'se_options'    => [],
         'retour'        => false
     ];
@@ -569,18 +577,23 @@ function FRM2_select_from_enum(array $options = []): ?string {
         : "`" . $opt['table'] . "`";
 
     $safeField = mysqli_real_escape_string($mysqli, $opt['field']);
-    $res = mysqli_query($mysqli, "SHOW COLUMNS FROM $fullTableName LIKE '$safeField'");
+    $resSQL = DTBS2_sqlbrut($mysqli, "SHOW COLUMNS FROM $fullTableName LIKE '$safeField'");
+    //$res = mysqli_query($mysqli, "SHOW COLUMNS FROM $fullTableName LIKE '$safeField'");
     
-    if ($res && $row = mysqli_fetch_assoc($res)) {
+    //if ($res && $row = mysqli_fetch_assoc($res)) {
+    if ($resSQL['statut'] && $row = mysqli_fetch_assoc($resSQL['resultat'])) {
         // Extraction des valeurs entre enum('...', '...')
         if (preg_match("/^enum\('(.*)'\)$/", $row['Type'], $matches)) {
             $enum_values = explode("','", $matches[1]);
             
             foreach ($enum_values as $val) {
+                $lbl = $val;
+                if (!empty($opt['format_lbl']) && function_exists($opt['format_lbl'])) {
+                    $lbl = $opt['format_lbl']($val);
+                }
                 $html .= FRM2_opt([
                     'value'    => $val,
-                    // On peut imaginer un traitement sur le label (ex: ucfirst)
-                    'label'    => ucfirst($val), 
+                    'label'    => $lbl, 
                     'selected' => ((string)$val === (string)$opt['selected']),
                     'retour'   => true
                 ]);
@@ -589,6 +602,71 @@ function FRM2_select_from_enum(array $options = []): ?string {
     }
 
     $html .= "</select>\n";
+
+    if ($opt['retour'] === true) {
+        return $html;
+    }
+
+    echo $html;
+    return null;
+}
+/**
+ * Génère un bouton HTML (input type submit/button/reset).
+ * 
+ * @param array $options {
+ *     @var string $class    Classes CSS.
+ *     @var string $type     Type du bouton (default: submit).
+ *     @var string $name     Nom de l'élément (default: boutton_soumission).
+ *     @var string $value    Texte du bouton (default: Ok).
+ *     @var string $action   Attributs JS (ex: onclick="...").
+ *     @var string $style    Style CSS en ligne.
+ *     @var string $id       ID unique de l'élément.
+ *     @var string $disabled Attribut disabled (si vrai, ajoute 'disabled').
+ *     @var array  $data     Tableau associatif pour les attributs data- (ex: ['id' => 1]).
+ *     @var bool   $retour   Si true, retourne le HTML au lieu de l'afficher.
+ * }
+ */
+function FRM2_bt(array $options = []): ?string {
+    
+    $defaults = [
+        'class'    => 'btflat',
+        'type'     => 'submit',
+        'name'     => 'boutton_soumission',
+        'value'    => 'Ok',
+        'action'   => '',
+        'style'    => '',
+        'id'       => '',
+        'disabled' => false,
+        'data'     => [],
+        'retour'   => false
+    ];
+
+    $opt = array_merge($defaults, $options);
+
+    // Gestion des attributs data-
+    $dataStr = "";
+    if (!empty($opt['data'])) {
+        foreach ($opt['data'] as $key => $val) {
+            $dataStr .= ' data-' . htmlspecialchars($key) . '="' . htmlspecialchars($val) . '"';
+        }
+    }
+
+    // Préparation de l'ID et du Disabled
+    $idStr = (!empty($opt['id'])) ? ' id="' . $opt['id'] . '"' : '';
+    $disabledStr = ($opt['disabled'] === true || $opt['disabled'] === 'disabled') ? ' disabled' : '';
+
+    $html = sprintf(
+        '<input%s type="%s" class="%s" name="%s" value="%s" %s style="%s"%s%s>' . "\n",
+        $idStr,
+        $opt['type'],
+        $opt['class'],
+        $opt['name'],
+        htmlspecialchars($opt['value']), // Sécurité sur le libellé
+        $opt['action'],
+        $opt['style'],
+        $disabledStr,
+        $dataStr
+    );
 
     if ($opt['retour'] === true) {
         return $html;
