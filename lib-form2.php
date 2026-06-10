@@ -87,6 +87,7 @@ function FRM2_form_fin(): void {
 }
 /**
  * Génère et affiche (ou retourne) la balise d'ouverture d'une liste déroulante (<select>).
+ * Remplace FRM_se
  *
  * @param string $name    L'attribut HTML 'name' (obligatoire).
  * @param array  $options {
@@ -667,6 +668,145 @@ function FRM2_bt(array $options = []): ?string {
         $disabledStr,
         $dataStr
     );
+
+    if ($opt['retour'] === true) {
+        return $html;
+    }
+
+    echo $html;
+    return null;
+}
+
+/**
+ * Génère et affiche une zone de texte (textarea).
+ *
+ * @param array $options {
+ * Tableau associatif des paramètres.
+ *
+ * @var string $name     Nom du champ (défaut: 'textarea_default').
+ * @var string $class    Classe CSS (défaut: vide).
+ * @var string $style    Style CSS inline (défaut: vide).
+ * @var int    $rows     Nombre de lignes (défaut: 4).
+ * @var int    $cols     Nombre de colonnes (défaut: 20).
+ * @var string $value    Contenu de la zone de texte (défaut: vide).
+ * @var string $action   Attributs additionnels bruts (défaut: vide).
+ * @var bool   $readonly Indique si le champ est en lecture seule (défaut: false).
+ * @var bool   $retour   Si true, retourne la chaîne au lieu de l'afficher (défaut: false).
+ * }
+ * * @return string|null La balise textarea ou null si affichée directement.
+ */
+function FRM2_ta(array $options = []): ?string {
+    $defaults = [
+        'name'     => '',
+        'class'    => 'itflat',
+        'style'    => '',
+        'rows'     => 4,
+        'cols'     => 20,
+        'value'    => '',
+        'action'   => '',
+        'readonly' => false,
+        'retour'   => false
+    ];
+
+    $opt = array_merge($defaults, $options);
+    
+    $element = '<textarea name="' . htmlspecialchars($opt['name']) . '"';
+    
+    if ($opt['class'] !== '')    $element .= ' class="' . htmlspecialchars($opt['class']) . '"';
+    if ($opt['style'] !== '')    $element .= ' style="' . htmlspecialchars($opt['style']) . '"';
+    if ($opt['rows'] !== '')     $element .= ' rows="' . (int)$opt['rows'] . '"';
+    if ($opt['cols'] !== '')     $element .= ' cols="' . (int)$opt['cols'] . '"';
+    if ($opt['readonly'] === true) $element .= ' readonly';
+    if ($opt['action'] !== '')   $element .= ' ' . $opt['action'];
+    
+    $element .= '>' . htmlspecialchars($opt['value']) . '</textarea>' . "\n";
+
+    if ($opt['retour'] === true) {
+        return $element;
+    }
+    echo $element;
+    return null;
+}
+/**
+ * Génère une case à cocher (input type="checkbox").
+ * 
+ * @param array $options {
+ * @var string $name        Nom du champ.
+ * @var string $value       Valeur soumise si cochée.
+ * @var string $class       Classes CSS.
+ * @var string $style       Style CSS en ligne.
+ * @var bool   $checked     Si vrai, coche la case (accepte true/1).
+ * @var string $text        Texte affiché à côté de la checkbox (libellé).
+ * @var string $action      Attributs JS (ex: onclick="...", onchange="...").
+ * @var bool   $readonly    Si vrai, bloque la modification (via un return false au clic).
+ * @var array  $data        Tableau associatif pour les attributs data- (ex: ['id' => 1]).
+ * @var string $extra1      Attribut ou chaîne libre supplémentaire.
+ * @var string $extra2      Deuxième attribut ou chaîne libre supplémentaire.
+ * @var bool   $retour      Si true, retourne le HTML au lieu de l'afficher.
+ * }
+ */
+function FRM2_cb(array $options = []): ?string {
+    
+    $defaults = [
+        'name'     => '',
+        'value'    => '',
+        'class'    => '',
+        'style'    => '',
+        'checked'  => false,
+        'text'     => '',
+        'action'   => '',
+        'readonly' => false,
+        'data'     => [],
+        'extra1'   => '',
+        'extra2'   => '',
+        'retour'   => false
+    ];
+
+    $opt = array_merge($defaults, $options);
+
+    $html = '<input type="checkbox"';
+
+    if (!empty($opt['name'])) { 
+        $html .= ' name="' . $opt['name'] . '"'; 
+    }
+    if (!empty($opt['class'])) { 
+        $html .= ' class="' . $opt['class'] . '"'; 
+    }
+    if (!empty($opt['style'])) { 
+        $html .= ' style="' . $opt['style'] . '"'; 
+    }
+    if (trim((string)$opt['value']) !== '') { 
+        $html .= ' value="' . htmlspecialchars($opt['value']) . '"'; 
+    }
+
+    // Gestion du checked (souple : accepte true, 1 ou "1")
+    if ($opt['checked'] === true || $opt['checked'] == 1) { 
+        $html .= ' checked'; 
+    }
+
+    // Gestion des attributs JS d'action
+    if (!empty($opt['action'])) { 
+        $html .= ' ' . $opt['action']; 
+    }
+
+    // Ton astuce métier readonly pour jQuery
+    if ($opt['readonly'] === true || $opt['readonly'] == 1) { 
+        $html .= " onclick='return false;'"; 
+    }
+
+    // Gestion des attributs data- (standardisés TB2)
+    if (!empty($opt['data'])) {
+        foreach ($opt['data'] as $key => $val) {
+            $html .= ' data-' . htmlspecialchars($key) . '="' . htmlspecialchars($val) . '"';
+        }
+    }
+
+    // Conservation de tes extras
+    if (!empty($opt['extra1'])) { $html .= ' ' . $opt['extra1']; }
+    if (!empty($opt['extra2'])) { $html .= ' ' . $opt['extra2']; }
+
+    // On ferme le input et on ajoute le texte d'accompagnement protégé
+    $html .= '> ' . htmlspecialchars($opt['text']) . "\n";
 
     if ($opt['retour'] === true) {
         return $html;
