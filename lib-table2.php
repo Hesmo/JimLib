@@ -125,15 +125,16 @@ function TB2_ligne_fin(): void {
  *     @var int    $rowspan L'attribut HTML 'rowspan'. Par défaut vide.
  *     @var array  $data    Tableau associatif pour générer des attributs 'data-*'.
  *                          Doit impérativement être un tableau sous peine d'arrêt du script.
+*     @var bool   $retour      Si true, retourne le HTML au lieu de l'afficher.
  * }
  * 
- * @return void Affiche directement la balise générée.
+ * @return string|null Retourne le HTML généré si 'retour' est true, sinon null.
  *
  */
-function TB2_cellule(array $options = []): void {
+function TB2_cellule(array $options = []): ?string {
 
     $defaults = [
-        'id' => '', 'class' => '', 'style' => '', 'texte' => null, 'colspan' => '', 'rowspan' => '', 'data' => []
+        'id' => '', 'class' => '', 'style' => '', 'texte' => null, 'colspan' => '', 'rowspan' => '', 'data' => [], 'retour' => false
     ];
     
     $opt = array_merge($defaults, $options);
@@ -169,7 +170,13 @@ function TB2_cellule(array $options = []): void {
         $out .= $opt['texte'] . "</td>";
     }
 
-    echo $out . "\n";
+    if ($opt['retour']) {
+        return $out;
+    } else {
+        echo $out . "\n";
+    }
+
+    
 }
 
 /**
