@@ -8,6 +8,7 @@ declare(strict_types=1);
  *     @var string $method      Méthode d'envoi (GET ou POST, défaut: POST).
  *     @var bool   $multipart   Si true, ajoute l'enctype pour l'upload de fichiers.
  *     @var string $id          L'attribut HTML 'id'.
+ *     @var string $name        L'attribut HTML 'name'.
  *     @var string $class       L'attribut HTML 'class'.
  *     @var string $style       Styles CSS inline.
  *     @var array  $data        Tableau associatif pour les attributs 'data-*'.
@@ -18,11 +19,26 @@ declare(strict_types=1);
  */
 function FRM2_form(array $options = []): ?string {
 
+    // 1. Validation et synchronisation de id et name
+    $hasId = isset($options['id']) && trim((string)$options['id']) !== '';
+    $hasName = isset($options['name']) && trim((string)$options['name']) !== '';
+
+    if (!$hasId && !$hasName) {
+        trigger_error("Erreur critique dans FRM2_form : Vous devez fournir au moins un attribut 'id' ou 'name'.", E_USER_ERROR);
+    }
+
+    if ($hasId && !$hasName) {
+        $options['name'] = $options['id'];
+    } elseif ($hasName && !$hasId) {
+        $options['id'] = $options['name'];
+    }
+
     $defaults = [
         'action'    => '#',
         'method'    => 'POST',
         'multipart' => false,
         'id'        => '',
+        'name'      => '',
         'class'     => '',
         'style'     => '',
         'data'      => [],
@@ -47,7 +63,6 @@ function FRM2_form(array $options = []): ?string {
     foreach ($opt as $key => $val) {
         // On ignore les clés déjà traitées ou internes
         if (in_array($key, ['action', 'method', 'multipart', 'retour'])) continue;
-
         // Gestion du tableau 'data'
         if ($key === 'data') {
             if (!is_array($val)) {
@@ -240,23 +255,24 @@ function FRM2_opt(array $options = []): ?string {
     return null;
 }
 /**
- * Génère et affiche (ou retourne) un bouton radio HTML (<input type="radio">).
- *
- * @param array $options {
- *     @var string $name    Le nom du bouton radio (attribut name).
- *     @var string $value   La valeur envoyée (attribut value).
- *     @var string $label   Le texte affiché à côté du bouton.
- *     @var bool   $checked Si true, le bouton est coché.
- *     @var string $id      L'attribut HTML 'id'.
- *     @var string $class   L'attribut HTML 'class'.
- *     @var string $style   Styles CSS inline.
- *     @var array  $data    Tableau associatif pour les attributs 'data-*'.
- *     @var string $extra   Attributs bruts (ex: onClick, onchange...).
- *     @var bool   $retour  Si true, retourne la chaîne au lieu de l'afficher.
- * }
- * 
- * @return string|null Le code HTML du bouton radio ou null.
- */
+* Génère et affiche (ou retourne) un bouton radio HTML (<input type="radio">).
+*
+* @param array $options {
+*   @var string $name    Le nom du bouton radio (attribut name).
+*   @var string $value   La valeur envoyée (attribut value).
+*   @var string $label   Le texte affiché à côté du bouton.
+*   @var bool   $checked Si true, le bouton est coché.
+*   @var bool   $disabled Si true, le bouton est grisé / désactivé.
+*   @var string $id      L'attribut HTML 'id'.
+*   @var string $class   L'attribut HTML 'class'.
+*   @var string $style   Styles CSS inline.
+*   @var array  $data    Tableau associatif pour les attributs 'data-*'.
+*   @var string $extra   Attributs bruts (ex: onClick, onchange...).
+*   @var bool   $retour  Si true, retourne la chaîne au lieu de l'afficher.
+* }
+* 
+* @return string|null Le code HTML du bouton radio ou null.
+*/
 function FRM2_ir(array $options = []): ?string {
 
     $defaults = [
@@ -264,6 +280,7 @@ function FRM2_ir(array $options = []): ?string {
         'value'   => '',
         'label'   => '',
         'checked' => false,
+        'disabled' => false,
         'id'      => '',
         'class'   => '',
         'style'   => '',
@@ -307,6 +324,11 @@ function FRM2_ir(array $options = []): ?string {
         $out .= ' checked';
     }
 
+    // Gestion de l'état désactivé (HTML5 standard : juste 'disabled')
+    if ($opt['disabled'] === true || $opt['disabled'] == 1) {
+        $out .= ' disabled';
+    }
+    
     // Ajout des attributs extra (actions JS)
     if (trim((string)$opt['extra']) !== '') {
         $out .= ' ' . trim($opt['extra']);
@@ -622,6 +644,7 @@ function FRM2_select_from_enum(array $options = []): ?string {
  *     @var string $action   Attributs JS (ex: onclick="...").
  *     @var string $style    Style CSS en ligne.
  *     @var string $id       ID unique de l'élément.
+ *     @var int    $tabindex Attribut tabindex pour l'ordre de tabulation.
  *     @var string $disabled Attribut disabled (si vrai, ajoute 'disabled').
  *     @var array  $data     Tableau associatif pour les attributs data- (ex: ['id' => 1]).
  *     @var bool   $retour   Si true, retourne le HTML au lieu de l'afficher.
@@ -637,6 +660,7 @@ function FRM2_bt(array $options = []): ?string {
         'action'   => '',
         'style'    => '',
         'id'       => '',
+        'tabindex' => '',
         'disabled' => false,
         'data'     => [],
         'retour'   => false
@@ -737,6 +761,7 @@ function FRM2_ta(array $options = []): ?string {
  * @var string $style       Style CSS en ligne.
  * @var bool   $checked     Si vrai, coche la case (accepte true/1).
  * @var string $text        Texte affiché à côté de la checkbox (libellé).
+ * @var int    $tabindex Attribut tabindex pour l'ordre de tabulation.
  * @var string $action      Attributs JS (ex: onclick="...", onchange="...").
  * @var bool   $readonly    Si vrai, bloque la modification (via un return false au clic).
  * @var array  $data        Tableau associatif pour les attributs data- (ex: ['id' => 1]).
@@ -754,6 +779,7 @@ function FRM2_cb(array $options = []): ?string {
         'style'    => '',
         'checked'  => false,
         'text'     => '',
+        'tabindex' => '',
         'action'   => '',
         'readonly' => false,
         'data'     => [],
