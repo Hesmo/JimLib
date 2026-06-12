@@ -92,24 +92,7 @@ function TB2_ligne(array $options = []): void {
 function TB2_ligne_fin(): void {
     echo "</tr>\n";
 }
-/**
- * Génère et affiche la balise d'ouverture d'une cellule de tableau HTML (<td>).
- *
- * @param array $options {
- *     Tableau associatif des attributs HTML.
- *
- *     @var string $id      L'attribut HTML 'id'. Par défaut vide.
- *     @var string $class   L'attribut HTML 'class'. Par défaut vide.
- *     @var string $style   L'attribut HTML 'style'. Par défaut vide.
- *     @var int    $colspan L'attribut HTML 'colspan'. Par défaut vide.
- *     @var int    $rowspan L'attribut HTML 'rowspan'. Par défaut vide.
- *     @var array  $data    Tableau associatif pour générer des attributs 'data-*'.
- *                          Doit impérativement être un tableau sous peine d'arrêt du script.
- * }
- * 
- * @return void Affiche directement la balise générée.
- *
- */
+
 /**
  * Génère et affiche une cellule de tableau HTML (<td>).
  * Si l'indice 'texte' est fourni, affiche le contenu et ferme la balise automatiquement.
@@ -142,7 +125,7 @@ function TB2_cellule(array $options = []): ?string {
 
     foreach ($opt as $key => $val) {
         // On ignore l'indice 'texte' dans la boucle des attributs HTML
-        if ($key === 'texte') continue;
+        if ($key === 'texte' || $key === 'retour') continue;
 
         if ($key === 'data') {
             if (!is_array($val)) {
@@ -175,7 +158,7 @@ function TB2_cellule(array $options = []): ?string {
     } else {
         echo $out . "\n";
     }
-
+    return null;
     
 }
 
