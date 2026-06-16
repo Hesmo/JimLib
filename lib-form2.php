@@ -1,37 +1,51 @@
 <?Php
 declare(strict_types=1);
 /**
+ * Librairie de Génération de Formulaires HTML (Version 2)
+ *
+ * Centralise la génération sécurisée des composants de formulaires
+ * via un passage de paramètres par tableau associatif unique.
+ *
+ * @package FRM2
+ * @version 2.0.0
+ */
+
+// Définition de l'encodage cible pour la sécurisation XSS (XHTML / HTML5)
+define('FRM_ENCODING', 'ISO-8859-1');
+
+/**
  * Génère et affiche (ou retourne) la balise d'ouverture d'un formulaire (<form>).
  *
+ * Synchronise automatiquement les attributs 'id' et 'name' si l'un d'eux est manquant.
+ * Déclenche une erreur critique si aucun identifiant n'est fourni.
+ *
  * @param array $options {
- *     @var string $action      URL de destination du formulaire (défaut: #).
- *     @var string $method      Méthode d'envoi (GET ou POST, défaut: POST).
- *     @var bool   $multipart   Si true, ajoute l'enctype pour l'upload de fichiers.
- *     @var string $id          L'attribut HTML 'id'.
- *     @var string $name        L'attribut HTML 'name'.
- *     @var string $class       L'attribut HTML 'class'.
- *     @var string $style       Styles CSS inline.
- *     @var array  $data        Tableau associatif pour les attributs 'data-*'.
- *     @var bool   $retour      Si true, retourne la chaîne au lieu de l'afficher.
+ * Configuration optionnelle du formulaire.
+ *
+ * @var string $action    URL de destination du formulaire (défaut: '#').
+ * @var string $method    Méthode HTTP d'envoi : GET ou POST (défaut: 'POST').
+ * @var bool   $multipart Si true, force l'enctype pour le téléversement de fichiers.
+ * @var string $id        L'attribut HTML 'id'. Obligatoire si 'name' est vide.
+ * @var string $name      L'attribut HTML 'name'. Obligatoire si 'id' est vide.
+ * @var string $class     Classes CSS de l'élément.
+ * @var string $style     Styles CSS inline.
+ * @var array  $data      Tableau associatif de paires clés/valeurs pour attributs 'data-*'.
+ * @var bool   $retour    Si true, retourne la chaîne HTML brute au lieu de l'afficher.
  * }
- * 
- * @return string|null La balise <form> ou null.
+ * @return string|null La balise HTML <form> ouverte ou null si affichée directement.
  */
 function FRM2_form(array $options = []): ?string {
 
     // 1. Validation et synchronisation de id et name
-    $hasId = isset($options['id']) && trim((string)$options['id']) !== '';
-    $hasName = isset($options['name']) && trim((string)$options['name']) !== '';
+    $id = trim((string)($options['id'] ?? ''));
+    $name = trim((string)($options['name'] ?? ''));
 
-    if (!$hasId && !$hasName) {
+    if ($id === '' && $name === '') {
         trigger_error("Erreur critique dans FRM2_form : Vous devez fournir au moins un attribut 'id' ou 'name'.", E_USER_ERROR);
     }
 
-    if ($hasId && !$hasName) {
-        $options['name'] = $options['id'];
-    } elseif ($hasName && !$hasId) {
-        $options['id'] = $options['name'];
-    }
+    if ($id !== '' && $name === '') { $options['name'] = $id; }
+    if ($name !== '' && $id === '') { $options['id'] = $name; }
 
     $defaults = [
         'action'    => '#',
@@ -46,46 +60,35 @@ function FRM2_form(array $options = []): ?string {
     ];
 
     $opt = array_merge($defaults, $options);
-    $encoding = 'ISO-8859-1';
 
-    // Préparation de la balise de base
-    $actionSafe = htmlspecialchars($opt['action'], ENT_QUOTES | ENT_SUBSTITUTE, $encoding);
+    $actionSafe = htmlspecialchars($opt['action'], ENT_QUOTES | ENT_SUBSTITUTE, FRM_ENCODING);
     $methodSafe = strtoupper(trim((string)$opt['method']));
     
-    $out = "<form action=\"$actionSafe\" method=\"$methodSafe\" accept-charset=\"$encoding\"";
+    $out = "<form action=\"$actionSafe\" method=\"$methodSafe\" accept-charset=\"" . FRM_ENCODING . "\"";
 
-    // Gestion de l'enctype pour les fichiers
     if ($opt['multipart'] === true) {
         $out .= ' enctype="multipart/form-data"';
     }
 
-    // Itération sur les attributs standards
-    foreach ($opt as $key => $val) {
-        // On ignore les clés déjà traitées ou internes
-        if (in_array($key, ['action', 'method', 'multipart', 'retour'])) continue;
-        // Gestion du tableau 'data'
-        if ($key === 'data') {
-            if (!is_array($val)) {
-                trigger_error("Erreur critique dans FRM2_form : le paramètre 'data' doit être un tableau.", E_USER_ERROR);
-            }
-            foreach ($val as $dataKey => $dataVal) {
-                $safeDataVal = htmlspecialchars((string)$dataVal, ENT_QUOTES | ENT_SUBSTITUTE, $encoding);
-                $out .= " data-$dataKey=\"$safeDataVal\"";
-            }
-            continue;
-        }
-
-        // Attributs classiques (id, class, style...)
-        $strVal = trim((string)$val);
+    // Exportation sécurisée des attributs textuels autorisés
+    $allowedAttributes = ['id', 'name', 'class', 'style'];
+    foreach ($allowedAttributes as $attr) {
+        $strVal = trim((string)($opt[$attr] ?? ''));
         if ($strVal !== '') {
-            $safeVal = htmlspecialchars($strVal, ENT_QUOTES | ENT_SUBSTITUTE, $encoding);
-            $out .= " $key=\"$safeVal\"";
+            $out .= " $attr=\"" . htmlspecialchars($strVal, ENT_QUOTES | ENT_SUBSTITUTE, FRM_ENCODING) . "\"";
         }
+    }
+
+    // Traitement du tableau 'data'
+    if (!is_array($opt['data'])) {
+        trigger_error("Erreur critique dans FRM2_form : le paramètre 'data' doit être un tableau.", E_USER_ERROR);
+    }
+    foreach ($opt['data'] as $dataKey => $dataVal) {
+        $out .= " data-" . htmlspecialchars((string)$dataKey, ENT_QUOTES | ENT_SUBSTITUTE, FRM_ENCODING) . "=\"" . htmlspecialchars((string)$dataVal, ENT_QUOTES | ENT_SUBSTITUTE, FRM_ENCODING) . "\"";
     }
 
     $out .= ">";
 
-    // Sortie ou Retour
     if ($opt['retour'] === true) {
         return $out;
     }
@@ -93,29 +96,31 @@ function FRM2_form(array $options = []): ?string {
     echo $out . "\n";
     return null;
 }
-
 /**
- * Fermeture du formulaire.
+ * Ferme la balise de formulaire ouverte (<form>).
+ *
+ * @return void
  */
 function FRM2_form_fin(): void {
     echo "</form>\n";
 }
 /**
  * Génère et affiche (ou retourne) la balise d'ouverture d'une liste déroulante (<select>).
- * Remplace FRM_se
  *
- * @param string $name    L'attribut HTML 'name' (obligatoire).
+ * @param string $name    L'attribut HTML 'name' unique de l'élément (obligatoire).
  * @param array  $options {
- *     @var string $id      L'attribut HTML 'id'.
- *     @var string $class   L'attribut HTML 'class'.
- *     @var string $style   Styles CSS inline.
- *     @var bool   $multiple Si true, permet la sélection multiple.
- *     @var bool   $disabled Si true, désactive le champ.
- *     @var array  $data     Tableau associatif pour les attributs 'data-*'.
- *     @var bool   $retour   Si true, retourne la chaîne au lieu de l'afficher.
+ * Configuration optionnelle du menu déroulant.
+ *
+ * @var string $id        L'attribut HTML 'id'.
+ * @var string $class     Classes CSS applicables (défaut: 'seflat').
+ * @var string $style     Styles CSS inline.
+ * @var int|string $tabindex Index numérique configurant l'ordre séquentiel de tabulation clavier.
+ * @var bool   $multiple  Active la sélection multiple d'éléments.
+ * @var bool   $disabled  Désactive l'interaction avec le champ.
+ * @var array  $data      Tableau associatif pour les attributs dynamiques 'data-*'.
+ * @var bool   $retour    Si true, retourne la chaîne HTML brute au lieu de l'afficher.
  * }
- * 
- * @return string|null La balise <select> ou null.
+ * @return string|null La balise HTML <select> ou null si affichée directement.
  */
 function FRM2_se(string $name, array $options = []): ?string {
 
@@ -123,6 +128,7 @@ function FRM2_se(string $name, array $options = []): ?string {
         'id'       => '',
         'class'    => 'seflat',
         'style'    => '',
+        'tabindex' => '',
         'multiple' => false,
         'disabled' => false,
         'data'     => [],
@@ -130,41 +136,28 @@ function FRM2_se(string $name, array $options = []): ?string {
     ];
 
     $opt = array_merge($defaults, $options);
-    $encoding = 'ISO-8859-1';
 
-    // On commence avec l'attribut name qui est obligatoire
-    $out = "<select name=\"" . htmlspecialchars($name, ENT_QUOTES | ENT_SUBSTITUTE, $encoding) . "\"";
+    $out = "<select name=\"" . htmlspecialchars($name, ENT_QUOTES | ENT_SUBSTITUTE, FRM_ENCODING) . "\"";
 
-    foreach ($opt as $key => $val) {
-        // On ignore les clés internes
-        if (in_array($key, ['retour'])) continue;
-
-        // Gestion du tableau 'data'
-        if ($key === 'data') {
-            if (!is_array($val)) {
-                trigger_error("Erreur critique dans FRM2_se : le paramètre 'data' doit être un tableau.", E_USER_ERROR);
-            }
-            foreach ($val as $dataKey => $dataVal) {
-                $safeDataVal = htmlspecialchars((string)$dataVal, ENT_QUOTES | ENT_SUBSTITUTE, $encoding);
-                $out .= " data-$dataKey=\"$safeDataVal\"";
-            }
-            continue;
-        }
-
-        // Cas des attributs booléens (multiple, disabled)
-        if (is_bool($val)) {
-            if ($val === true) {
-                $out .= " $key";
-            }
-            continue;
-        }
-
-        // Attributs classiques (id, class, style...)
-        $strVal = trim((string)$val);
+    foreach (['id', 'class', 'style'] as $attr) {
+        $strVal = trim((string)($opt[$attr] ?? ''));
         if ($strVal !== '') {
-            $safeVal = htmlspecialchars($strVal, ENT_QUOTES | ENT_SUBSTITUTE, $encoding);
-            $out .= " $key=\"$safeVal\"";
+            $out .= " $attr=\"" . htmlspecialchars($strVal, ENT_QUOTES | ENT_SUBSTITUTE, FRM_ENCODING) . "\"";
         }
+    }
+
+    if (trim((string)$opt['tabindex']) !== '') {
+        $out .= ' tabindex="' . (int)$opt['tabindex'] . '"';
+    }
+
+    if ($opt['multiple'] === true) { $out .= " multiple"; }
+    if ($opt['disabled'] === true) { $out .= " disabled"; }
+
+    if (!is_array($opt['data'])) {
+        trigger_error("Erreur critique dans FRM2_se : le paramètre 'data' doit être un tableau.", E_USER_ERROR);
+    }
+    foreach ($opt['data'] as $dataKey => $dataVal) {
+        $out .= " data-" . htmlspecialchars((string)$dataKey, ENT_QUOTES | ENT_SUBSTITUTE, FRM_ENCODING) . "=\"" . htmlspecialchars((string)$dataVal, ENT_QUOTES | ENT_SUBSTITUTE, FRM_ENCODING) . "\"";
     }
 
     $out .= ">";
@@ -176,28 +169,30 @@ function FRM2_se(string $name, array $options = []): ?string {
     echo $out . "\n";
     return null;
 }
-
 /**
- * Fermeture de la liste déroulante.
+ * Ferme la balise de liste déroulante sélectionnée (</select>).
+ *
+ * @return void
  */
 function FRM2_se_fin(): void {
     echo "</select>\n";
 }
 /**
- * Génère et affiche (ou retourne) une option de liste déroulante (<option>).
+ * Génère et affiche (ou retourne) une option unitaire de liste déroulante (<option>).
  *
  * @param array $options {
- *     @var string $value    La valeur de l'option (attribut value).
- *     @var string $label    Le texte affiché pour l'option.
- *     @var bool   $selected Si true, l'option sera sélectionnée.
- *     @var string $id       L'attribut HTML 'id'.
- *     @var string $class    L'attribut HTML 'class'.
- *     @var string $style    Styles CSS inline.
- *     @var array  $data     Tableau associatif pour les attributs 'data-*'.
- *     @var bool   $retour   Si true, retourne la chaîne au lieu de l'afficher.
+ * Configuration de la balise option.
+ *
+ * @var string $value    Valeur interne renvoyée par le formulaire (attribut 'value').
+ * @var string $label    Texte d'affichage utilisateur situé entre les balises.
+ * @var bool   $selected Indique si l'option est active / pré-sélectionnée.
+ * @var string $id       L'attribut HTML 'id'.
+ * @var string $class    Classes CSS (défaut: 'optflat').
+ * @var string $style    Styles CSS inline.
+ * @var array  $data      Tableau associatif pour les attributs 'data-*'.
+ * @var bool   $retour    Si true, retourne la chaîne HTML brute au lieu de l'afficher.
  * }
- * 
- * @return string|null La balise <option> complète ou null.
+ * @return string|null Code HTML de la balise <option> complète ou null.
  */
 function FRM2_opt(array $options = []): ?string {
 
@@ -207,40 +202,26 @@ function FRM2_opt(array $options = []): ?string {
     ];
 
     $opt = array_merge($defaults, $options);
-    $encoding = 'ISO-8859-1';
 
-    // Sécurisation de la valeur et du label
-    $safeValue = htmlspecialchars((string)$opt['value'], ENT_QUOTES | ENT_SUBSTITUTE, $encoding);
-    $safeLabel = htmlspecialchars((string)$opt['label'], ENT_QUOTES | ENT_SUBSTITUTE, $encoding);
+    $safeValue = htmlspecialchars((string)$opt['value'], ENT_QUOTES | ENT_SUBSTITUTE, FRM_ENCODING);
+    $safeLabel = htmlspecialchars((string)$opt['label'], ENT_QUOTES | ENT_SUBSTITUTE, FRM_ENCODING);
 
     $out = "<option value=\"$safeValue\"";
 
-    foreach ($opt as $key => $val) {
-        // On ignore les clés qui ne sont pas des attributs HTML directs 
-        // ou qui ont déjà été traitées (value, label, selected, retour)
-        if (in_array($key, ['value', 'label', 'selected', 'retour'])) continue;
-
-        // Gestion du tableau 'data'
-        if ($key === 'data') {
-            if (!is_array($val)) {
-                trigger_error("Erreur critique dans FRM2_opt : le paramètre 'data' doit être un tableau.", E_USER_ERROR);
-            }
-            foreach ($val as $dataKey => $dataVal) {
-                $safeDataVal = htmlspecialchars((string)$dataVal, ENT_QUOTES | ENT_SUBSTITUTE, $encoding);
-                $out .= " data-$dataKey=\"$safeDataVal\"";
-            }
-            continue;
-        }
-
-        // Attributs classiques
-        $strVal = trim((string)$val);
+    foreach (['id', 'class', 'style'] as $attr) {
+        $strVal = trim((string)($opt[$attr] ?? ''));
         if ($strVal !== '') {
-            $safeVal = htmlspecialchars($strVal, ENT_QUOTES | ENT_SUBSTITUTE, $encoding);
-            $out .= " $key=\"$safeVal\"";
+            $out .= " $attr=\"" . htmlspecialchars($strVal, ENT_QUOTES | ENT_SUBSTITUTE, FRM_ENCODING) . "\"";
         }
     }
 
-    // Ajout de l'attribut selected
+    if (!is_array($opt['data'])) {
+        trigger_error("Erreur critique dans FRM2_opt : le paramètre 'data' doit être un tableau.", E_USER_ERROR);
+    }
+    foreach ($opt['data'] as $dataKey => $dataVal) {
+        $out .= " data-" . htmlspecialchars((string)$dataKey, ENT_QUOTES | ENT_SUBSTITUTE, FRM_ENCODING) . "=\"" . htmlspecialchars((string)$dataVal, ENT_QUOTES | ENT_SUBSTITUTE, FRM_ENCODING) . "\"";
+    }
+
     if ($opt['selected'] === true) {
         $out .= ' selected="selected"';
     }
@@ -255,90 +236,75 @@ function FRM2_opt(array $options = []): ?string {
     return null;
 }
 /**
-* Génère et affiche (ou retourne) un bouton radio HTML (<input type="radio">).
-*
-* @param array $options {
-*   @var string $name    Le nom du bouton radio (attribut name).
-*   @var string $value   La valeur envoyée (attribut value).
-*   @var string $label   Le texte affiché à côté du bouton.
-*   @var bool   $checked Si true, le bouton est coché.
-*   @var bool   $disabled Si true, le bouton est grisé / désactivé.
-*   @var string $id      L'attribut HTML 'id'.
-*   @var string $class   L'attribut HTML 'class'.
-*   @var string $style   Styles CSS inline.
-*   @var array  $data    Tableau associatif pour les attributs 'data-*'.
-*   @var string $extra   Attributs bruts (ex: onClick, onchange...).
-*   @var bool   $retour  Si true, retourne la chaîne au lieu de l'afficher.
-* }
-* 
-* @return string|null Le code HTML du bouton radio ou null.
-*/
+ * Génère et affiche (ou retourne) un bouton radio HTML (<input type="radio">).
+ *
+ * @param array $options {
+ * Configuration du composant radio.
+ *
+ * @var string $name      Nom partagé d'association du groupe radio.
+ * @var string $value     Valeur transmise si l'élément est coché.
+ * @var string $label     Libellé textuel affiché immédiatement après l'input.
+ * @var bool   $checked   Indique si le bouton est activé par défaut (accepte true/1).
+ * @var bool   $disabled  Grise l'élément et bloque la modification native.
+ * @var string $id        L'attribut HTML 'id'.
+ * @var string $class     Classes CSS applicables.
+ * @var string $style     Styles CSS inline.
+ * @var int|string $tabindex Index numérique configurant l'ordre séquentiel de tabulation clavier.
+ * @var array  $data      Tableau associatif pour les attributs dynamiques 'data-*'.
+ * @var string $extra     Attributs bruts injectés en fin de balise (ex: événements JS).
+ * @var bool   $retour    Si true, retourne la chaîne HTML brute au lieu de l'afficher.
+ * }
+ * @return string|null Le code HTML du bouton radio complet ou null.
+ */
 function FRM2_ir(array $options = []): ?string {
 
     $defaults = [
-        'name'    => '', // Le nom est obligatoire pour associer les boutons radio
-        'value'   => '',
-        'label'   => '',
-        'checked' => false,
+        'name'     => '', 
+        'value'    => '',
+        'label'    => '',
+        'checked'  => false,
         'disabled' => false,
-        'id'      => '',
-        'class'   => '',
-        'style'   => '',
-        'data'    => [],
-        'extra'   => '',
-        'retour'  => false
+        'id'       => '',
+        'class'    => '',
+        'style'    => '',
+        'tabindex' => '',
+        'data'     => [],
+        'extra'    => '',
+        'retour'   => false
     ];
 
     $opt = array_merge($defaults, $options);
-    $encoding = 'ISO-8859-1';
 
-    // Début de l'élément
     $out = '<input type="radio"';
 
-    foreach ($opt as $key => $val) {
-        // On ignore les clés qui ne sont pas des attributs directs ou traitées après
-        if (in_array($key, ['label', 'checked', 'retour', 'extra'])) continue;
-
-        // Gestion du tableau 'data'
-        if ($key === 'data') {
-            if (!is_array($val)) {
-                trigger_error("Erreur critique dans FRM2_ir : le paramètre 'data' doit être un tableau.", E_USER_ERROR);
-            }
-            foreach ($val as $dataKey => $dataVal) {
-                $safeDataVal = htmlspecialchars((string)$dataVal, ENT_QUOTES | ENT_SUBSTITUTE, $encoding);
-                $out .= " data-$dataKey=\"$safeDataVal\"";
-            }
-            continue;
-        }
-
-        // Attributs classiques (name, value, id, class, style)
-        $strVal = trim((string)$val);
+    foreach (['name', 'value', 'id', 'class', 'style'] as $attr) {
+        $strVal = trim((string)($opt[$attr] ?? ''));
         if ($strVal !== '') {
-            $safeVal = htmlspecialchars($strVal, ENT_QUOTES | ENT_SUBSTITUTE, $encoding);
-            $out .= " $key=\"$safeVal\"";
+            $out .= " $attr=\"" . htmlspecialchars($strVal, ENT_QUOTES | ENT_SUBSTITUTE, FRM_ENCODING) . "\"";
         }
     }
 
-    // Gestion de l'état coché
-    if ($opt['checked'] === true || $opt['checked'] === 1) {
-        $out .= ' checked';
+    if (trim((string)$opt['tabindex']) !== '') {
+        $out .= ' tabindex="' . (int)$opt['tabindex'] . '"';
     }
 
-    // Gestion de l'état désactivé (HTML5 standard : juste 'disabled')
-    if ($opt['disabled'] === true || $opt['disabled'] == 1) {
-        $out .= ' disabled';
-    }
+    if ($opt['checked'] === true || $opt['checked'] == 1) { $out .= ' checked'; }
+    if ($opt['disabled'] === true || $opt['disabled'] == 1) { $out .= ' disabled'; }
     
-    // Ajout des attributs extra (actions JS)
     if (trim((string)$opt['extra']) !== '') {
         $out .= ' ' . trim($opt['extra']);
     }
 
-    // Fermeture de la balise et ajout du label (texte)
-    $safeLabel = htmlspecialchars((string)$opt['label'], ENT_QUOTES | ENT_SUBSTITUTE, $encoding);
+    if (!is_array($opt['data'])) {
+        trigger_error("Erreur critique dans FRM2_ir : le paramètre 'data' doit être un tableau.", E_USER_ERROR);
+    }
+    foreach ($opt['data'] as $dataKey => $dataVal) {
+        $out .= " data-" . htmlspecialchars((string)$dataKey, ENT_QUOTES | ENT_SUBSTITUTE, FRM_ENCODING) . "=\"" . htmlspecialchars((string)$dataVal, ENT_QUOTES | ENT_SUBSTITUTE, FRM_ENCODING) . "\"";
+    }
+
+    $safeLabel = htmlspecialchars((string)$opt['label'], ENT_QUOTES | ENT_SUBSTITUTE, FRM_ENCODING);
     $out .= '> ' . $safeLabel;
 
-    // Sortie
     if ($opt['retour'] === true) {
         return $out;
     }
@@ -347,26 +313,30 @@ function FRM2_ir(array $options = []): ?string {
     return null;
 }
 /**
- * Génère et affiche (ou retourne) un champ de saisie HTML (<input>).
+ * Génère et affiche (ou retourne) un champ de saisie classique (<input>).
+ *
+ * Permet l'instanciation rapide de champs textuels, numériques ou secrets (mot de passe).
  *
  * @param array $options {
- *     @var string $type         Type d'input (text, password, email, etc. - défaut: text).
- *     @var string $label        Texte affiché devant l'input.
- *     @var string $name         Nom de l'élément (attribut name).
- *     @var string $value        Valeur par défaut.
- *     @var string $placeholder  Texte d'aide en fond de champ.
- *     @var int    $size         Taille visuelle du champ.
- *     @var int    $maxlength    Nombre de caractères maximum.
- *     @var string $id           L'attribut HTML 'id'.
- *     @var string $class        L'attribut HTML 'class'.
- *     @var string $style        Styles CSS inline.
- *     @var bool   $readonly     Si true, le champ est en lecture seule.
- *     @var bool   $autocomplete Si false, ajoute autocomplete="off".
- *     @var array  $data         Tableau associatif pour les attributs 'data-*'.
- *     @var bool   $retour       Si true, retourne la chaîne au lieu de l'afficher.
+ * Configuration du composant input.
+ *
+ * @var string $type         Type d'input HTML standard (text, password, number, email...) (défaut: 'text').
+ * @var string $label        Texte d'affichage brut placé immédiatement avant la balise input.
+ * @var string $name         Nom de l'élément (attribut 'name').
+ * @var string $value        Valeur par défaut pré-remplie.
+ * @var string $placeholder  Indicateur textuel d'aide en fond de champ.
+ * @var int|null $size       Dimensionnement visuel CSS/HTML natif.
+ * @var int|null $maxlength  Nombre maximal de caractères autorisés à la saisie.
+ * @var string $id           L'attribut HTML 'id'.
+ * @var string $class        Classes CSS appliquées (défaut: 'itflat').
+ * @var string $style        Styles CSS inline.
+ * @var int|string $tabindex Index numérique configurant l'ordre séquentiel de tabulation clavier.
+ * @var bool   $readonly     Passe le champ en mode lecture seule si true.
+ * @var bool   $autocomplete Désactive l'historique de saisie si défini sur false ('off').
+ * @var array  $data          Tableau associatif pour attributs 'data-*'.
+ * @var bool   $retour        Si true, retourne la chaîne HTML au lieu de l'afficher.
  * }
- * 
- * @return string|null Le code HTML de l'input ou null.
+ * @return string|null Le code HTML complet généré (label + input) ou null.
  */
 function FRM2_it(array $options = []): ?string {
 
@@ -381,6 +351,7 @@ function FRM2_it(array $options = []): ?string {
         'id'           => '',
         'class'        => 'itflat',
         'style'        => '',
+        'tabindex'     => '',
         'readonly'     => false,
         'autocomplete' => true,
         'data'         => [],
@@ -388,56 +359,38 @@ function FRM2_it(array $options = []): ?string {
     ];
 
     $opt = array_merge($defaults, $options);
-    $encoding = 'ISO-8859-1';
 
-    // Début de la sortie avec le label
-    $out = htmlspecialchars((string)$opt['label'], ENT_QUOTES | ENT_SUBSTITUTE, $encoding);
+    $out = htmlspecialchars((string)$opt['label'], ENT_QUOTES | ENT_SUBSTITUTE, FRM_ENCODING);
     
-    // Construction de la balise input
-    $typeSafe = htmlspecialchars($opt['type'], ENT_QUOTES | ENT_SUBSTITUTE, $encoding);
+    $typeSafe = htmlspecialchars($opt['type'], ENT_QUOTES | ENT_SUBSTITUTE, FRM_ENCODING);
     $out .= "<input type=\"$typeSafe\"";
 
-    foreach ($opt as $key => $val) {
-        // On ignore les clés déjà traitées ou internes
-        if (in_array($key, ['type', 'label', 'readonly', 'autocomplete', 'retour', 'maxlength'])) continue;
-
-        // Gestion du tableau 'data'
-        if ($key === 'data') {
-            if (!is_array($val)) {
-                trigger_error("Erreur critique dans FRM2_it : le paramètre 'data' doit être un tableau.", E_USER_ERROR);
-            }
-            foreach ($val as $dataKey => $dataVal) {
-                $safeDataVal = htmlspecialchars((string)$dataVal, ENT_QUOTES | ENT_SUBSTITUTE, $encoding);
-                $out .= " data-$dataKey=\"$safeDataVal\"";
-            }
-            continue;
-        }
-
-        // Attributs classiques (name, value, id, class, style, size, placeholder)
-        $strVal = trim((string)$val);
-        if ($strVal !== '') {
-            $safeVal = htmlspecialchars($strVal, ENT_QUOTES | ENT_SUBSTITUTE, $encoding);
-            $out .= " $key=\"$safeVal\"";
+    foreach (['name', 'value', 'placeholder', 'id', 'class', 'style', 'size'] as $attr) {
+        if ($opt[$attr] !== null && trim((string)$opt[$attr]) !== '') {
+            $out .= " $attr=\"" . htmlspecialchars(trim((string)$opt[$attr]), ENT_QUOTES | ENT_SUBSTITUTE, FRM_ENCODING) . "\"";
         }
     }
 
-    // Gestion de maxlength (séparé car souvent un entier)
     if ($opt['maxlength'] !== null) {
         $out .= ' maxlength="' . (int)$opt['maxlength'] . '"';
     }
 
-    // Attributs booléens
-    if ($opt['readonly'] === true) {
-        $out .= ' readonly';
-    }
-    if ($opt['autocomplete'] === false) {
-        $out .= ' autocomplete="off"';
+    if (trim((string)$opt['tabindex']) !== '') {
+        $out .= ' tabindex="' . (int)$opt['tabindex'] . '"';
     }
 
-    // Ajout des attributs extra (scripts, etc.)
+    if ($opt['readonly'] === true) { $out .= ' readonly'; }
+    if ($opt['autocomplete'] === false) { $out .= ' autocomplete="off"'; }
+
+    if (!is_array($opt['data'])) {
+        trigger_error("Erreur critique dans FRM2_it : le paramètre 'data' doit être un tableau.", E_USER_ERROR);
+    }
+    foreach ($opt['data'] as $dataKey => $dataVal) {
+        $out .= " data-" . htmlspecialchars((string)$dataKey, ENT_QUOTES | ENT_SUBSTITUTE, FRM_ENCODING) . "=\"" . htmlspecialchars((string)$dataVal, ENT_QUOTES | ENT_SUBSTITUTE, FRM_ENCODING) . "\"";
+    }
+
     $out .= ">\n";
 
-    // Sortie
     if ($opt['retour'] === true) {
         return $out;
     }
@@ -446,22 +399,27 @@ function FRM2_it(array $options = []): ?string {
     return null;
 }
 /**
- * Génère un menu déroulant complet à partir d'une table SQL (format bdd.table supporté).
- * 
+ * Génère un menu déroulant dynamique (<select>) alimenté par une requête de base de données.
+ *
+ * Gère automatiquement les tables préfixées par base de données (ex: 'compta.fournisseurs').
+ *
  * @param array $options {
- *     @var string $name        Nom du select (obligatoire).
- *     @var string $table       Nom complet de la table (ex: "compta.fournisseurs").
- *     @var string $val_field   Nom du champ SQL pour la 'value'.
- *     @var string $lbl_field   Nom du champ SQL pour le libellé.
- *     @var string $selected    Valeur à sélectionner.
- *     @var string $order       Ordre de tri (ex: "nom ASC").
- *     @var string $where       Condition WHERE.
- *     @var string $first_opt   Option vide (ex: "-- Choisir --").
- *     @var string $first_opt_val   // Valeur par défaut -1
- *     @var string $format_lbl  Fonction de formatage du label (ex: 'ucfirst', 'strtoupper', 'ucwords'....).
- *     @var array  $se_options  Options pour FRM2_se (class, id, data...).
- *     @var bool   $retour      Si true, retourne le HTML.
+ * Configuration SQL et HTML du composant.
+ *
+ * @var string $name          Nom unique du select (obligatoire).
+ * @var string $table         Nom complet de la table SQL à interroger.
+ * @var string $val_field     Nom de la colonne SQL utilisée pour le paramètre 'value'.
+ * @var string $lbl_field     Nom de la colonne SQL stockant le libellé utilisateur.
+ * @var string $selected      Valeur courante devant être cochée par défaut.
+ * @var string $order         Instruction optionnelle de tri SQL (ex: "nom_champ ASC").
+ * @var string $where         Condition SQL restrictive (par défaut '1' pour tout lire).
+ * @var string|null $first_opt Libellé d'une première option neutre (ex: "-- Choisir --").
+ * @var string $first_opt_val Valeur associée à l'option neutre (défaut: '-1').
+ * @var string|null $format_lbl Fonction PHP de callback pour formater le texte (ex: 'ucfirst').
+ * @var array  $se_options    Sous-tableau d'options HTML spécifiques passées à FRM2_se.
+ * @var bool   $retour        Si true, retourne l'intégralité du code HTML produit.
  * }
+ * @return string|null Le code HTML complet de la liste déroulante ou null.
  */
 function FRM2_select_from_table(array $options = []): ?string {
     global $mysqli;
@@ -469,27 +427,25 @@ function FRM2_select_from_table(array $options = []): ?string {
     $defaults = [
         'name'           => '',
         'table'          => '',
-        'val_field'     => '',
-        'lbl_field'     => '',
-        'selected'      => '',
-        'order'         => '',
-        'where'         => '1',
-        'first_opt'     => null,
-        'first_opt_val' => '-1',
-        'format_lbl'    => null, // Nouvelle option
-        'se_options'    => [],
-        'retour'        => false
+        'val_field'      => '',
+        'lbl_field'      => '',
+        'selected'       => '',
+        'order'          => '',
+        'where'          => '1',
+        'first_opt'      => null,
+        'first_opt_val'  => '-1',
+        'format_lbl'     => null, 
+        'se_options'     => [],
+        'retour'         => false
     ];
 
     $opt = array_merge($defaults, $options);
     $html = "";
 
-    // 1. Initialisation du SELECT
     $se_params = $opt['se_options'];
     $se_params['retour'] = true;
     $html .= FRM2_se($opt['name'], $se_params);
 
-    // 2. Première option (vide)
     if ($opt['first_opt'] !== null) {
         $html .= FRM2_opt([
             'value'  => $opt['first_opt_val'],
@@ -499,25 +455,20 @@ function FRM2_select_from_table(array $options = []): ?string {
         ]);
     }
 
-    // 3. Construction de la requête
-    // On split le nom de la table pour protéger bdd et table séparément
     $tableParts = explode('.', $opt['table']);
-    if (count($tableParts) === 2) {
-        $fullTableName = "`" . $tableParts[0] . "`.`" . $tableParts[1] . "`";
-    } else {
-        $fullTableName = "`" . $opt['table'] . "`";
-    }
+    $fullTableName = (count($tableParts) === 2) 
+        ? "`" . $tableParts[0] . "`.`" . $tableParts[1] . "`" 
+        : "`" . $opt['table'] . "`";
 
     $orderBy = ($opt['order'] !== '') ? "ORDER BY " . $opt['order'] : "";
     
-    $requete = "SELECT `" . $opt['val_field'] . "`, `" . $opt['lbl_field'] . "` 
-                FROM $fullTableName 
-                WHERE " . $opt['where'] . " 
-                $orderBy";
+    $safeValField = mysqli_real_escape_string($mysqli, $opt['val_field']);
+    $safeLblField = mysqli_real_escape_string($mysqli, $opt['lbl_field']);
+
+    $requete = "SELECT `$safeValField`, `$safeLblField` FROM $fullTableName WHERE " . $opt['where'] . " $orderBy";
 
     $resultat = DTBS_sqlbrut($requete, $mysqli);
 
-    // 4. Génération des options
     if ($resultat['statut'] && $resultat['nbrec'] > 0) {
         while ($row = mysqli_fetch_assoc($resultat['resultat'])) {
             $val = $row[$opt['val_field']];
@@ -538,27 +489,28 @@ function FRM2_select_from_table(array $options = []): ?string {
 
     $html .= "</select>\n";
 
-    if ($opt['retour'] === true) {
-        return $html;
-    }
-
+    if ($opt['retour'] === true) { return $html; }
     echo $html;
     return null;
 }
 /**
- * Génère un menu déroulant complet à partir des valeurs d'un champ ENUM.
- * 
+ * Génère un menu déroulant (<select>) à partir des valeurs restrictives d'un champ SQL de type ENUM.
+ *
  * @param array $options {
- *     @var string $name        Nom du select (obligatoire).
- *     @var string $table       Nom de la table (format bdd.table supporté).
- *     @var string $field       Nom du champ ENUM.
- *     @var string $selected    Valeur à sélectionner par défaut.
- *     @var string $first_opt   Libellé d'une première option (ex: "-- Statut --").
- *     @var string $first_opt_val Valeur de la première option (défaut: -1).
- *     @var string $format_lbl  Fonction de formatage du label (ex: 'ucfirst', 'strtoupper').
- *     @var array  $se_options  Options pour FRM2_se (class, id, data...).
- *     @var bool   $retour      Si true, retourne le HTML au lieu de l'afficher.
+ * Configuration d'extraction et de rendu du champ ENUM.
+ *
+ * @var string $name          Nom de l'élément HTML généré.
+ * @var string $table         Nom complet de la table hôte (supporte le format 'bdd.table').
+ * @var string $field         Nom exact de la colonne structurée en ENUM.
+ * @var string $selected      Valeur à pré-sélectionner à l'affichage.
+ * @var string|null $first_opt Libellé d'en-tête optionnel (ex: "-- Choisir statut --").
+ * @var string $first_opt_val Valeur de l'option d'en-tête (défaut: '-1').
+ * @var string|null $format_lbl Callback de formatage linguistique (ex: 'strtoupper').
+ * @var int|string $tabindex  Index numérique configurant l'ordre séquentiel de tabulation clavier.
+ * @var array  $se_options    Sous-tableau d'options héritées pour FRM2_se.
+ * @var bool   $retour        Si true, extrait le HTML au lieu de l'imprimer.
  * }
+ * @return string|null La structure HTML générée complète ou null.
  */
 function FRM2_select_from_enum(array $options = []): ?string {
     global $mysqli;
@@ -570,7 +522,8 @@ function FRM2_select_from_enum(array $options = []): ?string {
         'selected'      => '',
         'first_opt'     => null,
         'first_opt_val' => '-1',
-        'format_lbl'    => null, // Nouvelle option de formatage
+        'format_lbl'    => null, 
+        'tabindex'      => '',
         'se_options'    => [],
         'retour'        => false
     ];
@@ -578,12 +531,17 @@ function FRM2_select_from_enum(array $options = []): ?string {
     $opt = array_merge($defaults, $options);
     $html = "";
 
-    // 1. Initialisation du SELECT via ta fonction FRM2_se
+    // Récupération des paramètres pour le composant <select>
     $se_params = $opt['se_options'];
+    
+    // Si un tabindex a été fourni au niveau principal, on le transmet à FRM2_se
+    if (trim((string)$opt['tabindex']) !== '') {
+        $se_params['tabindex'] = $opt['tabindex'];
+    }
+    
     $se_params['retour'] = true;
     $html .= FRM2_se($opt['name'], $se_params);
 
-    // 2. Première option optionnelle
     if ($opt['first_opt'] !== null) {
         $html .= FRM2_opt([
             'value'    => $opt['first_opt_val'],
@@ -593,7 +551,6 @@ function FRM2_select_from_enum(array $options = []): ?string {
         ]);
     }
 
-    // 3. Récupération de la structure du champ ENUM
     $tableParts = explode('.', $opt['table']);
     $fullTableName = (count($tableParts) === 2) 
         ? "`" . $tableParts[0] . "`.`" . $tableParts[1] . "`" 
@@ -601,11 +558,8 @@ function FRM2_select_from_enum(array $options = []): ?string {
 
     $safeField = mysqli_real_escape_string($mysqli, $opt['field']);
     $resSQL = DTBS2_sqlbrut($mysqli, "SHOW COLUMNS FROM $fullTableName LIKE '$safeField'");
-    //$res = mysqli_query($mysqli, "SHOW COLUMNS FROM $fullTableName LIKE '$safeField'");
     
-    //if ($res && $row = mysqli_fetch_assoc($res)) {
     if ($resSQL['statut'] && $row = mysqli_fetch_assoc($resSQL['resultat'])) {
-        // Extraction des valeurs entre enum('...', '...')
         if (preg_match("/^enum\('(.*)'\)$/", $row['Type'], $matches)) {
             $enum_values = explode("','", $matches[1]);
             
@@ -626,29 +580,29 @@ function FRM2_select_from_enum(array $options = []): ?string {
 
     $html .= "</select>\n";
 
-    if ($opt['retour'] === true) {
-        return $html;
-    }
-
+    if ($opt['retour'] === true) { return $html; }
     echo $html;
     return null;
 }
 /**
- * Génère un bouton HTML (input type submit/button/reset).
- * 
+ * Génère un bouton d'action ou de validation HTML (<input type="submit|button|reset">).
+ *
  * @param array $options {
- *     @var string $class    Classes CSS.
- *     @var string $type     Type du bouton (default: submit).
- *     @var string $name     Nom de l'élément (default: boutton_soumission).
- *     @var string $value    Texte du bouton (default: Ok).
- *     @var string $action   Attributs JS (ex: onclick="...").
- *     @var string $style    Style CSS en ligne.
- *     @var string $id       ID unique de l'élément.
- *     @var int    $tabindex Attribut tabindex pour l'ordre de tabulation.
- *     @var string $disabled Attribut disabled (si vrai, ajoute 'disabled').
- *     @var array  $data     Tableau associatif pour les attributs data- (ex: ['id' => 1]).
- *     @var bool   $retour   Si true, retourne le HTML au lieu de l'afficher.
+ * Configuration structurelle du bouton.
+ *
+ * @var string $class    Classes CSS graphiques à appliquer (défaut: 'btflat').
+ * @var string $type     Attribut de comportement natif : 'submit', 'button', 'reset' (défaut: 'submit').
+ * @var string $name     Nom de variable transmis lors de la soumission (défaut: 'boutton_soumission').
+ * @var string $value    Texte de l'étiquette affiché à l'intérieur du bouton (défaut: 'Ok').
+ * @var string $action   Événements ou attributs JS natifs injectés textuellement (ex: 'onclick="..."').
+ * @var string $style    Déclarations CSS inline spécifiques.
+ * @var string $id       Identifiant HTML 'id' unique.
+ * @var int|string $tabindex Index numérique configurant l'ordre séquentiel de tabulation clavier.
+ * @var bool|string $disabled Désactive l'action et grise l'affichage si true ou 'disabled'.
+ * @var array  $data      Tableau clé/valeur pour l'injection d'attributs HTML5 'data-*'.
+ * @var bool   $retour    Si défini sur true, renvoie la chaîne HTML sans l'afficher.
  * }
+ * @return string|null Le code HTML du bouton d'action sécurisé ou null.
  */
 function FRM2_bt(array $options = []): ?string {
     
@@ -668,56 +622,53 @@ function FRM2_bt(array $options = []): ?string {
 
     $opt = array_merge($defaults, $options);
 
-    // Gestion des attributs data-
     $dataStr = "";
-    if (!empty($opt['data'])) {
+    if (is_array($opt['data'])) {
         foreach ($opt['data'] as $key => $val) {
-            $dataStr .= ' data-' . htmlspecialchars($key) . '="' . htmlspecialchars($val) . '"';
+            $dataStr .= ' data-' . htmlspecialchars((string)$key, ENT_QUOTES | ENT_SUBSTITUTE, FRM_ENCODING) . '="' . htmlspecialchars((string)$val, ENT_QUOTES | ENT_SUBSTITUTE, FRM_ENCODING) . '"';
         }
     }
 
-    // Préparation de l'ID et du Disabled
-    $idStr = (!empty($opt['id'])) ? ' id="' . $opt['id'] . '"' : '';
+    $idStr = (!empty($opt['id'])) ? ' id="' . htmlspecialchars((string)$opt['id'], ENT_QUOTES | ENT_SUBSTITUTE, FRM_ENCODING) . '"' : '';
     $disabledStr = ($opt['disabled'] === true || $opt['disabled'] === 'disabled') ? ' disabled' : '';
+    $tabIndexStr = (!empty($opt['tabindex'])) ? ' tabindex="' . (int)$opt['tabindex'] . '"' : '';
 
     $html = sprintf(
-        '<input%s type="%s" class="%s" name="%s" value="%s" %s style="%s"%s%s>' . "\n",
+        '<input%s type="%s" class="%s" name="%s" value="%s" %s style="%s"%s%s%s>' . "\n",
         $idStr,
-        $opt['type'],
-        $opt['class'],
-        $opt['name'],
-        htmlspecialchars($opt['value']), // Sécurité sur le libellé
+        htmlspecialchars($opt['type'], ENT_QUOTES | ENT_SUBSTITUTE, FRM_ENCODING),
+        htmlspecialchars($opt['class'], ENT_QUOTES | ENT_SUBSTITUTE, FRM_ENCODING),
+        htmlspecialchars($opt['name'], ENT_QUOTES | ENT_SUBSTITUTE, FRM_ENCODING),
+        htmlspecialchars($opt['value'], ENT_QUOTES | ENT_SUBSTITUTE, FRM_ENCODING), 
         $opt['action'],
-        $opt['style'],
+        htmlspecialchars($opt['style'], ENT_QUOTES | ENT_SUBSTITUTE, FRM_ENCODING),
         $disabledStr,
+        $tabIndexStr,
         $dataStr
     );
 
-    if ($opt['retour'] === true) {
-        return $html;
-    }
-
+    if ($opt['retour'] === true) { return $html; }
     echo $html;
     return null;
 }
 
 /**
- * Génère et affiche une zone de texte (textarea).
+ * Génère et affiche (ou retourne) une zone de texte multiligne (<textarea>).
  *
  * @param array $options {
- * Tableau associatif des paramètres.
+ * Configuration de la zone de texte.
  *
- * @var string $name     Nom du champ (défaut: 'textarea_default').
- * @var string $class    Classe CSS (défaut: vide).
- * @var string $style    Style CSS inline (défaut: vide).
- * @var int    $rows     Nombre de lignes (défaut: 4).
- * @var int    $cols     Nombre de colonnes (défaut: 20).
- * @var string $value    Contenu de la zone de texte (défaut: vide).
- * @var string $action   Attributs additionnels bruts (défaut: vide).
- * @var bool   $readonly Indique si le champ est en lecture seule (défaut: false).
- * @var bool   $retour   Si true, retourne la chaîne au lieu de l'afficher (défaut: false).
+ * @var string $name     Nom unique identifiant l'élément lors du POST/GET.
+ * @var string $class    Classes CSS affectées (défaut: 'itflat').
+ * @var string $style    Déclarations graphiques CSS inline.
+ * @var int    $rows     Nombre maximal de lignes textuelles visibles par défaut (défaut: 4).
+ * @var int    $cols     Largeur indicative calculée en caractères (défaut: 20).
+ * @var string $value    Contenu textuel par défaut injecté à l'intérieur du champ.
+ * @var string $action   Attributs événementiels complémentaires injectés en brut.
+ * @var bool   $readonly Empêche la modification textuelle directe si défini sur true.
+ * @var bool   $retour    Si true, extrait le HTML au lieu d'exécuter un echo.
  * }
- * * @return string|null La balise textarea ou null si affichée directement.
+ * @return string|null La structure textuelle complète HTML <textarea> ou null.
  */
 function FRM2_ta(array $options = []): ?string {
     $defaults = [
@@ -734,41 +685,45 @@ function FRM2_ta(array $options = []): ?string {
 
     $opt = array_merge($defaults, $options);
     
-    $element = '<textarea name="' . htmlspecialchars($opt['name']) . '"';
+    $element = '<textarea name="' . htmlspecialchars($opt['name'], ENT_QUOTES | ENT_SUBSTITUTE, FRM_ENCODING) . '"';
     
-    if ($opt['class'] !== '')    $element .= ' class="' . htmlspecialchars($opt['class']) . '"';
-    if ($opt['style'] !== '')    $element .= ' style="' . htmlspecialchars($opt['style']) . '"';
+    if ($opt['class'] !== '')    $element .= ' class="' . htmlspecialchars($opt['class'], ENT_QUOTES | ENT_SUBSTITUTE, FRM_ENCODING) . '"';
+    if ($opt['style'] !== '')    $element .= ' style="' . htmlspecialchars($opt['style'], ENT_QUOTES | ENT_SUBSTITUTE, FRM_ENCODING) . '"';
     if ($opt['rows'] !== '')     $element .= ' rows="' . (int)$opt['rows'] . '"';
     if ($opt['cols'] !== '')     $element .= ' cols="' . (int)$opt['cols'] . '"';
     if ($opt['readonly'] === true) $element .= ' readonly';
     if ($opt['action'] !== '')   $element .= ' ' . $opt['action'];
     
-    $element .= '>' . htmlspecialchars($opt['value']) . '</textarea>' . "\n";
+    $element .= '>' . htmlspecialchars($opt['value'], ENT_QUOTES | ENT_SUBSTITUTE, FRM_ENCODING) . '</textarea>' . "\n";
 
-    if ($opt['retour'] === true) {
-        return $element;
-    }
+    if ($opt['retour'] === true) { return $element; }
     echo $element;
     return null;
 }
 /**
- * Génère une case à cocher (input type="checkbox").
- * 
+ * Génère et affiche (ou retourne) une case à cocher unitaire (<input type="checkbox">).
+ *
+ * Utilise l'interception événementielle 'onclick' pour émuler de manière transparente
+ * un état 'readonly' inexistant nativement sur les composants checkboxes HTML.
+ *
  * @param array $options {
- * @var string $name        Nom du champ.
- * @var string $value       Valeur soumise si cochée.
- * @var string $class       Classes CSS.
- * @var string $style       Style CSS en ligne.
- * @var bool   $checked     Si vrai, coche la case (accepte true/1).
- * @var string $text        Texte affiché à côté de la checkbox (libellé).
- * @var int    $tabindex Attribut tabindex pour l'ordre de tabulation.
- * @var string $action      Attributs JS (ex: onclick="...", onchange="...").
- * @var bool   $readonly    Si vrai, bloque la modification (via un return false au clic).
- * @var array  $data        Tableau associatif pour les attributs data- (ex: ['id' => 1]).
- * @var string $extra1      Attribut ou chaîne libre supplémentaire.
- * @var string $extra2      Deuxième attribut ou chaîne libre supplémentaire.
- * @var bool   $retour      Si true, retourne le HTML au lieu de l'afficher.
+ * Configuration détaillée de la case à cocher.
+ *
+ * @var string $name     Nom de variable pour la transmission des tableaux ou variables.
+ * @var string $value    Valeur renvoyée au serveur si la case est cochée.
+ * @var string $class    Classes CSS applicables.
+ * @var string $style    Directives CSS inline spécifiques.
+ * @var bool   $checked  Force la pré-activation de la case (accepte true/1).
+ * @var string $text     Libellé descriptif de sécurité affiché à droite de la checkbox.
+ * @var int|string $tabindex Configuration de l'accessibilité par tabulation séquentielle.
+ * @var string $action   Attributs d'écoute JS complémentaires (ex: 'onchange="..."').
+ * @var bool   $readonly Si true, neutralise le clic utilisateur via le retour logique de clic.
+ * @var array  $data      Tableau clé/valeur gérant l'exportation vers attributs 'data-*'.
+ * @var string $extra1   Chaîne d'attributs complémentaires personnalisés de premier niveau.
+ * @var string $extra2   Chaîne d'attributs complémentaires personnalisés de second niveau.
+ * @var bool   $retour    Si vrai, dévie la sortie vers un retour de fonction.
  * }
+ * @return string|null Le code HTML complet de la checkbox accompagnée de son texte ou null.
  */
 function FRM2_cb(array $options = []): ?string {
     
@@ -793,51 +748,40 @@ function FRM2_cb(array $options = []): ?string {
     $html = '<input type="checkbox"';
 
     if (!empty($opt['name'])) { 
-        $html .= ' name="' . $opt['name'] . '"'; 
+        $html .= ' name="' . htmlspecialchars($opt['name'], ENT_QUOTES | ENT_SUBSTITUTE, FRM_ENCODING) . '"'; 
     }
     if (!empty($opt['class'])) { 
-        $html .= ' class="' . $opt['class'] . '"'; 
+        $html .= ' class="' . htmlspecialchars($opt['class'], ENT_QUOTES | ENT_SUBSTITUTE, FRM_ENCODING) . '"'; 
     }
     if (!empty($opt['style'])) { 
-        $html .= ' style="' . $opt['style'] . '"'; 
+        $html .= ' style="' . htmlspecialchars($opt['style'], ENT_QUOTES | ENT_SUBSTITUTE, FRM_ENCODING) . '"'; 
     }
     if (trim((string)$opt['value']) !== '') { 
-        $html .= ' value="' . htmlspecialchars($opt['value']) . '"'; 
+        $html .= ' value="' . htmlspecialchars($opt['value'], ENT_QUOTES | ENT_SUBSTITUTE, FRM_ENCODING) . '"'; 
+    }
+    if (!empty($opt['tabindex'])) { 
+        $html .= ' tabindex="' . (int)$opt['tabindex'] . '"'; 
     }
 
-    // Gestion du checked (souple : accepte true, 1 ou "1")
-    if ($opt['checked'] === true || $opt['checked'] == 1) { 
-        $html .= ' checked'; 
-    }
+    if ($opt['checked'] === true || $opt['checked'] == 1) { $html .= ' checked'; }
+    if (!empty($opt['action'])) { $html .= ' ' . $opt['action']; }
 
-    // Gestion des attributs JS d'action
-    if (!empty($opt['action'])) { 
-        $html .= ' ' . $opt['action']; 
-    }
-
-    // Ton astuce métier readonly pour jQuery
     if ($opt['readonly'] === true || $opt['readonly'] == 1) { 
         $html .= " onclick='return false;'"; 
     }
 
-    // Gestion des attributs data- (standardisés TB2)
-    if (!empty($opt['data'])) {
+    if (is_array($opt['data'])) {
         foreach ($opt['data'] as $key => $val) {
-            $html .= ' data-' . htmlspecialchars($key) . '="' . htmlspecialchars($val) . '"';
+            $html .= ' data-' . htmlspecialchars((string)$key, ENT_QUOTES | ENT_SUBSTITUTE, FRM_ENCODING) . '="' . htmlspecialchars((string)$val, ENT_QUOTES | ENT_SUBSTITUTE, FRM_ENCODING) . '"';
         }
     }
 
-    // Conservation de tes extras
     if (!empty($opt['extra1'])) { $html .= ' ' . $opt['extra1']; }
     if (!empty($opt['extra2'])) { $html .= ' ' . $opt['extra2']; }
 
-    // On ferme le input et on ajoute le texte d'accompagnement protégé
-    $html .= '> ' . htmlspecialchars($opt['text']) . "\n";
+    $html .= '> ' . htmlspecialchars($opt['text'], ENT_QUOTES | ENT_SUBSTITUTE, FRM_ENCODING) . "\n";
 
-    if ($opt['retour'] === true) {
-        return $html;
-    }
-
+    if ($opt['retour'] === true) { return $html; }
     echo $html;
     return null;
 }

@@ -1,174 +1,220 @@
 <?Php
 /**
- * Génère et affiche la balise d'ouverture d'un tableau HTML (<table>).
+ * Fonction interne pour sécuriser les attributs HTML.
+ * Basculée en ISO-8859-1 pour éviter les conflits de caractères.
+ */
+function _TB2_escape(string $value): string {
+    return htmlspecialchars(trim($value), ENT_QUOTES | ENT_SUBSTITUTE, 'ISO-8859-1');
+}
+/**
+ * Génère la balise d'ouverture d'un tableau HTML (<table>).
  *
  * @param array $options {
- *     Tableau associatif des attributs HTML.
+ * Tableau associatif des attributs HTML.
  *
- *     @var string $id    L'attribut HTML 'id'. Par défaut vide.
- *     @var string $class L'attribut HTML 'class'. Par défaut vide.
- *     @var string $style L'attribut HTML 'style'. Par défaut vide.
+ * @var string $id      L'attribut HTML 'id'.
+ * @var string $class   L'attribut HTML 'class'.
+ * @var string $style   L'attribut HTML 'style'.
+ * @var bool   $retour  Si true, retourne le HTML au lieu de l'afficher. Par défaut false.
  * }
- * 
- * @return void Affiche directement la balise générée.
- *
+ * * @return string|null Retourne le HTML si 'retour' est à true, sinon null.
  */
-function TB2_table(array $options = []): void {
-    $defaults = ['id' => '', 'class' => '', 'style' => ''];
+function TB2_table(array $options = []): ?string {
+    $defaults = ['id' => '', 'class' => '', 'style' => '', 'retour' => false];
+    
+    // On fusionne les options reçues avec les valeurs par défaut
     $opt = array_merge($defaults, $options);
+
     $out = "<table";
     foreach ($opt as $key => $val) {
-        $val = trim((string)$val);
-        if ($val !== '') {
-            // ENT_SUBSTITUTE évite que la chaîne soit vide si un caractère invalide est trouvé
-            $safeVal = htmlspecialchars($val, ENT_QUOTES | ENT_SUBSTITUTE, 'ISO-8859-1');
-            $out .= " $key=\"$safeVal\"";
+        // CRITIQUE : On ignore l'option 'retour' pour ne pas polluer le HTML
+        if ($key === 'retour' || is_array($val)) {
+            continue;
+        }
+
+        $strVal = trim((string)$val);
+        if ($strVal !== '') {
+            $out .= " $key=\"" . _TB2_escape($strVal) . "\"";
         }
     }
-    echo $out . ">\n";
+    $out .= ">\n";
+
+    // Gestion du retour ou de l'affichage direct
+    if ($opt['retour']) {
+        return $out;
+    }
+
+    echo $out;
+    return null;
 }
 /**
- * Affiche la balise de fermeture d'un tableau HTML (</table>).
+ * Génère la balise de fermeture d'un tableau HTML (</table>).
  *
- * @return void Affiche directement la balise.
- *
+ * @param bool $retour Si true, retourne le HTML au lieu de l'afficher. Par défaut false.
+ * @return string|null
  */
-function TB2_table_fin(): void {
-    echo "</table>\n";
+function TB2_table_fin(bool $retour = false): ?string {
+    $out = "</table>\n";
+    
+    if ($retour) {
+        return $out;
+    }
+    
+    echo $out;
+    return null;
 }
 /**
- * Génère et affiche la balise d'ouverture d'une ligne de tableau HTML (<tr>).
+ * Génère la balise d'ouverture d'une ligne de tableau HTML (<tr>).
  *
  * @param array $options {
- *     Tableau associatif des attributs HTML.
+ * Tableau associatif des attributs HTML.
  *
- *     @var string $id    L'attribut HTML 'id'. Par défaut vide.
- *     @var string $class L'attribut HTML 'class'. Par défaut vide.
- *     @var string $style L'attribut HTML 'style'. Par défaut vide.
- *     @var array  $data  Tableau associatif pour générer des attributs 'data-*'.
- *                        Doit impérativement être un tableau sous peine d'arrêt du script.
+ * @var string $id      L'attribut HTML 'id'.
+ * @var string $class   L'attribut HTML 'class'.
+ * @var string $style   L'attribut HTML 'style'.
+ * @var array  $data    Tableau associatif pour générer des attributs 'data-*'.
+ * @var bool   $retour  Si true, retourne le HTML au lieu de l'afficher. Par défaut false.
  * }
- * 
- * @return void Affiche directement la balise générée.
- *
+ * @return string|null Retourne le HTML si 'retour' est à true, sinon null.
  */
-function TB2_ligne(array $options = []): void {
+function TB2_ligne(array $options = []): ?string {
+    $defaults = ['id' => '', 'class' => '', 'style' => '', 'data' => [], 'retour' => false];
+    
+    // Validation stricte du type de 'data' avant la fusion
+    if (isset($options['data']) && !is_array($options['data'])) {
+        trigger_error("Erreur critique dans TB2_ligne : le paramètre 'data' doit être un tableau.", E_USER_ERROR);
+    }
 
-    $defaults = ['id' => '', 'class' => '', 'style' => '', 'data' => []];
     $opt = array_merge($defaults, $options);
     $out = "<tr";
 
     foreach ($opt as $key => $val) {
-        if ($key === 'data') {
-            // Si la clé data existe mais n'est pas un tableau, on arrête tout
-            if (!is_array($val)) {
-                trigger_error("Erreur critique dans TB2_ligne : le paramètre 'data' doit être un tableau.", E_USER_ERROR);
-                // Note : E_USER_ERROR provoque l'arrêt du script (équivalent à un die/exit)
-            }
+        // CRITIQUE : On ignore 'retour' pour ne pas générer un attribut retour="1"
+        if ($key === 'retour') {
+            continue;
+        }
 
+        if ($key === 'data') {
             foreach ($val as $dataKey => $dataVal) {
-                $safeDataVal = htmlspecialchars((string)$dataVal, ENT_QUOTES | ENT_SUBSTITUTE, 'ISO-8859-1');
-                $out .= " data-$dataKey=\"$safeDataVal\"";
+                $out .= " data-$dataKey=\"" . _TB2_escape((string)$dataVal) . "\"";
             }
             continue; 
         }
 
-        // Cas général pour les attributs standards
         $strVal = trim((string)$val);
         if ($strVal !== '') {
-            $safeVal = htmlspecialchars($strVal, ENT_QUOTES | ENT_SUBSTITUTE, 'ISO-8859-1');
-            $out .= " $key=\"$safeVal\"";
+            $out .= " $key=\"" . _TB2_escape($strVal) . "\"";
         }
     }
 
-    echo $out . ">\n";
-}
-/**
- * Affiche la balise de fermeture d'une ligne de tableau HTML (</tr>).
- *
- * @return void Affiche directement la balise.
- *
- */
-function TB2_ligne_fin(): void {
-    echo "</tr>\n";
+    $out .= ">\n";
+
+    if ($opt['retour']) {
+        return $out;
+    }
+
+    echo $out;
+    return null;
 }
 
 /**
- * Génère et affiche une cellule de tableau HTML (<td>).
+ * Génère la balise de fermeture d'une ligne de tableau HTML (</tr>).
+ *
+ * @param bool $retour Si true, retourne le HTML au lieu de l'afficher. Par défaut false.
+ * @return string|null
+ */
+function TB2_ligne_fin(bool $retour = false): ?string {
+    $out = "</tr>\n";
+    
+    if ($retour) {
+        return $out;
+    }
+    
+    echo $out;
+    return null;
+}
+/**
+ * Génère et affiche (ou retourne) une cellule de tableau HTML (<td>).
  * Si l'indice 'texte' est fourni, affiche le contenu et ferme la balise automatiquement.
  *
  * @param array $options {
- *     Tableau associatif des attributs HTML.
+ * Tableau associatif des attributs HTML.
  *
- *     @var string $id      L'attribut HTML 'id'. Par défaut vide.
- *     @var string $class   L'attribut HTML 'class'. Par défaut vide.
- *     @var string $style   L'attribut HTML 'style'. Par défaut vide.
- *     @var string $texte   Le contenu de la cellule. Si présent, ferme la cellule.
- *     @var int    $colspan L'attribut HTML 'colspan'. Par défaut vide.
- *     @var int    $rowspan L'attribut HTML 'rowspan'. Par défaut vide.
- *     @var array  $data    Tableau associatif pour générer des attributs 'data-*'.
- *                          Doit impérativement être un tableau sous peine d'arrêt du script.
-*     @var bool   $retour      Si true, retourne le HTML au lieu de l'afficher.
+ * @var string $id       L'attribut HTML 'id'.
+ * @var string $class    L'attribut HTML 'class'.
+ * @var string $style    L'attribut HTML 'style'.
+ * @var string $texte    Le contenu de la cellule. Si présent, ferme la cellule automatiquement.
+ * @var int    $colspan  L'attribut HTML 'colspan'.
+ * @var int    $rowspan  L'attribut HTML 'rowspan'.
+ * @var array  $data     Tableau associatif pour générer des attributs 'data-*'.
+ * @var bool   $retour   Si true, retourne le HTML au lieu de l'afficher. Par défaut false.
  * }
- * 
  * @return string|null Retourne le HTML généré si 'retour' est true, sinon null.
- *
  */
 function TB2_cellule(array $options = []): ?string {
 
     $defaults = [
-        'id' => '', 'class' => '', 'style' => '', 'texte' => null, 'colspan' => '', 'rowspan' => '', 'data' => [], 'retour' => false
+        'id' => '', 'class' => '', 'style' => '', 'texte' => null, 
+        'colspan' => '', 'rowspan' => '', 'data' => [], 'retour' => false
     ];
     
+    if (isset($options['data']) && !is_array($options['data'])) {
+        trigger_error("Erreur critique dans TB2_cellule : le paramètre 'data' doit être un tableau.", E_USER_ERROR);
+    }
+
     $opt = array_merge($defaults, $options);
     $out = "<td";
 
     foreach ($opt as $key => $val) {
-        // On ignore l'indice 'texte' dans la boucle des attributs HTML
-        if ($key === 'texte' || $key === 'retour') continue;
+        // CRITIQUE : On ignore 'texte' et 'retour' pour ne pas polluer la balise HTML
+        if ($key === 'texte' || $key === 'retour') {
+            continue;
+        }
 
         if ($key === 'data') {
-            if (!is_array($val)) {
-                trigger_error("Erreur critique dans TB2_cellule : le paramètre 'data' doit être un tableau.", E_USER_ERROR);
-            }
-
             foreach ($val as $dataKey => $dataVal) {
-                $safeDataVal = htmlspecialchars((string)$dataVal, ENT_QUOTES | ENT_SUBSTITUTE, 'ISO-8859-1');
-                $out .= " data-$dataKey=\"$safeDataVal\"";
+                $out .= " data-$dataKey=\"" . _TB2_escape((string)$dataVal) . "\"";
             }
             continue; 
         }
 
         $strVal = trim((string)$val);
         if ($strVal !== '') {
-            $safeVal = htmlspecialchars($strVal, ENT_QUOTES | ENT_SUBSTITUTE, 'ISO-8859-1');
-            $out .= " $key=\"$safeVal\"";
+            $out .= " $key=\"" . _TB2_escape($strVal) . "\"";
         }
     }
 
     $out .= ">";
 
-    // Si 'texte' est défini, on affiche le contenu et on ferme la balise
+    // Si 'texte' est défini, on injecte le contenu et on ferme le <td>
     if ($opt['texte'] !== null) {
         $out .= $opt['texte'] . "</td>";
     }
 
+    // Gestion du retour de la chaîne ou de l'affichage direct
     if ($opt['retour']) {
         return $out;
-    } else {
-        echo $out . "\n";
     }
+
+    // Si on affiche directement, on ajoute un saut de ligne si la cellule est fermée
+    echo $out . ($opt['texte'] !== null ? "\n" : "");
     return null;
-    
 }
 
 /**
- * Affiche la balise de fermeture d'une cellule de tableau HTML (</td>).
+ * Génère la balise de fermeture d'une cellule de tableau HTML (</td>).
  *
- * @return void Affiche directement la balise.
- *
+ * @param bool $retour Si true, retourne le HTML au lieu de l'afficher. Par défaut false.
+ * @return string|null
  */
-function TB2_cellule_fin(): void {
-    echo "</td>\n";
+function TB2_cellule_fin(bool $retour = false): ?string {
+    $out = "</td>\n";
+    
+    if ($retour) {
+        return $out;
+    }
+    
+    echo $out;
+    return null;
 }
 ?>
