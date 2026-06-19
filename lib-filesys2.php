@@ -1,11 +1,11 @@
 <?Php
-function FILESYS_filtre_dir_link(string $var){ return !is_link($var); }
-function FILESYS_filtre_dir_file(string $var){ return !is_file($var); }
-function FILESYS_filtre_dir_dir(string $var) { return !is_dir($var);  }
-function FILESYS_filtre_dir_hide(string $var) {  if (substr($var,0,1)==".") { return false; } else { return true; } }
-function FILESYS_filtre_eaDir(string $var) {  if (substr($var,-6)=="@eaDir") { return false; } else { return true; } }
+function FILESYS2_filtre_dir_link(string $var){ return !is_link($var); }
+function FILESYS2_filtre_dir_file(string $var){ return !is_file($var); }
+function FILESYS2_filtre_dir_dir(string $var) { return !is_dir($var);  }
+function FILESYS2_filtre_dir_hide(string $var) {  if (substr($var,0,1)==".") { return false; } else { return true; } }
+function FILESYS2_filtre_eaDir(string $var) {  if (substr($var,-6)=="@eaDir") { return false; } else { return true; } }
 
-function FILESYS_lit_repertoire(string $path, bool $file, bool $link, bool $dir,bool $hidden){
+function FILESYS2_lit_repertoire(string $path, bool $file, bool $link, bool $dir,bool $hidden){
 
 	$ar_retour = [
 		'dispo'=> false,
@@ -55,7 +55,7 @@ function FILESYS_lit_repertoire(string $path, bool $file, bool $link, bool $dir,
     }
 
     // 2. Supprime les eaDir (Synology)
-    $ar_retour['fichiers'] = array_filter($ar_retour['fichiers'], 'FILESYS_filtre_eaDir');
+    $ar_retour['fichiers'] = array_filter($ar_retour['fichiers'], 'FILESYS2_filtre_eaDir');
 
     // 3. Application des filtres de type (Nécessite de reconstruire le chemin temporairement)
     // Note : On utilise le path ici pour les tests is_file/is_dir/is_link
