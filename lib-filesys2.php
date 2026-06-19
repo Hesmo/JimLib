@@ -3,7 +3,12 @@ function FILESYS2_filtre_dir_link(string $var){ return !is_link($var); }
 function FILESYS2_filtre_dir_file(string $var){ return !is_file($var); }
 function FILESYS2_filtre_dir_dir(string $var) { return !is_dir($var);  }
 function FILESYS2_filtre_dir_hide(string $var) {  if (substr($var,0,1)==".") { return false; } else { return true; } }
-function FILESYS2_filtre_eaDir(string $var) {  if (substr($var,-6)=="@eaDir") { return false; } else { return true; } }
+
+//function FILESYS2_filtre_eaDir(string $var) {  if (substr($var,-6)=="@eaDir") { return false; } else { return true; } }
+/* Proposition de Gemini (pour remplacer la fonction ci-dessus): */
+function FILESYS2_filtre_eaDir(string $var): bool { 
+    return !str_ends_with($var, '@eaDir'); 
+}
 
 function FILESYS2_lit_repertoire(string $path, bool $file, bool $link, bool $dir,bool $hidden){
 
