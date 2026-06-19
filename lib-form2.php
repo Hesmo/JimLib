@@ -416,7 +416,7 @@ function FRM2_it(array $options = []): ?string {
  * @var string|null $first_opt Libellé d'une première option neutre (ex: "-- Choisir --").
  * @var string $first_opt_val Valeur associée à l'option neutre (défaut: '-1').
  * @var string|null $format_lbl Fonction PHP de callback pour formater le texte (ex: 'ucfirst').
- * @var array  $se_options    Sous-tableau d'options HTML spécifiques passées à FRM2_se.
+ * @var array  $se_options    Sous-tableau d'options HTML spécifiques passées à FRM2_se, exemple style.
  * @var bool   $retour        Si true, retourne l'intégralité du code HTML produit.
  * }
  * @return string|null Le code HTML complet de la liste déroulante ou null.
