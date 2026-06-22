@@ -402,4 +402,42 @@ function DTBS2_sqlbrut(mysqli $pointeur, string $requete): array {
 
     return $ar_retour;
 }
+/**
+ * Gère les transactions SQL de manière sécurisée (V2).
+ * 
+ * @param mysqli $mysqli  Lien de connexion active.
+ * @param string $action  L'action à mener : 'begin', 'rollback', 'commit'
+ * @return string         "Ok" si l'opération a réussi, ou le message d'erreur détaillé.
+ * 
+ */
+function DTBS2_transaction(mysqli $mysqli, string $action): string {
+    
+    try {
+        switch ($action) {
+            case 'begin':
+                // On tente de démarrer la transaction
+                if ($mysqli->begin_transaction()) {
+                    return "Ok";
+                }
+                return "Echec du démarrage de la transaction.";
+            case 'rollback':
+                if ($mysqli->rollback()) {
+                    $mysqli->autocommit(true);
+                    return "Ok";
+                }
+                return "Echec de l'annulation (ROLLBACK).";
+            case 'commit':
+                if ($mysqli->commit()) {
+                    $mysqli->autocommit(true);
+                    return "Ok";
+                }
+                return "Echec de la validation (COMMIT).";
+            default:
+                return "Paramètre action inattendu : '$action'";
+        }
+    } catch (mysqli_sql_exception $e) {
+        // Si MariaDB renvoie une erreur (ex: déconnexion, timeout, deadlock), on la capture ici
+        return "Erreur SQL lors de l'action '$action' : " . $e->getMessage();
+    }
+}
 ?>
