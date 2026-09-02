@@ -1,4 +1,4 @@
-<?Php
+<?php
 /* Liste des codes erreurs et traduction en langage courant */
 $ar_errmysql[1451] = "Suppression impossible, enregistrement utilisé dans une autre table";
 $ar_errmysql[1062] = "Ajout impossible, enregistrement déjà présent";
@@ -44,7 +44,7 @@ function DTBS2_select(mysqli $pointeur, array $options = []) {
 	$ar_retour = array( 'statut'=>true, 'erreur'=>"", 'requete'=>"", 'nbrec'=>0, 'resultat'=>0 );
 	// Parametres par défaut
 	$defaults = [
-        'table' => '', 'champ' => '*', 'condition' => '', 'groupby' => '', 'tri' => ''
+        'table' => '', 'champ' => '*', 'condition' => '', 'groupby' => '', 'tri' => '', 'encodage' => 'latin1'
 	];
 	// Fusion des parametres par défaut et des parametres fournis (les param fournis ecrase les param par défaut)
     $opt = array_merge($defaults, $options);
@@ -61,6 +61,11 @@ function DTBS2_select(mysqli $pointeur, array $options = []) {
 	$ar_retour['requete'] = $sql;
 
 	// Exécution de la requete
+	// Définir l'encodage si spécifié
+	if ($opt['encodage']!="latin1") {
+		$pointeur->set_charset($opt['encodage']);
+	}
+
 	$ar_retour['resultat'] = mysqli_query($pointeur, $ar_retour['requete'],MYSQLI_STORE_RESULT);
 	if (!$ar_retour['resultat']) {
 		$ar_retour['statut']= false;
@@ -68,6 +73,7 @@ function DTBS2_select(mysqli $pointeur, array $options = []) {
 	} else {
 		$ar_retour['nbrec'] = mysqli_num_rows($ar_retour['resultat']);
 	}
+    $pointeur->set_charset('latin1');
 	return $ar_retour;
     
 }
