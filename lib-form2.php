@@ -467,7 +467,7 @@ function FRM2_select_from_table(array $options = []): ?string {
 
     $requete = "SELECT `$safeValField`, `$safeLblField` FROM $fullTableName WHERE " . $opt['where'] . " $orderBy";
 
-    $resultat = DTBS_sqlbrut($requete, $mysqli);
+    $resultat = DTBS2_sqlbrut($mysqli, $requete);
 
     if ($resultat['statut'] && $resultat['nbrec'] > 0) {
         while ($row = mysqli_fetch_assoc($resultat['resultat'])) {
