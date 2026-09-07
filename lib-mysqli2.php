@@ -38,7 +38,7 @@ $ar_errmysql[1452] = "Action impossible, en raison d'une contrainte de clé etran
  *  - nbrec    : (int) Nombre d?enregistrements retournés
  *  - resultat : (mysqli_result|int) Résultat MySQLi ou 0 en cas d?erreur
  */
-function DTBS2_select(mysqli $pointeur, array $options = []) {
+function DTBS2_select(mysqli $pointeur, array $options = []): array {
 	
 	// Déclaration du tableau de retour
 	$ar_retour = array( 'statut'=>true, 'erreur'=>"", 'requete'=>"", 'nbrec'=>0, 'resultat'=>0 );
@@ -60,8 +60,7 @@ function DTBS2_select(mysqli $pointeur, array $options = []) {
 
 	$ar_retour['requete'] = $sql;
 
-	// Exécution de la requete
-	// Définir l'encodage si spécifié
+	// Définir l'encodage si différent de latin1
 	if ($opt['encodage']!="latin1") {
 		$pointeur->set_charset($opt['encodage']);
 	}
@@ -73,7 +72,11 @@ function DTBS2_select(mysqli $pointeur, array $options = []) {
 	} else {
 		$ar_retour['nbrec'] = mysqli_num_rows($ar_retour['resultat']);
 	}
-    $pointeur->set_charset('latin1');
+    // Repasse en latin1 si on était dans un autre encodage
+    if ($opt['encodage']!="latin1") {
+		$pointeur->set_charset('latin1');
+	}
+    
 	return $ar_retour;
     
 }
@@ -120,7 +123,7 @@ function DTBS2_select(mysqli $pointeur, array $options = []) {
  *     }
  *
  */
-function DTBS2_efface_rec(mysqli $pointeur, string $table, string $clause) {
+function DTBS2_efface_rec(mysqli $pointeur, string $table, string $clause): array{
 	
 	// Déclaration du tableau de retour
 	$ar_efface = array( 'statut'=>true, 'erreur'=>"", 'requete'=>"", 'nbrec'=>0, 'resultat'=>0 );
@@ -211,7 +214,7 @@ function DTBS2_efface_rec(mysqli $pointeur, string $table, string $clause) {
  *     }
  */
 
-function DTBS2_modif_rec(mysqli $pointeur, string $table, string $clause, array $ar_field) {
+function DTBS2_modif_rec(mysqli $pointeur, string $table, string $clause, array $ar_field): array {
 
 	$ar_retour = array(
 		'statut'=>true,
@@ -329,7 +332,7 @@ function DTBS2_add_rec(mysqli $mysqli, string $table, array $ar_nval): array {
 }
 /**
  * Extrait les valeurs possibles d'un champ ENUM d'une table MariaDB.
- * Pour faire un select utiliiser plutot FRM2_select_from_enum
+ * Pour faire un select utiliser plutot FRM2_select_from_enum
  * 
  * @param mysqli $mysqli  Lien de connexion.
  * @param string $table   Nom de la table (format bdd.table supporté).

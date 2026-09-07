@@ -406,6 +406,7 @@ function FRM2_it(array $options = []): ?string {
  * @param array $options {
  * Configuration SQL et HTML du composant.
  *
+ * @param mysqli $mysqli Instance de connexion à la base de données.
  * @var string $name          Nom unique du select (obligatoire).
  * @var string $table         Nom complet de la table SQL à interroger.
  * @var string $val_field     Nom de la colonne SQL utilisée pour le paramètre 'value'.
@@ -421,8 +422,7 @@ function FRM2_it(array $options = []): ?string {
  * }
  * @return string|null Le code HTML complet de la liste déroulante ou null.
  */
-function FRM2_select_from_table(array $options = []): ?string {
-    global $mysqli;
+function FRM2_select_from_table(mysqli $mysqli, array $options = []): ?string {
 
     $defaults = [
         'name'           => '',
@@ -499,6 +499,7 @@ function FRM2_select_from_table(array $options = []): ?string {
  * @param array $options {
  * Configuration d'extraction et de rendu du champ ENUM.
  *
+ * @var mysqli $mysqli Instance de connexion à la base de données.
  * @var string $name          Nom de l'élément HTML généré.
  * @var string $table         Nom complet de la table hôte (supporte le format 'bdd.table').
  * @var string $field         Nom exact de la colonne structurée en ENUM.
@@ -512,8 +513,8 @@ function FRM2_select_from_table(array $options = []): ?string {
  * }
  * @return string|null La structure HTML générée complète ou null.
  */
-function FRM2_select_from_enum(array $options = []): ?string {
-    global $mysqli;
+function FRM2_select_from_enum(mysqli $mysqli, array $options = []): ?string {
+    
 
     $defaults = [
         'name'          => '',
@@ -560,7 +561,7 @@ function FRM2_select_from_enum(array $options = []): ?string {
     $resSQL = DTBS2_sqlbrut($mysqli, "SHOW COLUMNS FROM $fullTableName LIKE '$safeField'");
     
     if ($resSQL['statut'] && $row = mysqli_fetch_assoc($resSQL['resultat'])) {
-        if (preg_match("/^enum\('(.*)'\)$/", $row['Type'], $matches)) {
+        if (preg_match("/^enum\('(.*)'\)$/i", $row['Type'], $matches)) {
             $enum_values = explode("','", $matches[1]);
             
             foreach ($enum_values as $val) {

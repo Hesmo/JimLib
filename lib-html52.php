@@ -29,7 +29,7 @@ enum CssUnit: string {
  * 
  * @return string|null La structure HTML de démarrage si 'retour' est true, sinon null.
  */
-function HTML52_doctype(array $options = []): ?string {
+function HTML52_doctype(array $options = []): string|null  {
 
     $defaults = [
         'lang' => 'fr',
@@ -66,7 +66,7 @@ function HTML52_doctype(array $options = []): ?string {
  * }
  * @return string|null La balise <meta> si 'retour' est true, sinon null.
  */
-function HTML52_meta(array $options = []): ?string {
+function HTML52_meta(array $options = []): string|null {
     $defaults = [
         'name' => '',
         'content' => '',
@@ -132,7 +132,7 @@ function HTML52_meta(array $options = []): ?string {
  * 
  * @return string|null La balise HTML <title> si 'retour' est true, sinon null.
  */
-function HTML52_title(array $options = []): ?string {
+function HTML52_title(array $options = []): string|null {
 
     $defaults = [
         'titre' => '',
@@ -169,7 +169,7 @@ function HTML52_title(array $options = []): ?string {
  * 
  * @return string|null La balise HTML <link> si 'retour' est true, sinon null.
  */
-function HTML52_headlink(array $options = []): ?string {
+function HTML52_headlink(array $options = []): string|null {
 
     $defaults = [
         'rel' => 'stylesheet',
@@ -220,7 +220,7 @@ function HTML52_headlink(array $options = []): ?string {
  * }
  * @return string|null La balise <script> si 'retour' est true, sinon null.
  */
-function HTML52_script(array $options = []): ?string {
+function HTML52_script(array $options = []): string|null {
     $defaults = [
         'src' => '',
         'async' => false,
@@ -247,7 +247,7 @@ function HTML52_script(array $options = []): ?string {
  * @param bool $retour Si true, retourne la chaîne au lieu de l'afficher.
  * @return string|null
  */
-function HTML52_head_off(bool $retour = false): ?string {
+function HTML52_head_off(bool $retour = false): string|null {
     $out = "</head>\n";
 
     if ($retour) {
@@ -264,7 +264,7 @@ function HTML52_head_off(bool $retour = false): ?string {
  * @param bool $retour Si true, retourne la chaîne au lieu de l'afficher.
  * @return string|null
  */
-function HTML52_body(bool $etat, bool $retour = false): ?string {
+function HTML52_body(bool $etat, bool $retour = false): string|null {
     $out = $etat ? "<body>\n" : "</body>\n";
 
     if ($retour) {
@@ -296,7 +296,7 @@ function HTML52_body(bool $etat, bool $retour = false): ?string {
  * 
  * @return string|null La balise HTML si 'retour' est à true, sinon null.
  */
-function HTML52_href(array $options = []): ?string {
+function HTML52_href(array $options = []): string|null {
 
     $defaults = [
         'href' => '', 'contenu' => '', 'title' => '', 'target' => '_self',
@@ -420,7 +420,6 @@ function HTML52_img(array $options = []): string|null {
     if ($opt['retour'] === true) {
         return $out;
     }
-
     echo $out;
     return null; // Optionnel, mais propre pour correspondre au prototype
 }
@@ -446,7 +445,7 @@ function HTML52_img(array $options = []): string|null {
  * 
  * @return string|null La balise <div> ou null selon l'option 'retour'.
  */
-function HTML52_div(array $options = []): ?string {
+function HTML52_div(array $options = []): string|null {
 
     $defaults = [
         'retour'     => false,
@@ -499,7 +498,7 @@ function HTML52_div(array $options = []): ?string {
     // Le style est déjà sécurisé par les Enums et le trim, mais on l'échappe par précaution
     $out .= ' style="' . htmlspecialchars($finalStyle, ENT_QUOTES | ENT_SUBSTITUTE, $opt['encodage']) . '"';
 
-    // --- 3. Gestion du tableau 'data' (Style TB2) ---
+    // --- 3. Gestion du tableau 'data' 
     if (!empty($opt['data'])) {
         if (!is_array($opt['data'])) {
             trigger_error("Erreur critique dans HTML52_div : le paramètre 'data' doit être un tableau.", E_USER_ERROR);
@@ -524,8 +523,9 @@ function HTML52_div(array $options = []): ?string {
 /**
  * Fermeture du bloc div.
  */
-function HTML52_div_fin(): void {
+function HTML52_div_fin(): null {
     echo "</div>\n";
+    return null;
 }
 
 
