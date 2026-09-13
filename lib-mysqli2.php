@@ -5,39 +5,114 @@ $ar_errmysql[1062] = "Ajout impossible, enregistrement déjà présent";
 $ar_errmysql[1452] = "Action impossible, en raison d'une contrainte de clé etrangère";
 
 /**
- * Exécute une requête SELECT générique sur une base de données MySQL / MariaDB.
+ * Exécute une requête SELECT générique sécurisée via des requêtes préparées (prepare).
  *
- * Cette fonction permet de construire dynamiquement une requête SELECT
- * à partir d'un tableau d'options et d'exécuter cette requête via MySQLi.
- * Les clauses WHERE, GROUP BY et ORDER BY sont optionnelles.
- *
- * Les paramètres sont fournis sous forme de tableau associatif afin de
- * permettre un appel de la fonction dans n'importe quel ordre.
- *
- * ?? Sécurité :
- * Les paramètres SQL (champ, condition, groupby, tri) ne doivent pas
- * être alimentés directement par des données utilisateur non filtrées,
- * sous peine d?injection SQL.
- *
- * @param mysqli $pointeur
- * Connexion MySQLi valide et active.
- *
- * @param array $options
- * Tableau associatif des options de la requête :
- *  - table     : (string) Nom de la table à interroger (obligatoire)
- *  - champ     : (string) Champs à sélectionner (par défaut "*")
- *  - condition : (string) Clause WHERE sans le mot-clé WHERE
- *  - groupby   : (string) Clause GROUP BY sans le mot-clé GROUP BY
- *  - tri       : (string) Clause ORDER BY sans le mot-clé ORDER BY
- *
- * @return array
- * Tableau de retour structuré contenant :
- *  - statut   : (bool) Succès ou échec de l?exécution
- *  - erreur   : (string) Message d?erreur MySQL en cas d?échec
- *  - requete  : (string) Requête SQL générée
- *  - nbrec    : (int) Nombre d?enregistrements retournés
- *  - resultat : (mysqli_result|int) Résultat MySQLi ou 0 en cas d?erreur
+ * @param mysqli $pointeur Connexion MySQLi active.
+ * @param array $options {
+ *     @var string $table Nom de la table (obligatoire).
+ *     @var string $champ Champs à sélectionner (défaut: "*").
+ *     @var string $condition Clause WHERE avec marqueurs '?' (ex: "statut = ? AND type = ?").
+ *     @var array  $params Valeurs à binder sur les marqueurs '?' (ex: ["A", 3]).
+ *     @var string $groupby Clause GROUP BY sans le mot-clé (ex: "id_client").
+ *     @var string $tri Clause ORDER BY sans le mot-clé (ex: "date_creation DESC").
+ *     @var string $encodage Jeu de caractères (défaut: 'latin1').
+ * }
+ * @return array{statut: bool, erreur: string, requete: string, nbrec: int, resultat: mysqli_result|int}
  */
+function DTBS2_select(mysqli $pointeur, array $options = []): array {
+    
+    $ar_retour = ['statut' => true, 'erreur' => "", 'requete' => "", 'nbrec' => 0, 'resultat' => 0];
+    $defaults = [
+        'table' => '',
+        'champ' => '*',
+        'condition' => '',
+        'params' => [],
+        'groupby' => '',
+        'tri' => '',
+        'encodage' => 'latin1'
+    ];
+    $opt = array_merge($defaults, $options);
+
+    if (trim($opt['table']) === "") {
+        $ar_retour['statut'] = false;
+        $ar_retour['erreur'] = "Table non fournie";
+        return $ar_retour;
+    }
+
+    // Protection élémentaire des noms de tables (gestion bdd.table)
+    $table_protected = str_replace('.', '`.`', $opt['table']);
+    
+    // Construction du SQL
+    $sql = "SELECT {$opt['champ']} FROM `$table_protected`";
+    if ($opt['condition'] !== '') {
+        $sql .= " WHERE {$opt['condition']}";
+    }
+    if ($opt['groupby'] !== '') {
+        $sql .= " GROUP BY {$opt['groupby']}";
+    }
+    if ($opt['tri'] !== '') {
+        $sql .= " ORDER BY {$opt['tri']}";
+    }
+
+    $ar_retour['requete'] = $sql;
+
+    if ($opt['encodage'] !== "latin1") {
+        $pointeur->set_charset($opt['encodage']);
+    }
+
+    // Préparation de la requête
+    $stmt = $pointeur->prepare($sql);
+    if (!$stmt) {
+        $ar_retour['statut'] = false;
+        $ar_retour['erreur'] = "Erreur de préparation : " . $pointeur->error;
+        if ($opt['encodage'] !== "latin1") {
+            $pointeur->set_charset('latin1');
+        }
+        return $ar_retour;
+    }
+
+    // Liaison dynamique des paramètres si présents
+    if (!empty($opt['params'])) {
+        $types = "";
+        foreach ($opt['params'] as $param) {
+            if (is_int($param)) {
+                $types .= "i";
+            } elseif (is_double($param) || is_float($param)) {
+                $types .= "d";
+            } else {
+                $types .= "s";
+            }
+        }
+        $stmt->bind_param($types, ...array_values($opt['params']));
+    }
+
+    // Exécution et récupération du jeu de résultats
+    if ($stmt->execute()) {
+        $res = $stmt->get_result();
+        if ($res !== false) {
+            $ar_retour['resultat'] = $res;
+            $ar_retour['nbrec'] = $res->num_rows;
+        } else {
+            $ar_retour['statut'] = false;
+            $ar_retour['erreur'] = "Erreur lors de la récupération du résultat (Driver mysqlnd requis)";
+        }
+    } else {
+        $ar_retour['statut'] = false;
+        $ar_retour['erreur'] = "Erreur d'exécution : " . $stmt->error;
+    }
+
+    $stmt->close();
+
+    if ($opt['encodage'] !== "latin1") {
+        $pointeur->set_charset('latin1');
+    }
+
+    return $ar_retour;
+}
+
+
+
+/*
 function DTBS2_select(mysqli $pointeur, array $options = []): array {
 	
 	// Déclaration du tableau de retour
@@ -79,7 +154,7 @@ function DTBS2_select(mysqli $pointeur, array $options = []): array {
     
 	return $ar_retour;
     
-}
+}*/
 /**
  * Supprime un ou plusieurs enregistrements dans une table MySQL
  * en utilisant une clause WHERE fournie en texte libre.
