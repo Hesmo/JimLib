@@ -11,17 +11,15 @@ $ar_errmysql[1452] = "Action impossible, en raison d'une contrainte de clé etran
  * @param array $options {
  *     @var string $table Nom de la table (obligatoire).
  *     @var string $champ Champs à sélectionner (défaut: "*").
- *     @var string $condition Clause WHERE avec marqueurs '?' (ex: "statut = ? AND type = ?").
- *     @var array  $params Valeurs à binder sur les marqueurs '?' (ex: ["A", 3]).
+ *     @var string $condition Clause WHERE optionnelle (avec marqueurs '?').
+ *     @var array $params Valeurs à binder sur les marqueurs '?' si présents.
  *     @var string $groupby Clause GROUP BY sans le mot-clé (ex: "id_client").
  *     @var string $tri Clause ORDER BY sans le mot-clé (ex: "date_creation DESC").
  *     @var string $encodage Jeu de caractères (défaut: 'latin1').
  * }
  * @return array{statut: bool, erreur: string, requete: string, nbrec: int, resultat: mysqli_result|int}
  */
-function DTBS2_select(mysqli $pointeur, array $options = []): array {
-    
-    $ar_retour = ['statut' => true, 'erreur' => "", 'requete' => "", 'nbrec' => 0, 'resultat' => 0];
+function DTBS2_select(mysqli $pointeur, array $options = []): array {$ar_retour = ['statut' => true, 'erreur' => "", 'requete' => "", 'nbrec' => 0, 'resultat' => 0];
     $defaults = [
         'table' => '',
         'champ' => '*',
@@ -31,7 +29,7 @@ function DTBS2_select(mysqli $pointeur, array $options = []): array {
         'tri' => '',
         'encodage' => 'latin1'
     ];
-    $opt = array_merge($defaults, $options);
+    $opt = array_merge($defaults,$options);
 
     if (trim($opt['table']) === "") {
         $ar_retour['statut'] = false;
@@ -54,31 +52,27 @@ function DTBS2_select(mysqli $pointeur, array $options = []): array {
         $sql .= " ORDER BY {$opt['tri']}";
     }
 
-    $ar_retour['requete'] = $sql;
+    $ar_retour['requete'] =$sql;
 
     if ($opt['encodage'] !== "latin1") {
         $pointeur->set_charset($opt['encodage']);
     }
 
-    // Préparation de la requête
+    // Préparation unifiée de la requête
     $stmt = $pointeur->prepare($sql);
-    if (!$stmt) {
-        $ar_retour['statut'] = false;
+    if (!$stmt) {$ar_retour['statut'] = false;
         $ar_retour['erreur'] = "Erreur de préparation : " . $pointeur->error;
-        if ($opt['encodage'] !== "latin1") {
-            $pointeur->set_charset('latin1');
+        if ($opt['encodage'] !== "latin1") { 
+            $pointeur->set_charset('latin1'); 
         }
         return $ar_retour;
     }
 
     // Liaison dynamique des paramètres si présents
-    if (!empty($opt['params'])) {
-        $types = "";
-        foreach ($opt['params'] as $param) {
-            if (is_int($param)) {
-                $types .= "i";
-            } elseif (is_double($param) || is_float($param)) {
-                $types .= "d";
+    if (!empty($opt['params'])) {$types = "";
+        foreach ($opt['params'] as$param) {
+            if (is_int($param)) {$types .= "i";
+            } elseif (is_double($param) || is_float($param)) {$types .= "d";
             } else {
                 $types .= "s";
             }
@@ -86,12 +80,12 @@ function DTBS2_select(mysqli $pointeur, array $options = []): array {
         $stmt->bind_param($types, ...array_values($opt['params']));
     }
 
-    // Exécution et récupération du jeu de résultats
+    // Exécution
     if ($stmt->execute()) {
-        $res = $stmt->get_result();
+        $res =$stmt->get_result();
         if ($res !== false) {
-            $ar_retour['resultat'] = $res;
-            $ar_retour['nbrec'] = $res->num_rows;
+            $ar_retour['resultat'] =$res;
+            $ar_retour['nbrec'] =$res->num_rows;
         } else {
             $ar_retour['statut'] = false;
             $ar_retour['erreur'] = "Erreur lors de la récupération du résultat (Driver mysqlnd requis)";
@@ -110,51 +104,6 @@ function DTBS2_select(mysqli $pointeur, array $options = []): array {
     return $ar_retour;
 }
 
-
-
-/*
-function DTBS2_select(mysqli $pointeur, array $options = []): array {
-	
-	// Déclaration du tableau de retour
-	$ar_retour = array( 'statut'=>true, 'erreur'=>"", 'requete'=>"", 'nbrec'=>0, 'resultat'=>0 );
-	// Parametres par défaut
-	$defaults = [
-        'table' => '', 'champ' => '*', 'condition' => '', 'groupby' => '', 'tri' => '', 'encodage' => 'latin1'
-	];
-	// Fusion des parametres par défaut et des parametres fournis (les param fournis ecrase les param par défaut)
-    $opt = array_merge($defaults, $options);
-
-	// Test si au moint une table est fournie
-	if (trim($opt['table'])===""){ $ar_retour['statut']=false; $ar_retour['erreur'] = "Table non fourni"; return $ar_retour; }
-
-    // Construction de la requete
-	$sql = "SELECT {$opt['champ']} FROM {$opt['table']}";
-    if ($opt['condition']) $sql .= " WHERE {$opt['condition']}";
-    if ($opt['groupby'])   $sql .= " GROUP BY {$opt['groupby']}";
-    if ($opt['tri'])       $sql .= " ORDER BY {$opt['tri']}";
-
-	$ar_retour['requete'] = $sql;
-
-	// Définir l'encodage si différent de latin1
-	if ($opt['encodage']!="latin1") {
-		$pointeur->set_charset($opt['encodage']);
-	}
-
-	$ar_retour['resultat'] = mysqli_query($pointeur, $ar_retour['requete'],MYSQLI_STORE_RESULT);
-	if (!$ar_retour['resultat']) {
-		$ar_retour['statut']= false;
-		$ar_retour['erreur']= mysqli_error($pointeur);
-	} else {
-		$ar_retour['nbrec'] = mysqli_num_rows($ar_retour['resultat']);
-	}
-    // Repasse en latin1 si on était dans un autre encodage
-    if ($opt['encodage']!="latin1") {
-		$pointeur->set_charset('latin1');
-	}
-    
-	return $ar_retour;
-    
-}*/
 /**
  * Supprime un ou plusieurs enregistrements dans une table MySQL
  * en utilisant une clause WHERE fournie en texte libre.
@@ -335,6 +284,7 @@ function DTBS2_modif_rec(mysqli $pointeur, string $table, string $clause, array 
 	return $ar_retour;
 
 }
+
 /**
  * Ajoute un enregistrement dans une table MySQL via l'extension mysqli.
  *  
@@ -348,7 +298,6 @@ function DTBS2_modif_rec(mysqli $pointeur, string $table, string $clause, array 
  *                          - resultat (mixed) : résultat brut de mysqli_query()
  *                          - insert_id (int) : ID de l'enregistrement inséré ou -1 en cas d'échec
  */
-
 function DTBS2_add_rec(mysqli $mysqli, string $table, array $ar_nval): array {
     $ar_retour = [
         'statut'    => true,
@@ -405,6 +354,7 @@ function DTBS2_add_rec(mysqli $mysqli, string $table, array $ar_nval): array {
     $stmt->close();
     return $ar_retour;
 }
+
 /**
  * Extrait les valeurs possibles d'un champ ENUM d'une table MariaDB.
  * Pour faire un select utiliser plutot FRM2_select_from_enum
@@ -441,6 +391,7 @@ function DTBS2_get_choice_enum($mysqli, $table, $field): array {
 
     return [];
 }
+
 /**
  * Exécute une requête SQL brute (V2) et retourne un compte-rendu complet.
  * 
@@ -486,6 +437,7 @@ function DTBS2_sqlbrut(mysqli $pointeur, string $requete): array {
 
     return $ar_retour;
 }
+
 /**
  * Gère les transactions SQL de manière sécurisée (V2).
  * 
