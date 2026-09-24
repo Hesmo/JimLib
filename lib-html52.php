@@ -527,7 +527,50 @@ function HTML52_div_fin(): null {
     echo "</div>\n";
     return null;
 }
+/**
+ * Génère et affiche (ou retourne) un conteneur en ligne (<span>).
+ *
+ * @param array $options {
+ * @var bool $retour Si true, retourne la chaîne au lieu de l'afficher.
+ * @var string $id L'attribut HTML 'id'.
+ * @var string $class L'attribut HTML 'class'.
+ * @var string $style Styles CSS inline (chaîne brute).
+ * @var string $texte Contenu textuel ou HTML situé à l'intérieur de la balise.
+ * @var array $data Tableau pour attributs 'data-*'.
+ * @var string $encodage Jeu de caractères pour l'encodage HTML (défaut: 'ISO-8859-1').
+ * }
+ * 
+ * @return string|null La balise <span> complète ou null selon l'option 'retour'.
+ */
+function HTML52_span(array $options = []): string|null {
 
+    $defaults = ['retour' => false, 'id' => '', 'class' => '', 'style' => '', 'texte' => '', 'data' => [], 'encodage' => 'ISO-8859-1'];
+    $opt = array_merge($defaults, $options);
+    $out = "<span";
+    if (trim((string)$opt['id']) !== '') { $out .= ' id="' . htmlspecialchars((string)$opt['id'], ENT_QUOTES | ENT_SUBSTITUTE, $opt['encodage']) . '"'; }
+    if (trim((string)$opt['class']) !== '') { $out .= ' class="' . htmlspecialchars((string)$opt['class'], ENT_QUOTES | ENT_SUBSTITUTE, $opt['encodage']) . '"'; }
+    if (trim((string)$opt['style']) !== '') { $out .= ' style="' . htmlspecialchars((string)$opt['style'], ENT_QUOTES | ENT_SUBSTITUTE, $opt['encodage']) . '"'; }
+    if (!empty($opt['data'])) {
+        if (!is_array($opt['data'])) { trigger_error("Erreur critique dans HTML52_span : le paramètre 'data' doit être un tableau.", E_USER_ERROR); }
+        foreach ($opt['data'] as $dataKey => $dataVal) { $out .= " data-" . htmlspecialchars((string)$dataKey, ENT_QUOTES | ENT_SUBSTITUTE, $opt['encodage']) . "=\"" . htmlspecialchars((string)$dataVal, ENT_QUOTES | ENT_SUBSTITUTE, $opt['encodage']) . "\""; }
+    }
+    $out .= ">" . (string)$opt['texte'] . "</span>";
+    if ($opt['retour'] === true) { return $out; }
+    echo $out;
+    return null;
 
+}
+/**
+ * Ferme la balise <span>.
+ *
+ * @param bool $retour Si true, retourne la chaîne au lieu de l'afficher.
+ * @return string|null
+ */
+function HTML52_span_fin(bool $retour = false): string|null {
+    $out = "</span>";
+    if ($retour) { return $out; }
+    echo $out;
+    return null;
+}
 
 ?>
