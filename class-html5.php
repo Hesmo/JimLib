@@ -24,7 +24,6 @@ class HTML5Img {
 		$this->Retour = $elem." >";
 
     }
-			
 		
 }		
 ?>

@@ -31,6 +31,7 @@ function phoneCheck($numero,$international){
 * @param string $typed ('humain','mysql')
 * @param integer $avecheure (true,false)
 * @param integer $inverse si true renvoie au format AAAA-MM-DD HH:II sinon DD-MM-AAAA HH:II
+* appelé par ? 
 */
 function DateCheck($date,$typed,$avecheure,$inverse){
 	$date = preg_replace("/[^0-9]/", "", $date);
