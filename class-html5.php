@@ -1,4 +1,5 @@
 <?Php
+// Classe HTML5Img appelé pour générer des balises <img> HTML5 avec des attributs personnalisables
 class HTML5Img {
 	
 	public $Retour;

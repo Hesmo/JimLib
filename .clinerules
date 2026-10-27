@@ -1,0 +1,8 @@
+# Contexte & Architecture du Projet
+
+## 1. Règles Git (Sécurité)
+- Ne réalise **AUCUNE** opération Git (`git add`, `git rm`, `git commit`, `git push`) sans confirmation explicite préalable dans le tchat.
+
+## 2. Encodages des fichiers
+- Les fichiers sont encodés en **ISO-8859-1** (ou **Windows-1252**).
+
