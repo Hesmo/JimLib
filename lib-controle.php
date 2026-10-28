@@ -166,5 +166,3 @@ function AfficheRequete(string $req): string {
 	$req = str_replace("ORDER BY","<br/>ORDER BY<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;",$req);
 	return $req;
 }
-?>
-
